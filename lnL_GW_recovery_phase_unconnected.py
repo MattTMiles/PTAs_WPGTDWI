@@ -41,7 +41,7 @@ from enterprise.signals import gp_signals
 from enterprise.signals import utils
 from enterprise_extensions import deterministic
 from discovery.deterministic import make_phase_connected_binary, make_phase_unconnected_binary
-
+from discovery import const
 from pathlib import Path
 
 
@@ -275,13 +275,25 @@ pta.set_default_params({})
 if args.seed is not None:
     np.random.seed(args.seed)
 
+def get_correct_p_phase(psr, gwphi):
+    """Get correct pulsar phase offset for given pulsar and GW phi."""
+    #const.c = 2.99792458e8  # speed of light [m/s]
+    omega_gw = 2.0 * jnp.pi * 10**enterprise_params['cw_log10_fgw']
+    dec = jnp.arcsin(enterprise_params['cw_sindec'])
+    ra = enterprise_params['cw_ra']
+    omega_hat = jnp.array([ -jnp.cos(dec) * jnp.cos(ra), 
+                           -jnp.cos(dec) * jnp.sin(ra),
+                           -jnp.sin(dec)
+                         ])
+    pos = jnp.array(psr.pos)
+    p_dist_m = psr.pdist[0] * const.kpc  # Convert kpc to meters
+    phi_psr = (p_dist_m / const.c) * omega_gw  * (1.0 + jnp.dot(omega_hat, pos))
+
+    return phi_psr
+
 enterprise_params ={}
 enterprise_params.update({p: np.random.uniform(-18,-17) for p in pta.param_names if 'rednoise_log10_A' in p})
 enterprise_params.update({p: np.random.uniform(3,4) for p in pta.param_names if 'rednoise_gamma' in p})
-
-for psr in psrs:
-    enterprise_params.update({p: psr.pdist[0] for p in pta.param_names if psr.name+'_cw_p_dist' in p})
-    enterprise_params.update({p: psr.pdist[0] for p in pta.param_names if psr.name+'_cw_p_phase' in p})
 
 enterprise_params.update({'gwb_gamma': 4.333, 'gwb_log10_A': -14.5})
 enterprise_params.update(
@@ -311,6 +323,11 @@ enterprise_params.update(
         "cw2_psi": np.pi / 4.0,
     }
 )
+
+for psr in psrs:
+    enterprise_params.update({p: psr.pdist[0] for p in pta.param_names if psr.name+'_cw_p_dist' in p})
+    enterprise_params.update({p: get_correct_p_phase(psr, enterprise_params['cw_gwphi']) for p in pta.param_names if psr.name+'_cw_p_phase' in p})
+
 # Create a copy with the cw2→cw_*_2 relabeling used by Discovery
 temp_dict = {}
 reverse_temp_dict = {}
