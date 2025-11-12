@@ -81,7 +81,7 @@ parser.add_argument(
 )
 parser.add_argument(
     "--scan-param",
-    choices=["gwb_log10_A", "cw_log10_h", "cw_log10_h_2"],
+    #choices=["gwb_log10_A", "cw_log10_h", "cw_log10_h_2", "J0030+0451_cw_p_dist"],
     default="gwb_log10_A",
     help="Which amplitude parameter to scan over.",
 )
@@ -95,14 +95,33 @@ parser.add_argument(
     "--seed",
     type=int,
     default=None,
-    help="Seed for NumPy RNG (use same value as notebook to reproduce).",
+    help="Seed for NumPy RNG",
 )
 parser.add_argument(
     "--output-root",
     default="lnLs_GWAmp",
     help="Directory where per-run folders and artefacts are written.",
 )
+parser.add_argument(
+    "--n-cw-sources", 
+    type=int, 
+    default=1, 
+    help="How many phase-connected CW signals to inject/model.",
+    )
+parser.add_argument(
+    "--n-pulsars", 
+    type=int, 
+    default=10, 
+    help="How many pulsars to include in the model.",
+    )
+
 args = parser.parse_args()
+
+Npulsars = args.n_pulsars
+num_cw = args.n_cw_sources
+
+cw_block_names = ["cw" if i == 0 else f"cw{i+1}" for i in range(num_cw)]
+disco_suffixes = ["" if i == 0 else f"_{i+1}" for i in range(num_cw)]
 
 base_seed = args.seed if args.seed is not None else np.random.SeedSequence().entropy
 rng = np.random.default_rng(base_seed)
@@ -115,9 +134,8 @@ _SCAN_RANGES = {
     "cw_log10_h": (-17.0, -12.5),
     "cw_log10_h_2": (-17.0, -12.5),
 }
-scan_min, scan_max = _SCAN_RANGES[scan_param]
-gridsteps = 1000
-scan_values = jnp.linspace(scan_min, scan_max, gridsteps)
+_SCAN_RANGES.update({f"cw_log10_h{suffix}": (-17.0, -12.5) for suffix in disco_suffixes})
+
 
 def simulate(pta, params, sparse_cholesky=True):
     """Simulate code with enterprise (instead of libstempo/PINT)"""
@@ -194,6 +212,12 @@ def TimingModel(coefficients=False, name="linear_timing_model",
 # Load the pulsars data products as Enterprise Pulsar objects
 psrs = load_feathers.load_feathers_from_folder(feather_dir)
 
+_SCAN_RANGES.update({f"{psr.name}_cw_p_dist": (0.1, 5.0) for psr in psrs})
+scan_min, scan_max = _SCAN_RANGES[scan_param]
+gridsteps = 5000
+scan_values = jnp.linspace(scan_min, scan_max, gridsteps)
+
+
 # The _pdist attribute is used by enterprise to store the pulsar distance. Here, we back this up to allow us to vary it later.
 for psr in psrs:
     psr._pdist = psr.pdist
@@ -239,32 +263,22 @@ for p in psrs:
                         components=components, orf='hd', name='gwb')
 
 
-    cw = deterministic.cw_block_circ(
-        amp_prior="log-uniform",
-        dist_prior=None,
-        skyloc=None,
-        log10_fgw=None,
-        psrTerm=True,
-        phase_connected=True,
-        discoclone=False,
-        name="cw",
-    )
-
-    cw2 = deterministic.cw_block_circ(
-        amp_prior="log-uniform",
-        dist_prior=None,
-        skyloc=None,
-        log10_fgw=None,
-        psrTerm=True,
-        phase_connected=True,
-        discoclone=False,
-        name="cw2",
-    )
-
     s += crn
-    s += cw 
 
-    s += cw2
+    for name in cw_block_names:
+        s += deterministic.cw_block_circ(
+            amp_prior="log-uniform",
+            dist_prior=None,
+            skyloc=None,
+            log10_fgw=None,
+            psrTerm=True,
+            phase_connected=False,
+            discoclone=False,
+            name=name,
+        )
+    # s += cw 
+
+    # s += cw2
 
     models.append(s(p))
     print(p.name)
@@ -292,273 +306,46 @@ def get_correct_p_phase(psr, gwphi):
     return phi_psr
 
 enterprise_params ={}
-enterprise_params.update({p: np.random.uniform(-18,-17) for p in pta.param_names if 'rednoise_log10_A' in p})
-enterprise_params.update({p: np.random.uniform(3,4) for p in pta.param_names if 'rednoise_gamma' in p})
+enterprise_params.update({p: np.random.uniform(-18,-11) for p in pta.param_names if 'rednoise_log10_A' in p})
+enterprise_params.update({p: np.random.uniform(1,7) for p in pta.param_names if 'rednoise_gamma' in p})
 
 enterprise_params.update({'gwb_gamma': 4.333, 'gwb_log10_A': -14.5})
-enterprise_params.update(
-    {
-        "cw_cos_inc": 0.1,
-        "cw_log10_fgw": -8.0,
-        "cw_log10_h": -13.0,
-        "cw_log10_mc": 9.0,
-        "cw_gwphi": 0.458,
-        "cw_cos_gwtheta": 0.2,
-        "cw_phase0": 0.0,
-        # "cw_phi_earth": np.pi,
-        "cw_psi": np.pi / 4.0,
-    }
-)
-
-enterprise_params.update(
-    {
-        "cw2_cos_inc": -0.2,
-        "cw2_log10_fgw": -7.5,
-        "cw2_log10_h": -13.0,
-        "cw2_log10_mc": 8.5,
-        "cw2_gwphi": 0.158,
-        "cw2_cos_gwtheta": -0.1,
-        "cw2_phase0": np.pi / 3.0,
-        # "cw2_phi_earth": np.pi,
-        "cw2_psi": np.pi / 4.0,
-    }
-)
+for name in cw_block_names:
+    enterprise_params.update(
+        {
+            f"{name}_cos_inc": np.random.uniform(-1.0,1.0),
+            f"{name}_log10_fgw": np.random.uniform(-9,-7.0),
+            #f"{name}_log10_fgw": -8,
+            f"{name}_log10_h": np.random.uniform(-18.0, -11.0),
+            #f"{name}_log10_h": -12.5,
+            f"{name}_log10_mc": np.random.uniform(6.0, 10.0),
+            f"{name}_gwphi": np.random.uniform(0, 2 * np.pi),
+            f"{name}_cos_gwtheta": np.random.uniform(-1, 1),
+            f"{name}_phase0": np.random.uniform(0, 2 * np.pi),
+            f"{name}_psi": np.random.uniform(0, np.pi),
+        }
+    )
 
 for psr in psrs:
     enterprise_params.update({p: psr.pdist[0] for p in pta.param_names if psr.name+'_cw_p_dist' in p})
     enterprise_params.update({p: get_correct_p_phase(psr, enterprise_params['cw_gwphi']) for p in pta.param_names if psr.name+'_cw_p_phase' in p})
 
-# Create a copy with the cw2→cw_*_2 relabeling used by Discovery
-temp_dict = {}
-reverse_temp_dict = {}
-for key, val in enterprise_params.items():
-    if "cw2" in key:
-        new_key = key.replace("cw2", "cw") + "_2"
-        temp_dict[new_key] = val
-        reverse_temp_dict[new_key] = key
-    else:
-        temp_dict[key] = val
-        reverse_temp_dict[key] = key
-
-# dec1, dec2 = np.arcsin(enterprise_params['cw_sindec']), np.arcsin(enterprise_params['cw2_sindec'])
-# ra1, ra2 = enterprise_params['cw_ra'], enterprise_params['cw2_ra']
-# ang_sep = np.arccos(np.sin(dec1)*np.sin(dec2) + np.cos(dec1)*np.cos(dec2)*np.cos(ra1-ra2))
-
-# print("Angular separation between injected sources (deg): ", np.degrees(ang_sep))
-
-
-# Custom function to use the p_dist rather than p_phase
-
-
-def fpc_fast(pos, gwtheta, gwphi):
-    x, y, z = pos
-
-    sin_phi = jnp.sin(gwphi)
-    cos_phi = jnp.cos(gwphi)
-    sin_theta = jnp.sin(gwtheta)
-    cos_theta = jnp.cos(gwtheta)
-
-    m_dot_pos = sin_phi * x - cos_phi * y
-    n_dot_pos = -cos_theta * cos_phi * x - cos_theta * sin_phi * y + sin_theta * z
-    omhat_dot_pos = -sin_theta * cos_phi * x - sin_theta * sin_phi * y - cos_theta * z
-
-    denom = 1.0 + omhat_dot_pos
-
-    fplus = 0.5 * (m_dot_pos**2 - n_dot_pos**2) / denom
-    fcross = (m_dot_pos * n_dot_pos) / denom
-
-    return fplus, fcross
-    
-def cos2comp(f, df, A, f0, phi, t0):
-    """Project signal A * cos(2pi f t + phi) onto Fourier basis
-    cos(2pi k t/T), sin(2pi k t/T) for t in [t0, t0+T]."""
-
-    T = 1.0 / df[0]
-
-    Delta_omega = 2.0 * jnp.pi * (f0 - f[::2])
-    Sigma_omega = 2.0 * jnp.pi * (f0 + f[::2])
-
-    phase_Delta_start = phi + Delta_omega * t0
-    phase_Delta_end   = phi + Delta_omega * (t0 + T)
-
-    phase_Sigma_start = phi + Sigma_omega * t0
-    phase_Sigma_end   = phi + Sigma_omega * (t0 + T)
-
-    ck = (A / T) * (
-        (jnp.sin(phase_Delta_end) - jnp.sin(phase_Delta_start)) / Delta_omega +
-        (jnp.sin(phase_Sigma_end) - jnp.sin(phase_Sigma_start)) / Sigma_omega
-    )
-
-    sk = (A / T) * (
-        (jnp.cos(phase_Delta_end) - jnp.cos(phase_Delta_start)) / Delta_omega -
-        (jnp.cos(phase_Sigma_end) - jnp.cos(phase_Sigma_start)) / Sigma_omega
-    )
-
-    return jnp.stack((sk, ck), axis=1).reshape(-1)
-
-
-
-def makefourier_binary_pdist(pulsarterm=True):
-    def fourier_binary_pdist(f, df, mintoa, pos, log10_h, log10_f0, ra, sindec, cosinc, psi, phi_earth, p_dist):
-        h0 = 10**log10_h
-        f0 = 10**log10_f0
-
-        pos = jnp.array(pos)
-        
-        dec, inc = jnp.arcsin(sindec), jnp.arccos(cosinc)
-
-        # calculate antenna pattern
-        fplus, fcross = fpc_fast(pos, 0.5 * jnp.pi - dec, ra)
-
-        c = 2.99792458e8 
-        omega_hat = jnp.array([ -jnp.cos(dec) * jnp.cos(ra), 
-                                -jnp.cos(dec) * jnp.sin(ra),
-                                -jnp.sin(dec)
-                              ])
-
-        # Convert pulsar distance from kpc to meters to match c [m/s]
-        p_dist_m = p_dist * 3.0856775814913673e19  # 1 kpc in meters
-        phi_psr = (p_dist_m / c) * 2.0 * jnp.pi * f0  * (1.0 + jnp.dot(omega_hat, pos))
-
-        if pulsarterm:
-            phi_avg = 0.5 * (phi_earth + phi_psr)
-        else:
-            phi_avg = phi_earth
-
-        tref = 86400.0 * 51544.5  # MJD J2000 in seconds
-
-        cphase = cos2comp(f, df, 1.0, f0, phi_avg - 2.0 * jnp.pi * f0 * tref, mintoa)
-        sphase = cos2comp(f, df, 1.0, f0, phi_avg - 2.0 * jnp.pi * f0 * tref - 0.5 * jnp.pi, mintoa)
-
-        if pulsarterm:
-            phi_diff = 0.5 * (phi_earth - phi_psr)
-            sin_diff = jnp.sin(phi_diff)
-
-            delta_sin =  2.0 * cphase * sin_diff
-            delta_cos = -2.0 * sphase * sin_diff
-        else:
-            delta_sin = sphase
-            delta_cos = cphase
-
-        At = -1.0 * (1.0 + jnp.cos(inc)**2) * delta_sin
-        Bt =  2.0 * jnp.cos(inc) * delta_cos
-
-        alpha = h0 / (2 * jnp.pi * f0)
-
-        rplus  = alpha * (-At * jnp.cos(2 * psi) + Bt * jnp.sin(2 * psi))
-        rcross = alpha * ( At * jnp.sin(2 * psi) + Bt * jnp.cos(2 * psi))
-
-        res = -fplus * rplus - fcross * rcross
-
-        return res
-
-    if not pulsarterm:
-        fourier_binary_pdist = functools.partial(fourier_binary_pdist, p_dist=jnp.nan)
-
-    return fourier_binary_pdist
-
-def makefourier_binary_pdist_twoD(pulsarterm=True):
-    def fourier_binary_pdist_twoD(f, df, mintoa, pos, log10_h, log10_f0, ra, sindec, cosinc, psi, phi_earth, 
-                             log10_h_2, log10_f0_2, ra_2, sindec_2, cosinc_2, psi_2, phi_earth_2, p_dist):
-        
-        h0 = 10**log10_h
-        f0 = 10**log10_f0
-
-        h0_2 = 10**log10_h_2
-        f0_2 = 10**log10_f0_2
-
-        pos = jnp.array(pos)
-        
-        dec, inc = jnp.arcsin(sindec), jnp.arccos(cosinc)
-        dec_2, inc_2 = jnp.arcsin(sindec_2), jnp.arccos(cosinc_2)
-
-        # calculate antenna pattern
-        fplus, fcross = fpc_fast(pos, 0.5 * jnp.pi - dec, ra)
-        fplus_2, fcross_2 = fpc_fast(pos, 0.5 * jnp.pi - dec_2, ra_2)
-
-        c = 2.99792458e8 
-        omega_hat = jnp.array([ -jnp.cos(dec) * jnp.cos(ra), 
-                                -jnp.cos(dec) * jnp.sin(ra),
-                                -jnp.sin(dec)
-                              ])
-        omega_hat_2 = jnp.array([ -jnp.cos(dec_2) * jnp.cos(ra_2), 
-                                -jnp.cos(dec_2) * jnp.sin(ra_2),
-                                -jnp.sin(dec_2)
-                              ])
-
-        # Convert pulsar distance from kpc to meters to match c [m/s]
-        p_dist_m = p_dist * 3.0856775814913673e19  # 1 kpc in meters
-        phi_psr = (p_dist_m / c) * 2.0 * jnp.pi * f0  * (1.0 + jnp.dot(omega_hat, pos))
-
-        phi_psr_2 = (p_dist_m / c) * 2.0 * jnp.pi * f0_2  * (1.0 + jnp.dot(omega_hat_2, pos))
-
-
-        if pulsarterm:
-            phi_avg = 0.5 * (phi_earth + phi_psr)
-            phi_avg_2 = 0.5 * (phi_earth_2 + phi_psr_2)
-        else:
-            phi_avg = phi_earth
-            phi_avg_2 = phi_earth_2
-
-        tref = 86400.0 * 51544.5  # MJD J2000 in seconds
-
-        cphase = cos2comp(f, df, 1.0, f0, phi_avg - 2.0 * jnp.pi * f0 * tref, mintoa)
-        sphase = cos2comp(f, df, 1.0, f0, phi_avg - 2.0 * jnp.pi * f0 * tref - 0.5 * jnp.pi, mintoa)
-
-        cphase_2 = cos2comp(f, df, 1.0, f0_2, phi_avg_2 - 2.0 * jnp.pi * f0_2 * tref, mintoa)
-        sphase_2 = cos2comp(f, df, 1.0, f0_2, phi_avg_2 - 2.0 * jnp.pi * f0_2 * tref - 0.5 * jnp.pi, mintoa)
-
-        if pulsarterm:
-            phi_diff = 0.5 * (phi_earth - phi_psr)
-            sin_diff = jnp.sin(phi_diff)
-
-            delta_sin =  2.0 * cphase * sin_diff
-            delta_cos = -2.0 * sphase * sin_diff
-
-            phi_diff_2 = 0.5 * (phi_earth_2 - phi_psr_2)
-            sin_diff_2 = jnp.sin(phi_diff_2)
-
-            delta_sin_2 =  2.0 * cphase_2 * sin_diff_2
-            delta_cos_2 = -2.0 * sphase_2 * sin_diff_2
-        else:
-            delta_sin = sphase
-            delta_cos = cphase
-
-            delta_sin_2 = sphase_2
-            delta_cos_2 = cphase_2
-
-        At = -1.0 * (1.0 + jnp.cos(inc)**2) * delta_sin
-        Bt =  2.0 * jnp.cos(inc) * delta_cos
-
-        At_2 = -1.0 * (1.0 + jnp.cos(inc_2)**2) * delta_sin_2
-        Bt_2 =  2.0 * jnp.cos(inc_2) * delta_cos_2
-
-        alpha = h0 / (2 * jnp.pi * f0)
-
-        alpha_2 = h0_2 / (2 * jnp.pi * f0_2)
-
-        rplus  = alpha * (-At * jnp.cos(2 * psi) + Bt * jnp.sin(2 * psi))
-        rcross = alpha * ( At * jnp.sin(2 * psi) + Bt * jnp.cos(2 * psi))
-
-
-        rplus_2  = alpha_2 * (-At_2 * jnp.cos(2 * psi_2) + Bt_2 * jnp.sin(2 * psi_2))
-        rcross_2 = alpha_2 * ( At_2 * jnp.sin(2 * psi_2) + Bt_2 * jnp.cos(2 * psi_2))
-
-        res = -fplus * rplus - fcross * rcross
-        res2 = -fplus_2 * rplus_2 - fcross_2 * rcross_2
-
-        return res + res2
-
-    if not pulsarterm:
-        fourier_binary_pdist_twoD = functools.partial(fourier_binary_pdist_twoD, p_dist=jnp.nan)
-
-    return fourier_binary_pdist_twoD
+temp_dict = dict(enterprise_params)
+reverse_temp_dict = {k: k for k in enterprise_params}
+
+for name, suffix in zip(cw_block_names, disco_suffixes):
+    for key, val in enterprise_params.items():
+        if key.startswith(f"{name}_"):
+            base = key.replace(name, "cw", 1)
+            disco_key = f"{base}{suffix}"
+            temp_dict[disco_key] = val
+            reverse_temp_dict[disco_key] = key
 
 start_real = args.start_realisation
 n_real = args.n_real
 
 
-disco_psrs = [ds.Pulsar.read_feather(f) for f in sorted(glob.glob(feather_dir + "*.feather"))][:10] #Just using 10 psrs for now
+disco_psrs = [ds.Pulsar.read_feather(f) for f in sorted(glob.glob(feather_dir + "*.feather"))][:Npulsars] 
 for psr in disco_psrs:
     psr.toaerrs = np.full_like(psr.toas, 1e-6, dtype=np.float64)
 
@@ -585,80 +372,54 @@ timing_terms = {
     for psr in disco_psrs
 }
 
-single_source = make_phase_unconnected_binary(pulsarterm=args.pulsar_term)
 
-if args.pulsar_term:
-    def double_source_mean(
-        toas, pos,
-        log10_h, log10_fgw, log10_mc,
-        cos_gwtheta, gwphi, cos_inc,
-        phase0, psi,
-        p_dist,
-        log10_h_2, log10_fgw_2, log10_mc_2,
-        cos_gwtheta_2, gwphi_2, cos_inc_2,
-        phase0_2, psi_2,
-    ):
-        res = single_source(
-            toas, pos,
-            cos_gwtheta=cos_gwtheta, gwphi=gwphi, cos_inc=cos_inc,
-            log10_mc=log10_mc, log10_fgw=log10_fgw, log10_h=log10_h,
-            phase0=phase0, psi=psi, p_dist=p_dist,
-        )
-        if log10_h_2 is not None:
-            res += single_source(
-                toas, pos,
-                cos_gwtheta=cos_gwtheta_2, gwphi=gwphi_2, cos_inc=cos_inc_2,
-                log10_mc=log10_mc_2, log10_fgw=log10_fgw_2, log10_h=log10_h_2,
-                phase0=phase0_2, psi=psi_2, p_dist=p_dist,
-            )
-        return res
-else:
-    def double_source_mean(
-        toas, pos,
-        log10_h, log10_fgw, log10_mc,
-        cos_gwtheta, gwphi, cos_inc,
-        phase0, psi,
-        log10_h_2, log10_fgw_2, log10_mc_2,
-        cos_gwtheta_2, gwphi_2, cos_inc_2,
-        phase0_2, psi_2,
-    ):
-        res = single_source(
-            toas, pos,
-            cos_gwtheta=cos_gwtheta, gwphi=gwphi, cos_inc=cos_inc,
-            log10_mc=log10_mc, log10_fgw=log10_fgw, log10_h=log10_h,
-            phase0=phase0, psi=psi,
-        )
-        if log10_h_2 is not None:
-            res += single_source(
-                toas, pos,
-                cos_gwtheta=cos_gwtheta_2, gwphi=gwphi_2, cos_inc=cos_inc_2,
-                log10_mc=log10_mc_2, log10_fgw=log10_fgw_2, log10_h=log10_h_2,
-                phase0=phase0_2, psi=psi_2,
-            )
-        return res
+class MultiSourceDelay:
+    global_params = ("cos_gwtheta", "gwphi", "cos_inc", "log10_mc", "log10_fgw", "log10_h", "phase0", "psi")
 
+    def __init__(self, psr, n_sources, include_pterm):
+        self.psr = psr
+        self.n_sources = n_sources
+        self.include_pterm = include_pterm
+        self.single_source = make_phase_unconnected_binary(pulsarterm=self.include_pterm)
+        params = []
 
-fourdelay = make_phase_connected_binary(pulsarterm=args.pulsar_term)
-cwcommon = [
-    "cw_log10_h",
-    "cw_log10_fgw",
-    "cw_log10_mc",
-    "cw_cos_gwtheta",
-    "cw_gwphi",
-    "cw_cos_inc",
-    "cw_phase0",
-    # "cw_phi_earth",
-    "cw_psi",
-    "cw_log10_h_2",
-    "cw_log10_fgw_2",
-    "cw_log10_mc_2",
-    "cw_cos_gwtheta_2",
-    "cw_gwphi_2",
-    "cw_cos_inc_2",
-    "cw_phase0_2",
-    # "cw_phi_earth_2",
-    "cw_psi_2",
-]
+        # CW global parameters shared across pulsars
+        for idx in range(n_sources):
+            suffix = "" if idx == 0 else f"_{idx+1}"
+            for key in self.global_params:
+                name = f"cw_{key}{suffix}"
+                if name not in params:
+                    params.append(name)
+
+        # Pulsar-specific distance offsets (one per source if requested)
+        if self.include_pterm:
+            for idx in range(n_sources):
+                suffix = "" if idx == 0 else f"_{idx+1}"
+                params.append(f"{self.psr.name}_cw_p_dist")
+                params.append(f"{self.psr.name}_cw_p_phase")
+
+        self.params = params
+
+    def __call__(self, params):
+        total = 0.0
+        for idx in range(self.n_sources):
+            suffix = "" if idx == 0 else f"_{idx+1}"
+            kwargs = {
+                "cos_gwtheta": params[f"cw_cos_gwtheta{suffix}"],
+                "gwphi": params[f"cw_gwphi{suffix}"],
+                "cos_inc": params[f"cw_cos_inc{suffix}"],
+                "log10_mc": params[f"cw_log10_mc{suffix}"],
+                "log10_fgw": params[f"cw_log10_fgw{suffix}"],
+                "log10_h": params[f"cw_log10_h{suffix}"],
+                "phase0": params[f"cw_phase0{suffix}"],
+                "psi": params[f"cw_psi{suffix}"],
+            }
+            if self.include_pterm:
+                kwargs["p_dist"] = params[f"{self.psr.name}_cw_p_dist"]
+                kwargs["p_phase"] = params[f"{self.psr.name}_cw_p_phase"]
+            total += self.single_source(self.psr.toas, self.psr.pos, **kwargs)
+        return total
+    
 T = ds.getspan(disco_psrs)
 
 common_gp = ds.makecommongp_fourier(disco_psrs, ds.powerlaw, 30, T, name="rednoise")
@@ -668,10 +429,7 @@ global_gp = ds.makeglobalgp_fourier(
     ds.hd_orf,
     30,
     T,
-    #means=double_source_mean,
-    #common=cwcommon,
     name="gwb",
-    #meansname="cw",
 )
 
 chunk_size = 128
@@ -684,7 +442,7 @@ def build_likelihood(residual_map):
                 np.array(residual_map[psr.name], copy=True),
                 noise_terms[psr.name],
                 timing_terms[psr.name],
-                ds.makedelay(psr, double_source_mean, common=cwcommon, name="cw")
+                MultiSourceDelay(psr, num_cw, include_pterm=args.pulsar_term),
             ]
         )
         for psr in disco_psrs
@@ -792,7 +550,7 @@ legend_labels = []
 
 if plot_key in enterprise_params:
     inj_line = ax.axvline(
-        enterprise_params[plot_key], color="k", linestyle="--", label="injected value"
+        enterprise_params[plot_key], color="k", linestyle="--", label="injected value", alpha=0.4,
     )
     legend_handles.append(inj_line)
     legend_labels.append("injected value")
@@ -811,7 +569,7 @@ if legend_handles:
     ax.legend(legend_handles, legend_labels)
 ax.set_xlabel(scan_param)
 ax.set_ylabel("Log-Likelihood")
-ax.set_title(f"LogL realisations vs {combined_prefix}_{start_real}_{start_real + n_real - 1} phase_unconnected")
+ax.set_title(f"LogL realisations vs {combined_prefix}_{start_real}_{start_real + n_real - 1} phase_connected")
 ax.grid(True, linestyle="--", alpha=0.3)
 fig.tight_layout()
 fig.savefig(out_dir / f"{combined_prefix}_{start_real}_{start_real + n_real - 1}.png", dpi=150)

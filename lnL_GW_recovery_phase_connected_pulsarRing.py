@@ -115,6 +115,13 @@ parser.add_argument(
     help="How many pulsars to include in the model.",
     )
 
+parser.add_argument(
+    "--ring-radius-deg", 
+    type=int, 
+    default=20, 
+    help="Radius of the pulsar ring in degrees.",
+    )
+
 args = parser.parse_args()
 
 Npulsars = args.n_pulsars
@@ -127,6 +134,63 @@ base_seed = args.seed if args.seed is not None else np.random.SeedSequence().ent
 rng = np.random.default_rng(base_seed)
 if args.seed is not None:
     np.random.seed(args.seed)
+
+cw_draws = []
+for idx, name in enumerate(cw_block_names):
+    suffix = "" if idx == 0 else f"_{idx+1}"
+    cw_draws.append({
+        "suffix": suffix,
+        "cos_inc": rng.uniform(-1.0, 1.0),
+        "log10_fgw": rng.uniform(-8.1, -8.0),
+        "log10_h": rng.uniform(-18.0, -11.0),
+        "log10_mc": rng.uniform(9.0, 9.1),
+        "gwphi": rng.uniform(0.0, 2.0 * np.pi),
+        "cos_gwtheta": rng.uniform(-1.0, 1.0),
+        "phase0": rng.uniform(0.0, 2.0 * np.pi),
+        "psi": rng.uniform(0.0, np.pi),
+    })
+
+def unit_vector(phi, theta):
+    st = np.sin(theta)
+    return np.array([st * np.cos(phi), st * np.sin(phi), np.cos(theta)])
+
+def angles_from_vector(vec):
+    vec = vec / np.linalg.norm(vec)
+    theta = np.arccos(np.clip(vec[2], -1.0, 1.0))
+    phi = np.mod(np.arctan2(vec[1], vec[0]), 2.0 * np.pi)
+    return phi, theta
+
+def build_ring_positions(cw_dirs, n_psr, radius):
+    """Place all pulsars on a ring around the average CW sky direction."""
+    avg = np.mean(cw_dirs, axis=0)
+    norm = np.linalg.norm(avg)
+    if norm < 1e-8:
+        avg = cw_dirs[0]  # fallback if directions cancel
+    else:
+        avg = avg / norm
+
+    ref = np.array([0.0, 0.0, 1.0]) if abs(avg[2]) < 0.9 else np.array([1.0, 0.0, 0.0])
+    u = np.cross(avg, ref); u /= np.linalg.norm(u)
+    v = np.cross(avg, u)
+
+    positions = np.zeros((n_psr, 3))
+    for idx in range(n_psr):
+        beta = 2.0 * np.pi * idx / n_psr
+        tangent = np.cos(beta) * u + np.sin(beta) * v
+        vec = np.cos(radius) * avg + np.sin(radius) * tangent
+        positions[idx] = vec / np.linalg.norm(vec)
+    return positions
+
+
+
+def apply_ring_positions(psr_list, ring_vecs):
+    for psr, vec in zip(psr_list, ring_vecs):
+        phi, theta = angles_from_vector(vec)
+        psr.pos = vec.copy()
+        psr.phi = phi
+        psr.theta = theta
+
+
 
 scan_param = args.scan_param
 _SCAN_RANGES = {
@@ -239,6 +303,18 @@ gamma_gw = parameter.Uniform(0,7)('gwb_gamma')
 
 components = 30
 
+ring_radius = np.deg2rad(args.ring_radius_deg)
+cw_dirs = [unit_vector(draw["gwphi"], np.arccos(draw["cos_gwtheta"])) for draw in cw_draws]
+
+avg = np.mean(cw_dirs, axis=0)
+avg /= np.linalg.norm(avg)
+distances = np.array([np.arccos(np.clip(np.dot(avg, d), -1.0, 1.0)) for d in cw_dirs])
+required = distances.max() + np.deg2rad(5.0)  # small padding
+ring_radius = max(ring_radius, required)
+
+ring_vecs = build_ring_positions(cw_dirs, Npulsars, ring_radius)
+apply_ring_positions(psrs, ring_vecs)
+
 tm = TimingModel(coefficients=False, name="linear_timing_model",
                 use_svd=False, normed=True, prior_variance=1e-14)
 models = []
@@ -298,19 +374,18 @@ for psr in psrs:
 
 enterprise_params.update({'gwb_gamma': 4.333, 'gwb_log10_A': -14.5})
 
-for name in cw_block_names:
+# reuse the deterministic draw so injections, PTA, and disco all agree
+for name, draw in zip(cw_block_names, cw_draws):
     enterprise_params.update(
         {
-            f"{name}_cos_inc": np.random.uniform(-1.0,1.0),
-            f"{name}_log10_fgw": np.random.uniform(-9,-7.0),
-            #f"{name}_log10_fgw": -8,
-            f"{name}_log10_h": np.random.uniform(-18.0, -11.0),
-            #f"{name}_log10_h": -12.5,
-            f"{name}_log10_mc": np.random.uniform(6.0, 10.0),
-            f"{name}_gwphi": np.random.uniform(0, 2 * np.pi),
-            f"{name}_cos_gwtheta": np.random.uniform(-1, 1),
-            f"{name}_phase0": np.random.uniform(0, 2 * np.pi),
-            f"{name}_psi": np.random.uniform(0, np.pi),
+            f"{name}_cos_inc": draw["cos_inc"],
+            f"{name}_log10_fgw": draw["log10_fgw"],
+            f"{name}_log10_h": draw["log10_h"],
+            f"{name}_log10_mc": draw["log10_mc"],
+            f"{name}_gwphi": draw["gwphi"],
+            f"{name}_cos_gwtheta": draw["cos_gwtheta"],
+            f"{name}_phase0": draw["phase0"],
+            f"{name}_psi": draw["psi"],
         }
     )
 
@@ -334,6 +409,8 @@ n_real = args.n_real
 disco_psrs = [ds.Pulsar.read_feather(f) for f in sorted(glob.glob(feather_dir + "*.feather"))][:Npulsars] 
 for psr in disco_psrs:
     psr.toaerrs = np.full_like(psr.toas, 1e-6, dtype=np.float64)
+
+apply_ring_positions(disco_psrs, ring_vecs)
 
 def to_mollweide(phi, theta):
     """Convert RA/Dec (phi/theta) to Mollweide x/y coordinates in radians."""
