@@ -289,19 +289,12 @@ pta.set_default_params({})
 if args.seed is not None:
     np.random.seed(args.seed)
 
-def get_correct_p_phase(psr, gwphi):
+def get_correct_p_phase(psr, mc, fgw):
     """Get correct pulsar phase offset for given pulsar and GW phi."""
-    #const.c = 2.99792458e8  # speed of light [m/s]
-    omega_gw = 2.0 * jnp.pi * 10**enterprise_params['cw_log10_fgw']
-    dec = jnp.arcsin(enterprise_params['cw_sindec'])
-    ra = enterprise_params['cw_ra']
-    omega_hat = jnp.array([ -jnp.cos(dec) * jnp.cos(ra), 
-                           -jnp.cos(dec) * jnp.sin(ra),
-                           -jnp.sin(dec)
-                         ])
-    pos = jnp.array(psr.pos)
-    p_dist_m = psr.pdist[0] * const.kpc  # Convert kpc to meters
-    phi_psr = (p_dist_m / const.c) * omega_gw  * (1.0 + jnp.dot(omega_hat, pos))
+
+    w0 = np.pi * 10**fgw
+    omega_p = w0 * (1 - 256 / 5 * mc ** (5 / 3) * w0 ** (8 / 3) * tp) ** (-3 / 8)
+    phi_psr = phase0 + 1 / 32 / mc ** (5 / 3) * (w0 ** (-5 / 3) - omega_p ** (-5 / 3))
 
     return phi_psr
 
