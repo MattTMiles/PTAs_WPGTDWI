@@ -226,7 +226,8 @@ def build_enterprise_pta(psrs: Sequence, cfg: Q1Config, cw_draws: Sequence[Dict[
     ring_radius = compute_ring_radius(cw_draws, cfg)
     cw_dirs = [unit_vector(draw["gwphi"], np.arccos(draw["cos_gwtheta"])) for draw in cw_draws]
     ring_vecs = build_ring_positions(cw_dirs, cfg.n_pulsars, ring_radius)
-    apply_ring_positions(psrs, ring_vecs)
+    apply_ring_positions(psrs, ring_vecs)  # If you want to use real pulsar positions instead of artificial ring comment this out
+    # NOTE: With realistic positions, sky localization will be much worse (more realistic)
 
     tm = TimingModel(coefficients=False, name="linear_timing_model", use_svd=False, normed=True, prior_variance=1e-14)
 
@@ -515,11 +516,12 @@ def build_discovery_loglike_marginalized(
     class MarginalizedDelay:
         global_params = ("cos_gwtheta", "gwphi", "cos_inc", "log10_mc", "log10_fgw", "log10_h", "phase0", "psi")
 
-        def __init__(self, psr, n_sources, include_pterm, include_evolve):
+        def __init__(self, psr, n_sources, include_pterm, include_evolve, d0_prior_mean):
             self.psr = psr
             self.n_sources = n_sources
             self.include_pterm = include_pterm
             self.include_evolve = include_evolve
+            self.d0_mean = d0_prior_mean  # Store mean distance instead of looking it up
             self.earth_term = make_phase_connected_binary(pulsarterm=False, evolve=self.include_evolve)
             self.full_term = make_phase_connected_binary(pulsarterm=True, evolve=self.include_evolve)
             params = []
@@ -529,6 +531,9 @@ def build_discovery_loglike_marginalized(
                     name = f"cw_{key}{suffix}"
                     if name not in params:
                         params.append(name)
+            # Add sigma as a parameter so it can be changed without rebuilding
+            if self.include_pterm:
+                params.append(f"{self.psr.name}_cw_sigma_d")
             self.params = params
 
         def __call__(self, params):
@@ -551,11 +556,11 @@ def build_discovery_loglike_marginalized(
                     total += earth
                     continue
 
+                # Get sigma from params instead of dist_priors closure
+                sigma = params.get(f"{self.psr.name}_cw_sigma_d", 0.1)
+
                 # Pulsar term at mean distance
-                d0, sigma = dist_priors.get(self.psr.name, (None, None))
-                if d0 is None:
-                    raise ValueError(f"Missing distance prior for pulsar {self.psr.name}")
-                full = self.full_term(self.psr.toas, self.psr.pos, p_dist=d0, **kwargs)
+                full = self.full_term(self.psr.toas, self.psr.pos, p_dist=self.d0_mean, **kwargs)
                 pulsar_part = full - earth
 
                 # Coherence factor kappa = exp(-0.5 * (w0 * (1-cos_mu) * kpc/c * sigma)^2)
@@ -565,7 +570,7 @@ def build_discovery_loglike_marginalized(
                 # Use full GW phase factor ~ 2*pi*f * (1 + cos_mu) * d/c
                 sigma_phi = 2.0 * w0 * (1.0 - cos_mu) * (det.const.kpc / det.const.c) * sigma
                 # Coherence factor kappa = exp(-0.5 * [2*w0 * (1-cos_mu) * (kpc/c) * sigma]^2)
-                kappa = jnp.exp(-0.5 * sigma_phi ** 2) if sigma is not None else 1.0
+                kappa = jnp.exp(-0.5 * sigma_phi ** 2)
 
                 total += earth + kappa * pulsar_part
             return total
@@ -581,7 +586,13 @@ def build_discovery_loglike_marginalized(
     delays = []
     if include_cw:
         delays = [
-            MarginalizedDelay(psr, cfg.n_cw_sources, include_pterm=cfg.include_pterm, include_evolve=cfg.rec_evolve)
+            MarginalizedDelay(
+                psr,
+                cfg.n_cw_sources,
+                include_pterm=cfg.include_pterm,
+                include_evolve=cfg.rec_evolve,
+                d0_prior_mean=dist_priors.get(psr.name, (1.0, 0.1))[0]  # Extract mean from dist_priors
+            )
             for psr in disco_psrs
         ]
     else:
