@@ -108,3 +108,11 @@ Question 3: What changes when a phase-connected pulsar-term model cannot be used
 Question 4: How does precise distance knowledge for some pulsars help infer the distances of others?
 
 
+-----------------------
+
+Question 5: What is the best way to sample the CW nodes effectively?
+
+- Contained in the CW_node_sampling directory, this has some good progress.
+
+
+-----------------------
