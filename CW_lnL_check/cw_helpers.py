@@ -587,9 +587,22 @@ def compute_mode_spacing(cos_gwtheta, gwphi, log10_fgw, psr_pos):
 _BATCHED_SCAN_CACHE = {}
 
 
+def _grid_with_required_points(scan_min, scan_max, n_points, required_points=None):
+    """Build sorted scan grid and force specific points into the grid."""
+    scan_vals = np.linspace(scan_min, scan_max, n_points)
+    if required_points is None:
+        return scan_vals
+
+    required = np.asarray(required_points, dtype=float)
+    required = required[(required >= scan_min) & (required <= scan_max)]
+    if len(required) == 0:
+        return scan_vals
+    return np.unique(np.concatenate([scan_vals, required]))
+
+
 def scan_pulsar_distance(logl_fn, base_values, param_keys, psr_dist_key,
                          scan_min, scan_max, n_points=3000, chunk_size=None,
-                         n_components=30):
+                         n_components=30, required_points=None):
     """Scan one pulsar's distance holding everything else fixed.
 
     Returns (scan_values, logl_values).
@@ -610,7 +623,9 @@ def scan_pulsar_distance(logl_fn, base_values, param_keys, psr_dist_key,
         chunk_size = max(32, min(1024, int(target_mem / mem_per_eval)))
 
     scan_idx = param_keys.index(psr_dist_key)
-    scan_vals = np.linspace(scan_min, scan_max, n_points)
+    scan_vals = _grid_with_required_points(
+        scan_min, scan_max, n_points, required_points=required_points
+    )
 
     # Cache the batched/jit'd function per logl_fn id so repeated scans across
     # pulsars don't re-trigger XLA compilation (tens of seconds per compile
@@ -623,10 +638,11 @@ def scan_pulsar_distance(logl_fn, base_values, param_keys, psr_dist_key,
     template = jnp.repeat(base_values[None, :], chunk_size, axis=0)
 
     pieces = []
-    n_chunks = int(np.ceil(n_points / chunk_size))
+    n_scan = len(scan_vals)
+    n_chunks = int(np.ceil(n_scan / chunk_size))
     for idx in range(n_chunks):
         start = idx * chunk_size
-        end = min(start + chunk_size, n_points)
+        end = min(start + chunk_size, n_scan)
         current = jnp.array(scan_vals[start:end])
         pad = chunk_size - current.shape[0]
         padded = current if pad == 0 else jnp.pad(current, (0, pad), constant_values=current[-1])
@@ -635,6 +651,124 @@ def scan_pulsar_distance(logl_fn, base_values, param_keys, psr_dist_key,
         pieces.append(np.array(block_vals[: end - start]))
 
     return scan_vals, np.concatenate(pieces)
+
+
+_BATCHED_2D_SCAN_CACHE = {}
+
+
+def scan_pulsar_pair_2d(logl_fn, base_values, param_keys,
+                        dist_key_i, dist_key_j, grid_i, grid_j,
+                        chunk_size=None, n_components=30):
+    """Evaluate lnL on a 2D pulsar-distance grid.
+
+    Returns (grid_i, grid_j, lnL_surface) with
+    lnL_surface[i, j] = lnL(grid_i[i], grid_j[j]).
+    """
+    grid_i = np.asarray(grid_i, dtype=float)
+    grid_j = np.asarray(grid_j, dtype=float)
+    ni, nj = len(grid_i), len(grid_j)
+    n_total = ni * nj
+
+    if chunk_size is None:
+        n_dist_params = sum(1 for k in param_keys if k.endswith("_cw_p_dist"))
+        n_psr = max(n_dist_params, 2)
+        mat_dim = n_psr * 2 * n_components
+        mem_per_eval = mat_dim * 8 * 4
+        target_mem = 4e9
+        chunk_size = max(32, min(1024, int(target_mem / mem_per_eval)))
+
+    idx_i = param_keys.index(dist_key_i)
+    idx_j = param_keys.index(dist_key_j)
+    Di_mesh, Dj_mesh = np.meshgrid(grid_i, grid_j, indexing="ij")
+    Di_flat = Di_mesh.ravel()
+    Dj_flat = Dj_mesh.ravel()
+
+    cache_key = (id(logl_fn), chunk_size)
+    batched_fn = _BATCHED_2D_SCAN_CACHE.get(cache_key)
+    if batched_fn is None:
+        batched_fn = jax.jit(jax.vmap(logl_fn))
+        _BATCHED_2D_SCAN_CACHE[cache_key] = batched_fn
+
+    template = jnp.repeat(base_values[None, :], chunk_size, axis=0)
+    pieces = []
+    n_chunks = int(np.ceil(n_total / chunk_size))
+    for chunk_idx in range(n_chunks):
+        start = chunk_idx * chunk_size
+        end = min(start + chunk_size, n_total)
+        di = jnp.array(Di_flat[start:end])
+        dj = jnp.array(Dj_flat[start:end])
+        pad = chunk_size - (end - start)
+        if pad:
+            di = jnp.pad(di, (0, pad), constant_values=di[-1])
+            dj = jnp.pad(dj, (0, pad), constant_values=dj[-1])
+        x_block = template.at[:, idx_i].set(di).at[:, idx_j].set(dj)
+        vals = batched_fn(x_block)
+        pieces.append(np.array(vals[: end - start]))
+
+    return grid_i, grid_j, np.concatenate(pieces).reshape(ni, nj)
+
+
+def scan_pair_window_2d(logl_fn, base_values, param_keys,
+                        psr_i, psr_j, cw_params_list,
+                        center_i=None, center_j=None,
+                        half_width_modes=3.0, points_per_mode=8,
+                        min_points=41, chunk_size=None,
+                        n_components=30, include_truth=True):
+    """Resolve a local 2D distance window around current pair estimates.
+
+    This is intended for coordinate-ascent updates. It does not do a
+    low-resolution full-prior pre-scan, because that aliases badly when the
+    prior contains many distance modes.
+    """
+    center_i = psr_i.pdist[0] if center_i is None else center_i
+    center_j = psr_j.pdist[0] if center_j is None else center_j
+
+    dL_i = min(
+        compute_mode_spacing(cw["cos_gwtheta"], cw["gwphi"], cw["log10_fgw"], psr_i.pos)
+        for cw in cw_params_list
+    )
+    dL_j = min(
+        compute_mode_spacing(cw["cos_gwtheta"], cw["gwphi"], cw["log10_fgw"], psr_j.pos)
+        for cw in cw_params_list
+    )
+
+    n_i = int(max(min_points, np.ceil(2 * half_width_modes * points_per_mode + 1)))
+    n_j = int(max(min_points, np.ceil(2 * half_width_modes * points_per_mode + 1)))
+
+    req_i = [psr_i.pdist[0]] if include_truth else None
+    req_j = [psr_j.pdist[0]] if include_truth else None
+    grid_i = _grid_with_required_points(
+        max(0.01, center_i - half_width_modes * dL_i),
+        center_i + half_width_modes * dL_i,
+        n_i,
+        required_points=req_i,
+    )
+    grid_j = _grid_with_required_points(
+        max(0.01, center_j - half_width_modes * dL_j),
+        center_j + half_width_modes * dL_j,
+        n_j,
+        required_points=req_j,
+    )
+
+    dist_key_i = f"{psr_i.name}_cw_p_dist"
+    dist_key_j = f"{psr_j.name}_cw_p_dist"
+    grid_i, grid_j, lnL = scan_pulsar_pair_2d(
+        logl_fn, base_values, param_keys,
+        dist_key_i, dist_key_j, grid_i, grid_j,
+        chunk_size=chunk_size, n_components=n_components,
+    )
+    mi, mj = np.unravel_index(np.argmax(lnL), lnL.shape)
+
+    return {
+        "grid_i": grid_i,
+        "grid_j": grid_j,
+        "lnL": lnL,
+        "peak_i": float(grid_i[mi]),
+        "peak_j": float(grid_j[mj]),
+        "peak_lnL": float(lnL[mi, mj]),
+        "dL_i": float(dL_i),
+        "dL_j": float(dL_j),
+    }
 
 
 def analyze_peaks(scan_vals, logl_vals, true_dist, mode_spacing=None):
@@ -926,12 +1060,15 @@ def inject_noisefree_cw(disco_psrs, cw_params_list):
 
 
 def build_noisefree_likelihood(disco_psrs, residual_map, num_cw, cw_params_list,
-                               sigma_toa=1e-6, include_gwb=True, log10_equad=-8.0):
+                               sigma_toa=1e-6, include_gwb=False,
+                               include_red_noise=True, log10_equad=-8.0):
     """Build a simple white-noise-only likelihood for the noise-free case.
 
     Uses the same discovery ArrayLikelihood infrastructure but with:
     - Fixed white noise (efac=1, equad=-8)
-    - No red noise or GWB GPs (set to negligible amplitude)
+    - A negligible-amplitude common red GP by default to keep discovery on its
+      JAX-compatible ArrayLikelihood path
+    - No GWB GP by default
     - CW delay model with pulsar term
 
     Returns (logl_fn, param_keys, base_values).
@@ -950,7 +1087,10 @@ def build_noisefree_likelihood(disco_psrs, residual_map, num_cw, cw_params_list,
     }
 
     T = ds.getspan(disco_psrs)
-    common_gp = ds.makecommongp_fourier(disco_psrs, ds.powerlaw, 30, T, name="rednoise")
+    if include_red_noise:
+        common_gp = ds.makecommongp_fourier(disco_psrs, ds.powerlaw, 30, T, name="rednoise")
+    else:
+        common_gp = None
     if include_gwb:
         global_gp = ds.makeglobalgp_fourier(
             disco_psrs, ds.powerlaw, ds.hd_orf, 30, T, name="gwb"
@@ -983,9 +1123,10 @@ def build_noisefree_likelihood(disco_psrs, residual_map, num_cw, cw_params_list,
         param_dict[f"{psr.name}_cw_p_dist"] = psr.pdist[0]
 
     # Red noise (per-pulsar in discovery) at negligible amplitudes
-    for psr in disco_psrs:
-        param_dict[f"{psr.name}_rednoise_log10_A"] = -20.0
-        param_dict[f"{psr.name}_rednoise_gamma"] = 4.0
+    if include_red_noise:
+        for psr in disco_psrs:
+            param_dict[f"{psr.name}_rednoise_log10_A"] = -20.0
+            param_dict[f"{psr.name}_rednoise_gamma"] = 4.0
     # GWB at negligible amplitude (only if included in likelihood)
     if include_gwb:
         param_dict["gwb_log10_A"] = -20.0
@@ -1005,3 +1146,56 @@ def build_noisefree_likelihood(disco_psrs, residual_map, num_cw, cw_params_list,
     logl_fn = jax.jit(logl_wrapped)
 
     return logl_fn, param_keys, base_vals
+
+
+def build_pure_cw_likelihood(disco_psrs, residual_map, cw_params_list,
+                             log10_equad=-8.0):
+    """Build JIT-safe white-noise + timing-model + CW likelihood, no GP terms.
+
+    This avoids ``ArrayLikelihood(commongp=None)`` because that route can call
+    SciPy solves inside a JIT trace.  Instead each pulsar's kernel-product
+    function is built once with the callable CW residual model; discovery then
+    uses its JAX-safe Woodbury path during evaluation.
+    """
+    num_cw = len(cw_params_list)
+
+    noisedict = {}
+    for psr in disco_psrs:
+        noisedict[psr.name + "_KAT_MKBF_efac"] = 1.0
+        noisedict[psr.name + "_KAT_MKBF_log10_ecorr"] = -8.0
+        noisedict[psr.name + "_KAT_MKBF_log10_t2equad"] = log10_equad
+
+    pulsar_likes = [
+        ds.PulsarLikelihood([
+            np.array(residual_map[psr.name], copy=True),
+            ds.makenoise_measurement(psr, noisedict=noisedict),
+            ds.makegp_timing(psr, variance=1e-14),
+            MultiSourceDelay(psr, num_cw, include_pterm=True),
+        ])
+        for psr in disco_psrs
+    ]
+
+    kp_fns = [psl.N.make_kernelproduct(psl.y) for psl in pulsar_likes]
+    all_params = sorted(set.union(*[set(kp.params) for kp in kp_fns]))
+
+    disco_suffixes = ["" if i == 0 else f"_{i+1}" for i in range(num_cw)]
+    param_dict = {}
+    for suffix, cw_p in zip(disco_suffixes, cw_params_list):
+        for key in MultiSourceDelay.global_params:
+            param_dict[f"cw_{key}{suffix}"] = cw_p[key]
+    for psr in disco_psrs:
+        param_dict[f"{psr.name}_cw_p_dist"] = psr.pdist[0]
+
+    order_map = {k: i for i, k in enumerate(all_params)}
+    sorted_items = sorted(
+        param_dict.items(), key=lambda kv: order_map.get(kv[0], float("inf"))
+    )
+    sorted_dict = {k: v for k, v in sorted_items if k in all_params}
+    param_keys = list(sorted_dict.keys())
+    base_vals = jnp.array([sorted_dict[k] for k in param_keys], dtype=jnp.float64)
+
+    def logl_wrapped(x_array):
+        params = {k: v for k, v in zip(param_keys, x_array)}
+        return sum(kp(params) for kp in kp_fns)
+
+    return jax.jit(logl_wrapped), param_keys, base_vals
