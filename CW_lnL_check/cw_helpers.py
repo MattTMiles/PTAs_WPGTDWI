@@ -111,8 +111,18 @@ def simulate(pta, params, sparse_cholesky=True):
     return [np.array(g + w) for g, w in zip(gpresiduals, whiteresiduals)]
 
 
-def build_enterprise_pta(psrs, num_cw, components=30, log10_equad=-8.0):
+def build_enterprise_pta(
+    psrs, num_cw, components=30, log10_equad=-8.0,
+    include_rn=True, rn_components=30,
+):
     """Build enterprise PTA model for simulation.
+
+    Parameters
+    ----------
+    include_rn : bool
+        If True, add per-pulsar achromatic power-law red noise.
+    rn_components : int
+        Number of Fourier components for the intrinsic red-noise basis.
 
     Returns (pta, cw_block_names, Tspan).
     """
@@ -128,8 +138,6 @@ def build_enterprise_pta(psrs, num_cw, components=30, log10_equad=-8.0):
     efac = parameter.Constant(1)
     equad = parameter.Constant(log10_equad)
 
-    log10_A_red = parameter.Uniform(-18, -11)
-    gamma_red = parameter.Uniform(0, 7)
     log10_A_gw = parameter.Uniform(-18, -11)("gwb_log10_A")
     gamma_gw = parameter.Uniform(0, 7)("gwb_gamma")
 
@@ -142,11 +150,14 @@ def build_enterprise_pta(psrs, num_cw, components=30, log10_equad=-8.0):
         s += white_signals.MeasurementNoise(efac=efac, selection=selection)
         s += white_signals.TNEquadNoise(log10_tnequad=equad, selection=selection)
 
-        pl = utils.powerlaw(log10_A=log10_A_red, gamma=gamma_red)
-        rn = gp_signals.FourierBasisGP(
-            spectrum=pl, components=components, Tspan=Tspan, name="rednoise"
-        )
-        s += rn
+        if include_rn:
+            log10_A_rn = parameter.Uniform(-20, -11)
+            gamma_rn = parameter.Uniform(0, 7)
+            pl_rn = utils.powerlaw(log10_A=log10_A_rn, gamma=gamma_rn)
+            rn = gp_signals.FourierBasisGP(
+                spectrum=pl_rn, components=rn_components, Tspan=Tspan, name="rednoise"
+            )
+            s += rn
         s += common_red_noise_block(
             psd="powerlaw", prior="log-uniform", components=components, orf="hd", name="gwb"
         )
@@ -178,7 +189,7 @@ def generate_injection_params(
     pta, psrs, num_cw, cw_block_names, log10_h,
     scenario="single", rng=None,
     log10_h_range=None, log10_fgw_range=None, log10_mc_range=None,
-    gwb_log10_A=None, gwb_gamma=None,
+    gwb_log10_A=None, gwb_gamma=None, include_rn=True,
 ):
     """Generate a complete injection parameter dictionary.
 
@@ -201,13 +212,15 @@ def generate_injection_params(
 
     params = {}
 
-    # Red noise -- realistic range
-    params.update(
-        {p: rng.uniform(-16, -14) for p in pta.param_names if "rednoise_log10_A" in p}
-    )
-    params.update(
-        {p: rng.uniform(2, 5) for p in pta.param_names if "rednoise_gamma" in p}
-    )
+    # Per-pulsar intrinsic red noise -- realistic MSP range.
+    # Keep discovery-compatible enterprise name "rednoise".
+    if include_rn:
+        params.update(
+            {p: rng.uniform(-15, -13) for p in pta.param_names if "rednoise_log10_A" in p}
+        )
+        params.update(
+            {p: rng.uniform(1.5, 5.0) for p in pta.param_names if "rednoise_gamma" in p}
+        )
 
     # Pulsar distances from EM priors
     for psr in psrs:
@@ -372,6 +385,7 @@ def _enterprise_to_disco_params(enterprise_params, cw_block_names):
 def build_disco_likelihood(
     disco_psrs, residual_map, num_cw, enterprise_params, cw_block_names,
     components=30, include_pterm=True, include_gwb=True, log10_equad=-8.0,
+    include_rn=True, rn_components=30,
 ):
     """Build discovery ArrayLikelihood.
 
@@ -392,7 +406,12 @@ def build_disco_likelihood(
     }
 
     T = ds.getspan(disco_psrs)
-    common_gp = ds.makecommongp_fourier(disco_psrs, ds.powerlaw, components, T, name="rednoise")
+    if include_rn:
+        common_gp = ds.makecommongp_fourier(
+            disco_psrs, ds.powerlaw, rn_components, T, name="rednoise"
+        )
+    else:
+        common_gp = None
     if include_gwb:
         global_gp = ds.makeglobalgp_fourier(
             disco_psrs, ds.powerlaw, ds.hd_orf, components, T, name="gwb"
@@ -453,6 +472,7 @@ def build_disco_likelihood(
 def build_fast_scan_likelihood(
     disco_psrs, residual_map, num_cw, enterprise_params, cw_block_names,
     components=30, include_pterm=True, log10_equad=-8.0,
+    include_rn=True, rn_components=30,
 ):
     """Fast discovery logL with cached outer Cholesky. See module docstring.
 
@@ -477,7 +497,12 @@ def build_fast_scan_likelihood(
     }
 
     T = ds.getspan(disco_psrs)
-    common_gp = ds.makecommongp_fourier(disco_psrs, ds.powerlaw, components, T, name="rednoise")
+    if include_rn:
+        common_gp = ds.makecommongp_fourier(
+            disco_psrs, ds.powerlaw, rn_components, T, name="rednoise"
+        )
+    else:
+        common_gp = None
     global_gp = ds.makeglobalgp_fourier(
         disco_psrs, ds.powerlaw, ds.hd_orf, components, T, name="gwb"
     )
@@ -572,13 +597,13 @@ def compute_mode_spacing(cos_gwtheta, gwphi, log10_fgw, psr_pos):
     """Distance mode spacing dL (kpc) for one CW-pulsar pair."""
     gwtheta = np.arccos(cos_gwtheta)
     f_gw = 10.0 ** log10_fgw
-    omega = np.array([
+    omhat = np.array([
         -np.sin(gwtheta) * np.cos(gwphi),
         -np.sin(gwtheta) * np.sin(gwphi),
         -np.cos(gwtheta),
     ])
-    cos_mu = np.dot(omega, psr_pos)
-    denom = abs(1.0 - cos_mu)
+    omhat_dot_pos = np.dot(omhat, psr_pos)
+    denom = abs(1.0 + omhat_dot_pos)
     if denom < 1e-4:
         return np.inf
     return 1.0 / (f_gw * KPC_OVER_C * denom)
@@ -1199,3 +1224,189 @@ def build_pure_cw_likelihood(disco_psrs, residual_map, cw_params_list,
         return sum(kp(params) for kp in kp_fns)
 
     return jax.jit(logl_wrapped), param_keys, base_vals
+
+
+# ============================================================
+# Gradient distance optimization helpers
+# ============================================================
+
+def make_distance_optimizer(logl_fn, param_keys, base_values, disco_psrs,
+                            prior_means=None, prior_sigmas=None,
+                            n_sigma=3.0, objective="logpost", maxiter=200,
+                            factr=None):
+    """Build gradient-based optimizer for pulsar distances only.
+
+    Optimizes scaled coordinates z_i = (d_i - prior_mean_i) / prior_sigma_i.
+    Returns (optimize, fun_np, jac_np, neg_objective_z), where optimize takes
+    and returns kpc.
+    """
+    import scipy.optimize
+
+    if objective not in ("lnL", "logpost"):
+        raise ValueError("objective must be 'lnL' or 'logpost'")
+
+    n_psr = len(disco_psrs)
+    if prior_means is None:
+        prior_means = [psr.pdist[0] for psr in disco_psrs]
+    if prior_sigmas is None:
+        prior_sigmas = [psr.pdist[1] for psr in disco_psrs]
+
+    dist_keys = [f"{psr.name}_cw_p_dist" for psr in disco_psrs]
+    missing = [k for k in dist_keys if k not in param_keys]
+    if missing:
+        raise KeyError(f"Missing distance parameters in param_keys: {missing}")
+
+    dist_indices_np = np.array([param_keys.index(k) for k in dist_keys], dtype=int)
+    dist_indices = jnp.array(dist_indices_np)
+    base_values = jnp.asarray(base_values, dtype=jnp.float64)
+    mu = jnp.asarray(prior_means, dtype=jnp.float64)
+    sig = jnp.asarray(prior_sigmas, dtype=jnp.float64)
+    if mu.shape != (n_psr,) or sig.shape != (n_psr,):
+        raise ValueError("prior_means and prior_sigmas must match disco_psrs length")
+    if np.any(np.asarray(sig) <= 0):
+        raise ValueError("prior_sigmas must be positive")
+
+    z_lo = jnp.full(n_psr, -float(n_sigma), dtype=jnp.float64)
+    z_hi = jnp.full(n_psr, float(n_sigma), dtype=jnp.float64)
+    z_lo = jnp.maximum(z_lo, (0.01 - mu) / sig)
+    z_lo_np = np.asarray(z_lo, dtype=np.float64)
+    z_hi_np = np.asarray(z_hi, dtype=np.float64)
+    bad_bounds = np.where(z_lo_np >= z_hi_np)[0]
+    if len(bad_bounds):
+        raise ValueError(f"Infeasible distance bounds for pulsar indices: {bad_bounds.tolist()}")
+
+    def z_to_d(z):
+        return mu + sig * z
+
+    def d_to_z(d):
+        return (d - mu) / sig
+
+    @jax.jit
+    def neg_objective_z(z):
+        d = z_to_d(z)
+        x = base_values.at[dist_indices].set(d)
+        lnL = logl_fn(x)
+        if objective == "logpost":
+            return -(lnL - 0.5 * jnp.sum(z ** 2))
+        return -lnL
+
+    neg_grad_z = jax.jit(jax.grad(neg_objective_z))
+
+    def fun_np(z_np):
+        return float(neg_objective_z(jnp.asarray(z_np, dtype=jnp.float64)))
+
+    def jac_np(z_np):
+        return np.asarray(
+            neg_grad_z(jnp.asarray(z_np, dtype=jnp.float64)), dtype=np.float64
+        )
+
+    z_test = d_to_z(mu)
+    _ = fun_np(np.asarray(z_test, dtype=np.float64))
+    _ = jac_np(np.asarray(z_test, dtype=np.float64))
+
+    def optimize(d_start_kpc):
+        d_start_kpc = np.asarray(d_start_kpc, dtype=np.float64)
+        z0 = np.asarray(d_to_z(jnp.asarray(d_start_kpc)), dtype=np.float64)
+        z0 = np.clip(z0, z_lo_np + 1e-10, z_hi_np - 1e-10)
+        ftol = 1e-14 if factr is None else float(factr) * np.finfo(float).eps
+        try:
+            res = scipy.optimize.minimize(
+                fun_np, z0, jac=jac_np, method="L-BFGS-B",
+                bounds=list(zip(z_lo_np, z_hi_np)),
+                options={"maxiter": maxiter, "ftol": ftol, "gtol": 1e-10},
+            )
+            d_opt = np.asarray(z_to_d(jnp.asarray(res.x)), dtype=np.float64)
+            x_opt = np.array(base_values, dtype=np.float64, copy=True)
+            x_opt[dist_indices_np] = d_opt
+            lnL_opt = float(logl_fn(jnp.asarray(x_opt, dtype=jnp.float64)))
+            z_opt = (d_opt - np.asarray(prior_means, dtype=np.float64)) / np.asarray(prior_sigmas, dtype=np.float64)
+            logprior = -0.5 * np.sum(z_opt ** 2)
+            jac = np.asarray(getattr(res, "jac", np.full_like(res.x, np.nan)), dtype=np.float64)
+            return d_opt, lnL_opt, lnL_opt + logprior, dict(
+                success=bool(res.success),
+                message=str(res.message),
+                nfev=getattr(res, "nfev", None),
+                njev=getattr(res, "njev", None),
+                nit=getattr(res, "nit", None),
+                grad_norm=float(np.linalg.norm(jac)),
+                z=np.asarray(res.x, dtype=np.float64),
+            )
+        except Exception as e:
+            return d_start_kpc.copy(), np.nan, np.nan, dict(
+                success=False, message=str(e), nfev=0, njev=0, nit=0,
+                grad_norm=np.nan, z=z0,
+            )
+
+    optimize.neg_objective_z = neg_objective_z
+    optimize.neg_grad_z = neg_grad_z
+    optimize.z_to_d = z_to_d
+    optimize.d_to_z = d_to_z
+    optimize.z_bounds = (z_lo_np.copy(), z_hi_np.copy())
+    optimize.dist_indices = dist_indices_np.copy()
+
+    return optimize, fun_np, jac_np, neg_objective_z
+
+
+def enumerate_pulsar_modes(psr, cw_params_list, prior_mean, prior_sigma,
+                           n_sigma=3.0, empirical_reference=None,
+                           snr_weights=None, score_threshold=None,
+                           max_candidates=30):
+    """Enumerate candidate distance modes for one pulsar.
+
+    Candidates are pooled from each CW mode family and ranked by multi-CW
+    consistency.  Higher score means closer agreement with all mode families.
+    """
+    empirical_reference = empirical_reference or {}
+    n_cw = len(cw_params_list)
+    weights = np.ones(n_cw, dtype=float) if snr_weights is None else np.asarray(snr_weights, dtype=float)
+    if weights.shape != (n_cw,):
+        raise ValueError("snr_weights must match cw_params_list length")
+    if np.sum(weights) <= 0:
+        weights = np.ones(n_cw, dtype=float)
+    weights = weights / np.sum(weights)
+
+    lo = max(0.01, float(prior_mean) - float(n_sigma) * float(prior_sigma))
+    hi = float(prior_mean) + float(n_sigma) * float(prior_sigma)
+
+    per_cw_spacings = []
+    families = []
+    pooled = [float(prior_mean)]
+    for k, cw in enumerate(cw_params_list):
+        dL = float(compute_mode_spacing(cw["cos_gwtheta"], cw["gwphi"], cw["log10_fgw"], psr.pos))
+        per_cw_spacings.append(dL)
+        if not np.isfinite(dL) or dL <= 0:
+            families.append(np.array([float(prior_mean)]))
+            continue
+
+        d_ref = float(empirical_reference.get(k, prior_mean))
+        n_min = int(np.floor((lo - d_ref) / dL)) - 1
+        n_max = int(np.ceil((hi - d_ref) / dL)) + 1
+        centers = d_ref + np.arange(n_min, n_max + 1, dtype=float) * dL
+        centers = centers[(centers >= lo) & (centers <= hi)]
+        if len(centers) == 0:
+            centers = np.array([np.clip(d_ref, lo, hi)], dtype=float)
+        families.append(centers)
+        pooled.extend(centers.tolist())
+
+    raw_candidates = np.unique(np.clip(np.asarray(pooled, dtype=float), lo, hi))
+    scores = []
+    for d in raw_candidates:
+        score = 0.0
+        for k, (centers, dL) in enumerate(zip(families, per_cw_spacings)):
+            if not np.isfinite(dL) or dL <= 0:
+                continue
+            delta = np.min(np.abs(d - centers))
+            score -= weights[k] * (delta / dL) ** 2
+        scores.append(score)
+    scores = np.asarray(scores, dtype=float)
+
+    if score_threshold is not None:
+        keep = scores >= float(score_threshold)
+        keep |= np.isclose(raw_candidates, float(prior_mean), rtol=0, atol=1e-12)
+        raw_candidates = raw_candidates[keep]
+        scores = scores[keep]
+
+    order = np.argsort(scores)[::-1]
+    raw_candidates = raw_candidates[order][:max_candidates]
+    scores = scores[order][:max_candidates]
+    return raw_candidates, scores, per_cw_spacings
