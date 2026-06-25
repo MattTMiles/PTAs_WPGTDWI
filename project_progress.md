@@ -1,0 +1,225 @@
+# Pulsar Distance Likelihood Project — Progress Tracker
+
+*Living document. Update the running log at the bottom each working session.*
+Last updated: 2026-06-25
+
+---
+
+## 1. The project in one paragraph
+
+PTAs constrain pulsar distances through the **phase-connected** continuous-wave (CW)
+signal model: the pulsar-term phase depends on distance via `L(1 - cos μ)/c`, so the
+CW likelihood is periodic in each pulsar distance with fringe spacing
+`dL = c / [f_gw (1 - cos μ)] = λ_gw / (1 - cos μ)`. A single CW leaves the distance
+degenerate across fringes; multiple CWs (different `dL` per source) break the
+degeneracy because only the true distance phases all sources simultaneously. We are
+investigating whether — and when — this can be turned into a usable distance
+measurement, with an eye to the transition between resolvable CWs and a stochastic
+background, and to phasing up the array.
+
+Repo: `github.com/MattTMiles/PTAs_WPGTDWI`
+Branches needed: `MattTMiles/discovery`, `MattTMiles/enterprise_extensions`.
+
+## 2. The three prongs
+
+1. **Can pulsar distances be optimised out?** (search/estimation, not sampling)
+2. **The GWB ↔ CW transition region** — barely explored anywhere, high value.
+3. **Improving sampling of pulsar distances when a CW is present.**
+
+## 3. Collaborators & their positions (do not lose track of these)
+
+- **Matt Miles** (Vanderbilt) — lead. Building JUG (JAX pulsar timing) in parallel;
+  wants this integrated with PTA analysis pipelines that already sample noise.
+- **David Hogg** (Flatiron) — **strongly wants prong 1 pushed and believes it can be
+  done without sampling.** Position: "MCMC is the method of last resort"; know the
+  likelihood before sampling; don't sample well-determined parameters; start with
+  brute-force 2-D distance–distance grid scans on the two best pulsars, build up.
+  Working on sky models that don't resolve into sources (spherical harmonics).
+  Key remark: PTA angular resolution is `min(λ/D, λ/[cT])` → only need sky structure
+  to spherical-harmonic degree ~10. **ACTION OWNER on keeping prong-1 optimisation
+  alive: us, on Hogg's behalf.**
+- **Will Farr** (Flatiron) — framed the three sub-questions (info / search / Bayes)
+  and that **"there is provably no point doing 2 before 1, nor 3 before 2."** Says
+  the pulsar term is almost always recoverable given noise assumptions; the *distance*
+  is formally unrecoverable only in the truly stochastic / isotropic / short-
+  correlation-time limit. The transition between the two limits is the interesting,
+  poorly-understood regime. Suggested the integer-cycle / offset-phase distance jump
+  (fast/slow split), ref arXiv:2506.10846; Neil Cornish used it but never published.
+- **Steve Taylor** (Vanderbilt) — paper co-author elsewhere; localisation paper
+  arXiv:2603.10120 partially explores the phase-connected effect. Likes hybridising
+  optimisation inside a sampler (illegal moves during burn-in, then freeze for
+  detailed balance). Wants it embedded in standard PTA frameworks for uptake.
+- **Mihir Shetty** (NYU) — built JaxPINT (PINT ported to JAX) to model nonlinear
+  timing effects without marginalising the distances. Produced 1-D and 2-D distance
+  sweeps and a **Fisher-information-vs-N_CW** scaling plot (the "independence line").
+  Open question he flagged: how to quantify when the false-peak-elimination
+  transition happens.
+- **Konstantin Leyde** (Flatiron) — interested in folding the (periodic) distance
+  space; to look at interpreting the likelihood surface.
+- Also cc'd: Max Isi, Andy Casey, Yacine Ali-Haïmoud.
+
+## 4. Shared infrastructure (status: working)
+
+- `CW_lnL_check/cw_helpers.py` — enterprise simulation + discovery likelihood.
+  - `build_enterprise_pta`, `generate_injection_params` (scenarios: single,
+    close_freq, close_sky, well_separated, realistic), `simulate`.
+  - `MultiSourceDelay` — N CW sources sharing one `p_dist` per pulsar, vmapped.
+  - `build_disco_likelihood` / `build_noisefree_likelihood` — Woodbury-marginalised
+    (timing model + red noise + GWB GPs).
+  - **`build_fast_scan_likelihood`** — caches the outer `(N_psr·2·n_comp)³` Cholesky
+    once (GP hyperparams frozen at truth), ~50–100× speedup; enables N_psr=116 runs.
+  - `scan_pulsar_distance`, `analyze_peaks`, `compute_mode_spacing`,
+    `find_best_wrong_mode_in_prior`, `compute_joint_best_wrong_in_prior`.
+- Metric throughout: **joint Δln L = lnL(truth) − lnL(all pulsars at best wrong
+  fringe within ±3σ EM prior).**
+
+## 5. Status by prong
+
+### Prong 1 — optimise distances out
+- **Explored:** Joint optimiser (scan conditional likelihoods across EM prior, keep
+  top-N peaks, fix easiest→hardest, then let pulsars hop modes). Works with loud CWs,
+  no noise: 20/20 recovered. With stochastic noise + GWB: ~75–80% of distances.
+- **Not explored / open:** Honest *marginal* competing-mode metric (current metric is
+  conditional, see Issues); coordinated multi-pulsar decoy search; Hogg's pure
+  2-D grid → build-up programme as a standalone estimator; coherence proxy that
+  avoids solving the whole sky per grid point.
+- **Hogg wants this to be THE focus.** Keep a standing item to push the estimator.
+
+### Prong 2 — GWB ↔ CW transition  ← CURRENTLY ACTIVE
+- **Explored:** nb 05 = single realistic operating point (h~−14…−13.5, GWB at NG15,
+  1 µs WN, 116 psrs). Mihir's Fisher-info-vs-N_CW plot. Mock-population Ncorr heatmap
+  suggesting single-CW phase-up essentially never achievable for realistic pops.
+- **Active work (this session):** self-contained Fisher-information transition
+  calculation — conditional vs **marginal** distance information as sources go from
+  few/loud (resolvable) to many/faint (confusion → stochastic). See §6.
+- **Not explored / open:** systematic sweep at fixed total power; sensitivity to
+  GWB mis-specification (frozen-at-truth GP is optimistic here); heterogeneous noise;
+  the practical CW-strength / distance-precision threshold (goal "y").
+
+### Prong 3 — sampling
+- **Explored:** 3-phase annealed snap-sampler (`CW_node_sampling`): cool T 5000→1
+  over 15k steps; 5k adapt (learn empirical CW covariance); 5k production. Proposals
+  50% eigenmode / 30% distance(prior draw + ±0.6 dL grid of 30) / 20% joint CW.
+  Newton-snap distances to conditional MAP after CW moves. Single & multi-CW (N=3).
+- **Known failure:** locks distances reasonably but **struggles to find CW
+  parameters**; no global CW move, no tempering swap (single-chain annealing can't
+  recover a missed mode).
+- **Not explored / open:** Farr integer-cycle/offset-phase distance parametrisation;
+  global CW big-jump (draw f/sky from prior); parallel tempering ladder.
+
+## 6. Active workstream — Prong 2 transition (details)
+
+**Question (Farr's framing, info-only):** as we move from a few resolvable CWs to many
+sub-threshold sources approaching an isotropic stochastic background, how does the
+information about a pulsar's distance behave?
+
+**Hypothesis:**
+- *Conditional* distance info (all CW phases known) ≈ linear in N_source — Mihir's
+  independence line.
+- *Marginal* distance info (per-source phase/amplitude marginalised) rises while
+  sources are resolvable, then **collapses** once sources confuse (≳1 per 1/T
+  frequency bin) — Farr's zero-information stochastic limit.
+- The gap between the two curves *is* the transition physics, and the turnover sets
+  the practical threshold (goal "y").
+
+**Method:** faithful non-evolving phase-connected CW residual (Earth + pulsar term),
+realistic TOA grid + white noise, autodiff Fisher matrix over {L, per-source phase,
+per-source log-amplitude}; marginal L-information = Schur complement. Sweep N at fixed
+total characteristic strain across the band.
+
+**Files:** `prong2_transition.py` (model + joint-array Fisher), figure
+`prong2_distance_information_transition.png`.
+
+**First result (toy model, 15 psr, 15 yr, 100 ns WN, band 3–20 nHz):**
+- Confirmed the key mechanism: for a *single* pulsar, distance is perfectly degenerate
+  with each source's pulsar-term phase → distance is only an *array* measurement, where
+  the global Earth term pins the source phases. (Single-pulsar marginal info ≈ 0.)
+- Conditional distance info ∝ N (reproduces Mihir's independence line); marginal info
+  rises then turns over.
+- `marg/cond` falls monotonically: ~0.95 (N=1) → ~0.53 (N=50) → ~0.18 (N=96).
+- Fixed-total-power: conditional info ~flat while marginal collapses — the literal
+  "CW fragmented into a background loses distance info" (Farr's limit), info-only.
+- **`marg/cond` is nearly identical in fixed-per-source vs fixed-total** → the
+  *recoverable fraction* is set by source crowding/geometry, not power distribution.
+- Caveat: toy amplitude normalisation + uniform 100 ns WN + idealised geometry. Next:
+  real array (sky + EM σ from feathers), heterogeneous noise, then port onto the real
+  discovery likelihood (marginal info via autodiff of `build_fast_scan_likelihood`,
+  marginalising CW params) to cross-check against the conditional joint-Δln L metric.
+
+**Scaled result (Stage A, 116 psr, 15 yr weekly = 782 TOA, N log-grid 1→1000, 30 seeds,
+both power modes; GPU, jax 0.4.28 venv, ~21 min total):**
+- `marg/cond` (array-median): **0.99 (N=1) → 0.87 (N≈100) → 0.53 (N≈400) → 0.08 (N=1000)**;
+  0.5-knee at N≈410 for the fiducial (15 yr, 3–20 nHz). Conditional ∝ N holds out to
+  N=1000 (independence line); marginal rises, turns over, collapses.
+- **Mode-independence is EXACT.** `max |Δ(marg/cond)|` between fixed-per-source and
+  fixed-total = **0.000** at every N (identical to machine precision); no break found up
+  to N=1000. The recoverable *fraction* is purely geometric — independent of how CW power
+  is distributed. (In fixed-total, conditional info is ~flat ≈2e11 while marginal
+  collapses: the literal "CW fragments into a background, distance info lost" picture.)
+- **Knee tracks N\* = T·Δf in scaling, offset by the array.** Varying T (10/15/20 yr,
+  band 3–20 nHz): knee = 288/412/555, N\* = 5.4/8.0/10.7 → **knee/N\* ≈ 52 (constant)**.
+  Varying band (3–12/3–20/3–40 nHz, T=15 yr): knee = 255/412/716 → knee/N\* = 60/51/41
+  (drifts). So the **T-scaling** of the confusion onset is captured by T·Δf; the
+  **bandwidth-scaling** only roughly. The ~50× offset is the array-resolution boost: 116
+  pulsars pin the global source phases ~50× better than naive one-source-per-1/T-bin
+  counting, pushing confusion onset to N≈50·(T·Δf). **Practical threshold (goal "y"):
+  distance info survives marginalisation up to N ≈ 50·T·Δf for a 116-pulsar array.**
+
+**Optimisation (this session, GPU):** padded source array to fixed N_max + boolean mask
+→ one compiled XLA shape serves all N (no per-N recompile; padded sources contribute
+exactly zero, verified padded-vs-unpadded to 1.9e-15). Schur source-block inverse moved
+from ridge-regularised solve to **eigh pseudo-inverse** (rcond 1e-10·max-eig) — exact on
+the rank-deficient padded/confusion block. Source-extras + distance gradients computed
+**analytically** (closed-form, validated vs jacfwd to 6e-16) instead of a 2·N_max-tangent
+jacfwd; per-call 16 s → 0.7 s (~22×), which is what lets N_max=1000 fit in 24 GB. Fisher
+assembled per-pulsar (F_LL diagonal) to keep memory O(n_src²) not O(n_param·n_data).
+
+## 7. Cross-cutting issues / caveats flagged
+
+1. **Conditional vs marginal.** `compute_joint_best_wrong_in_prior` finds each
+   pulsar's best wrong mode independently (others + CW params at truth), then sets all
+   wrong at once. Over-states separability: forbids decoy cooperation and conditions on
+   perfect CW recovery. Same trap as σ_MLE < σ_post in the JUG binary work. Need a
+   marginal / coordinate-ascent version.
+2. **Frozen-at-truth GP hyperparams = upper bound on distance info.** Acceptable for
+   prongs 1/3; wrong simplification for prong 2 (GWB is part of what we separate from).
+3. **Sampler distance move can't migrate fringes** (only ±0.6 dL around a fresh prior
+   draw; ~1/100s chance to hit the right fringe). Likely a primary cause of slow
+   distance convergence, independent of the CW-finding problem.
+4. **No global CW proposal / no tempering** → missed CW modes unrecoverable.
+5. **Homogeneous 1 µs WN (nb 05)** overstates weak pulsars; real arrays are dominated
+   by a few good pulsars — also the lever for the Deller/VLBI targeting science case.
+
+## 8. Running log
+
+- **2026-06-25** — Onboarded full repo + email chain. Wrote this tracker. Built
+  prong2_transition.py (joint-array conditional/marginal distance Fisher) and produced
+  the first transition figure; logged the single-pulsar degeneracy finding and the
+  marg/cond collapse. Next: scale on GPU + real array + port onto discovery likelihood.
+  Logged issues 1–5. (Claude + Matt)
+  prong-2 as active workstream; started the conditional-vs-marginal distance-
+  information transition calculation. Logged issues 1–5. (Claude + Matt)
+  
+- 2026-06-25 (Stage 0, cronus/4090) — Toy transition reproduced GPU-bit-identical to
+  CPU (marg/cond 0.950 @N=1, 0.178 @N=96; cond/N flat = cond ∝ N). 5.3s total,
+  compile-dominated, sub-second/N → Stage A is cheap. Built isolated jax 0.4.28 venv.
+  Added plot_prong2.py (was missing). Flagged discotech-GPU risk for Stage C.
+
+- 2026-06-25 (Stage A, cronus/4090) — Optimised + scaled prong2_transition.py for GPU.
+  Padding+mask (one compiled shape ∀N), eigh pseudo-inverse Schur, analytic gradients
+  (22× faster; jacfwd kept as validator). Correctness gates: padded==unpadded 1.9e-15,
+  analytic==autodiff 6e-16. Full run 116 psr / 15 yr weekly / N=1→1000 / 30 seeds / both
+  modes + T,band knee diagnostics in ~21 min. Findings: marg/cond 0.99→0.08, 0.5-knee
+  ≈410; marg/cond EXACTLY mode-independent (Δ=0.000, no break to N=1000); knee ∝ N\*=T·Δf
+  under T (knee/N\*≈52 const) but offset ~50× by array resolution (band-scaling only
+  rough). Goal-"y" threshold: distance info survives to N≈50·T·Δf for 116 psr. Refreshed
+  3-panel figure + npz. Files now under CW_transition/. (Claude + Matt)
+
+## 9. Environment (cronus)
+- GPU box cronus = NVIDIA RTX 4090, driver 550.120.
+- Toy/Fisher work (prong2_transition.py): isolated venv with jax 0.4.28
+  (CUDA 12.4 / cuDNN 8.9), driver-compatible. Latest jax[cuda12] FAILS cuDNN init
+  on this driver. Activate: source <scratch>/env/bin/activate.
+- discovery lives in the shared `discotech` env (separate jax) — DO NOT modify it.
+- OPEN RISK for Stage C: confirm discotech's jax can init the GPU; if it shares the
+  broken jax, Stage C Hessian is CPU-bound or needs a pinned discovery venv.
