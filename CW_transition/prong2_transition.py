@@ -851,10 +851,306 @@ def run_coherence_experiment(n_psr=116, T=15 * YR, cadence_days=7.0, sigma=1e-7,
           flush=True)
 
 
+# ======================================================================
+# Stage A.3 -- the N x t_c MAP: do confusion (Stage A) and coherence (Stage A.2)
+# factorise, or interact?  Combined model: N fixed-per-source sources, each with a
+# per-(source,pulsar) phase offset dphi_{s,p} ~ N(0, tau_{s,p}/t_c).
+#
+# Efficient marginalisation: dphi_{s,p} enters only pulsar p's residual, so the
+# dphi-block of F_data is BLOCK-DIAGONAL over pulsars (116 independent N x N blocks).
+# Marginalise dphi first by per-pulsar block inversion, then the dense 2N {phase0,logh}
+# block. Conditional pins {phase0, log10h, dphi}; marginal Schur-complements them all.
+# ======================================================================
+def _combined_psr_blocks(toas, p_hat, L_p, srcs, sigma):
+    """For one pulsar: data-Fisher sub-blocks over local params a=[L_p, phase0(N),
+    log10h(N)] and d=[dphi(N)]. Returns F_aa (1+2N,1+2N), F_ad (1+2N,N), F_dd (N,N),
+    tau_col (N,). Analytic gradients (validated against autodiff in the N=8 gate)."""
+    th, ph, ps = srcs[:, 0], srcs[:, 1], srcs[:, 2]
+    cinc, l10f, l10h, phase0 = srcs[:, 3], srcs[:, 4], srcs[:, 5], srcs[:, 6]
+    Fp, Fx, cos_mu = jax.vmap(lambda a, b, c: antenna(a, b, c, p_hat))(th, ph, ps)
+    f = 10.0 ** l10f
+    zeta = (10.0 ** l10h) / (2.0 * jnp.pi * f)
+    A = Fp * (1.0 + cinc ** 2)
+    B = Fx * (-2.0 * cinc)
+    twopif = 2.0 * jnp.pi * f
+    Phi_e = twopif[:, None] * toas[None, :] + phase0[:, None]
+    tau = (L_p * KPC_OVER_C) * (1.0 - cos_mu)                  # (N,)
+    Phi_p = Phi_e - twopif[:, None] * tau[:, None]
+    sE, cE = jnp.sin(Phi_e), jnp.cos(Phi_e)
+    sP, cP = jnp.sin(Phi_p), jnp.cos(Phi_p)
+    Ac, Bc = A[:, None], B[:, None]
+    W_e = Ac * sE + Bc * cE; W_p = Ac * sP + Bc * cP
+    Wp_e = Ac * cE - Bc * sE; Wp_p = Ac * cP - Bc * sP
+    zc = zeta[:, None]
+    gL = jnp.sum(zc * Wp_p * (twopif * KPC_OVER_C * (1.0 - cos_mu))[:, None], axis=0)  # (n_toa,)
+    Hph = zc * (Wp_e - Wp_p)                                   # (N, n_toa) phase0
+    Hlh = LN10 * zc * (W_e - W_p)                              # (N, n_toa) log10h
+    Hdp = -zc * Wp_p                                           # (N, n_toa) dphi
+    a = jnp.concatenate([gL[None, :], Hph, Hlh], axis=0)       # (1+2N, n_toa)
+    inv = 1.0 / sigma ** 2
+    F_aa = (a @ a.T) * inv
+    F_ad = (a @ Hdp.T) * inv
+    F_dd = (Hdp @ Hdp.T) * inv
+    return F_aa, F_ad, F_dd, tau
+
+
+@partial(jax.jit, static_argnums=(4,))
+def combined_blocks(toas, p_hats, L_arr, srcs, n_psr, sigma):
+    """vmap _combined_psr_blocks over pulsars. cond = diag(F_aa[:,0,0])."""
+    F_aa, F_ad, F_dd, tau = jax.vmap(
+        lambda ph, L: _combined_psr_blocks(toas, ph, L, srcs, sigma))(p_hats, L_arr)
+    return F_aa, F_ad, F_dd, tau, F_aa[:, 0, 0]
+
+
+@partial(jax.jit, static_argnums=(5, 6))
+def ntc_marg_cond(F_aa, F_ad, F_dd, tau, cond, n_psr, n_src, t_c, rcond=1e-10):
+    """Structured marginal/conditional. Marginalise dphi per-pulsar (N x N solves), then
+    the dense 2N {phase0,log10h} block; read the L diagonal."""
+    Pi = t_c / tau                              # (n_psr, n_src) = 1/sigma_phi^2
+
+    def per_p(Faa, Fad, Fdd, pi_col):
+        M = Fdd + jnp.diag(pi_col)              # (N, N)  -- per-pulsar block
+        sol = jnp.linalg.solve(M, Fad.T)        # (N, 1+2N)
+        return Faa - Fad @ sol                  # (1+2N, 1+2N)
+    delta = jax.vmap(per_p)(F_aa, F_ad, F_dd, Pi)     # (n_psr, 1+2N, 1+2N)
+
+    Feff_LL = delta[:, 0, 0]                    # (n_psr,)  L block is diagonal
+    Feff_Lpl = delta[:, 0, 1:]                  # (n_psr, 2N)
+    Feff_plpl = jnp.sum(delta[:, 1:, 1:], axis=0)     # (2N, 2N)  shared phase0/logh
+    pinv = _eigh_pinv(Feff_plpl, rcond)
+    marg = jnp.clip(Feff_LL - jnp.sum(Feff_Lpl * (Feff_Lpl @ pinv), axis=1), 0.0, None)
+    return cond, marg
+
+
+def ntc_dense_marg(F_aa, F_ad, F_dd, tau, n_psr, n_src, t_c, rcond=1e-10):
+    """DENSE reference for the gate: scatter per-pulsar blocks into the full Fisher over
+    [L(n_psr), phase0(N), log10h(N), dphi(N*n_psr)], add Pi on dphi, single Schur out all
+    nuisances. Same analytic F as the structured path -> must match to ~1e-10."""
+    npl = 2 * n_src
+    nd = n_src * n_psr
+    P = n_psr + npl + nd
+    F = np.zeros((P, P))
+    # global indices: L = p ; pl = n_psr + (0..2N-1) ; dphi_p = n_psr+npl + p*N + (0..N-1)
+    Faa = np.array(F_aa); Fad = np.array(F_ad); Fdd = np.array(F_dd); tau = np.array(tau)
+    pl = slice(n_psr, n_psr + npl)
+    for p in range(n_psr):
+        a_glb = [p] + list(range(n_psr, n_psr + npl))         # local a -> global
+        d_glb = list(range(n_psr + npl + p * n_src, n_psr + npl + (p + 1) * n_src))
+        F[np.ix_(a_glb, a_glb)] += Faa[p]
+        F[np.ix_(a_glb, d_glb)] += Fad[p]
+        F[np.ix_(d_glb, a_glb)] += Fad[p].T
+        F[np.ix_(d_glb, d_glb)] += Fdd[p]
+    Pi = np.zeros(P)
+    for p in range(n_psr):
+        d0 = n_psr + npl + p * n_src
+        Pi[d0:d0 + n_src] = t_c / tau[p]                      # 1/sigma_phi^2
+    F = F + np.diag(Pi)
+    nu = list(range(n_psr, P))                                # phase0,logh,dphi
+    Lidx = list(range(n_psr))
+    F_LL = F[np.ix_(Lidx, Lidx)]; F_Ln = F[np.ix_(Lidx, nu)]; F_nn = F[np.ix_(nu, nu)]
+    pinv = np.array(_eigh_pinv(jnp.array(F_nn), rcond))
+    marg = np.clip(np.diag(F_LL - F_Ln @ pinv @ F_Ln.T), 0.0, None)
+    cond = np.diag(F_LL)
+    return cond, marg
+
+
+def run_ntc_map(n_psr=116, T=15 * YR, cadence_days=7.0, sigma=1e-7,
+                f_band=(3e-9, 1.2e-8), log10_h=-14.3, n_seeds=15, seed0=900, rcond=1e-10):
+    """Stage A.3: the N x t_c map and the factorisation test."""
+    import time
+    t0 = time.time()
+    OUT = "/home/mattm/projects/HSYMT/CW_transition/prong2_Ntc_map.npz"
+    FIG = "/home/mattm/projects/HSYMT/CW_transition/prong2_Ntc_map.png"
+    p_hats = build_array(n_psr); L_arr = jnp.ones(n_psr)
+    toas = build_toas(T, cadence_days)
+    N_star = confusion_onset(T, f_band)
+    print(f"[ntc] band {f_band}, N*={N_star:.2f}, knee~{52*N_star:.0f}", flush=True)
+
+    # ---- GATE: structured vs dense at N=8 (same analytic F) ----
+    srcs8 = jnp.array(draw_sources(8, np.random.default_rng(1), f_band, log10_h))
+    bl8 = combined_blocks(toas, p_hats, L_arr, srcs8, n_psr, sigma)
+    t_c_test = 5e10
+    cs, ms = ntc_marg_cond(*bl8[:5], n_psr, 8, jnp.asarray(t_c_test), rcond)
+    cd, md = ntc_dense_marg(*bl8[:4], n_psr, 8, t_c_test, rcond)
+    rel = float(np.max(np.abs(np.array(ms) - md)) / np.max(np.abs(md)))
+    print(f"[ntc][gate structured-vs-dense @N=8] max rel diff = {rel:.2e}", flush=True)
+    assert rel < 1e-10, f"structured != dense ({rel:.2e})"
+
+    # ---- invariant Y: SNR^2 * sigma_phi^2, normalised to the N=1 half-info point ----
+    # The bare SNR^2 * median(sigma_phi^2) carries an O(geometry) factor (antenna
+    # 1/(1-cos mu) weighting spreads the per-baseline invariant), so we CALIBRATE the
+    # constant by the t_c at which the N=1 coherence transition hits R=0.5, then define
+    # Y = t_c_50 / t_c. Y=1 is then the coherence half-info point by construction; this
+    # is the form-independent invariant (Stage-A.2 gate ii: absolute t_c is model-
+    # dependent, the location is the claim).
+    snr2s, taus = [], []
+    for s in range(min(n_seeds, 8)):
+        srcs = jnp.array(draw_sources(4, np.random.default_rng(seed0 + s), f_band, log10_h))
+        snr = per_source_snr(toas, p_hats, L_arr, srcs, n_psr, sigma)
+        snr2s.append(float(jnp.median(snr ** 2)))
+        _, _, _, tau, _ = combined_blocks(toas, p_hats, L_arr, srcs, n_psr, sigma)
+        taus.append(float(jnp.median(tau)))
+    SNR2 = float(np.median(snr2s)); tau_med = float(np.median(taus))
+
+    tc_wide = np.logspace(np.log10(SNR2 * tau_med) - 4, np.log10(SNR2 * tau_med) + 4, 40)
+    r1 = []
+    for t_c in tc_wide:
+        rr = []
+        for s in range(n_seeds):
+            ss = jnp.array(draw_sources(1, np.random.default_rng(seed0 + 7 * s + 1),
+                                        f_band, log10_h))
+            bl = combined_blocks(toas, p_hats, L_arr, ss, n_psr, sigma)
+            c, m = ntc_marg_cond(*bl[:5], n_psr, 1, jnp.asarray(t_c), rcond)
+            rr.append(float(jnp.median(m) / jnp.median(c)))
+        r1.append(np.median(rr))
+    r1 = np.array(r1)
+    # R(1) rises with t_c; find t_c where it crosses 0.5
+    above = np.where(r1 > 0.5)[0]
+    iup = above[0]
+    lx = np.log(tc_wide[iup - 1]) + (0.5 - r1[iup - 1]) * (
+        np.log(tc_wide[iup]) - np.log(tc_wide[iup - 1])) / (r1[iup] - r1[iup - 1])
+    tc_50 = float(np.exp(lx))
+    print(f"[ntc] SNR^2/src ~ {SNR2:.3e}; N=1 half-info at t_c_50 ~ {tc_50:.3e} s "
+          f"(Y := t_c_50/t_c)", flush=True)
+
+    # ---- grid ----
+    N_grid = sorted(set(int(round(x)) for x in np.logspace(0, np.log10(256), 15)))
+    Y_grid = np.logspace(-2, 2, 15)
+    t_c_grid = tc_50 / Y_grid                   # Y = t_c_50 / t_c  (1 = N=1 half-info)
+    nN, nY = len(N_grid), len(Y_grid)
+    R = np.zeros((nN, nY)); Cnd = np.zeros((nN, nY)); Mrg = np.zeros((nN, nY))
+
+    for i, N in enumerate(N_grid):
+        cell_c = np.zeros((nY, n_seeds)); cell_m = np.zeros((nY, n_seeds))
+        cell_r = np.zeros((nY, n_seeds))
+        for s in range(n_seeds):
+            srcs = jnp.array(draw_sources(N, np.random.default_rng(seed0 + 7 * s + N),
+                                          f_band, log10_h))
+            bl = combined_blocks(toas, p_hats, L_arr, srcs, n_psr, sigma)
+            for j, t_c in enumerate(t_c_grid):
+                c, m = ntc_marg_cond(*bl[:5], n_psr, N, jnp.asarray(t_c), rcond)
+                mc = float(jnp.median(c)); mm = float(jnp.median(m))
+                cell_c[j, s] = mc; cell_m[j, s] = mm; cell_r[j, s] = mm / mc
+        Cnd[i] = np.median(cell_c, axis=1); Mrg[i] = np.median(cell_m, axis=1)
+        R[i] = np.median(cell_r, axis=1)        # median-of-ratios (consistent w/ gates)
+        print(f"[ntc] N={N:4d} (N/N*={N/N_star:5.1f})  R[Y=min..max]="
+              f"{R[i,0]:.3f}..{R[i,-1]:.3f}", flush=True)
+
+    # y->0 edge slice (t_c -> inf) and x=1 edge slice
+    R_conf = R[:, 0].copy()                     # smallest Y ~ coherent
+    R_coh = R[0, :].copy()                      # N=1 row
+
+    # EDGE GATE (i): y->0 reproduces Stage-A fixed-per-source confusion R_conf(N)
+    t_c_inf = SNR2 * tau_med / 1e-6
+    Rconf_ref = []
+    for N in N_grid:
+        rr = []
+        for s in range(n_seeds):
+            srcs = jnp.array(draw_sources(N, np.random.default_rng(seed0 + 7 * s + N),
+                                          f_band, log10_h))
+            bl = combined_blocks(toas, p_hats, L_arr, srcs, n_psr, sigma)
+            c, m = ntc_marg_cond(*bl[:5], n_psr, N, jnp.asarray(t_c_inf), rcond)
+            rr.append(float(jnp.median(m) / jnp.median(c)))
+        Rconf_ref.append(np.median(rr))
+    Rconf_ref = np.array(Rconf_ref)
+    # compare against Stage-A path (no dphi at all) in the SAME band
+    Rconf_stageA = []
+    for N in N_grid:
+        rr = []
+        for s in range(n_seeds):
+            srcs = draw_sources(N, np.random.default_rng(seed0 + 7 * s + N), f_band, log10_h)
+            pad, mask = pad_sources(srcs, max(N_grid))
+            c, m = fisher_array(toas, p_hats, L_arr, jnp.array(pad), jnp.array(mask),
+                                n_psr, sigma, rcond)
+            rr.append(float(jnp.median(m) / jnp.median(c)))
+        Rconf_stageA.append(np.median(rr))
+    Rconf_stageA = np.array(Rconf_stageA)
+    g_conf = float(np.max(np.abs(Rconf_ref - Rconf_stageA)))
+    print(f"[ntc][edge y->0] combined vs Stage-A confusion: max|Δ| = {g_conf:.2e}",
+          flush=True)
+    assert g_conf < 1e-3, f"y->0 edge != Stage-A confusion ({g_conf:.2e})"
+
+    # EDGE GATE (ii): x=1 (N=1) reproduces the Stage-A.2 coherence path (independent
+    # autodiff code) to ~1e-3. (The idealised R_coh=1/(1+Y) holds only up to an O(geometry)
+    # factor: the antenna 1/(1-cos mu) weighting spreads the per-baseline invariant, so the
+    # 0.5-crossing is not exactly at Y=1; reported below after rescaling.)
+    coh_ref = []
+    for t_c in t_c_grid:
+        rr = []
+        for s in range(n_seeds):
+            ss = jnp.array(draw_sources(1, np.random.default_rng(seed0 + 7 * s + 1),
+                                        f_band, log10_h))
+            Fc, tauc = coherence_blocks(toas, p_hats, L_arr, ss, n_psr, 1, sigma)
+            c2, m2 = coherence_marg_cond(Fc, tauc, n_psr, 1, float(t_c),
+                                         sigma_phi2_linear, rcond)
+            rr.append(float(jnp.median(m2) / jnp.median(c2)))
+        coh_ref.append(np.median(rr))
+    coh_ref = np.array(coh_ref)
+    g_coh = float(np.max(np.abs(R_coh - coh_ref)))
+    print(f"[ntc][edge x=1] N=1 slice vs Stage-A.2 coherence path: max|Δ| = {g_coh:.2e}",
+          flush=True)
+    assert g_coh < 1e-3, f"x=1 edge != Stage-A.2 coherence ({g_coh:.2e})"
+    # report the 1/(1+Y') fit with Y rescaled to the measured 0.5-crossing
+    Y50 = _cross_x(Y_grid, R_coh / R_coh[0], 0.5)
+    fit = 1.0 / (1.0 + Y_grid / Y50)
+    fit_res = float(np.nanmax(np.abs(R_coh / R_coh[0] - fit)))
+    print(f"[ntc] N=1 coherence: 0.5-crossing at Y={Y50:.3g} (not 1 -> geometry factor); "
+          f"1/(1+Y/Y50) fits the shape to {fit_res:.2f}.", flush=True)
+
+    # ---- HEADLINE: factorisation R(N,Y) vs R(N,0)*R(1,Y) ----
+    product = np.outer(R_conf, R_coh / R_coh[0])   # R(N,0) * [R(1,Y)/R(1,0)]
+    resid = R - product
+    k = np.unravel_index(np.argmax(np.abs(resid)), resid.shape)
+    maxdev = float(resid[k]); sign = "R>product (decoherence AIDS separation)" if maxdev > 0 \
+        else "R<product (dphi COMPOUNDS confusion loss)"
+    print(f"[ntc] factorisation: max|R - R(N,0)R(1,Y)| = {abs(maxdev):.3f} at "
+          f"N/N*={N_grid[k[0]]/N_star:.1f}, Y={Y_grid[k[1]]:.2g}; sign: {maxdev:+.3f} "
+          f"-> {sign}", flush=True)
+
+    np.savez(OUT, N_grid=np.array(N_grid), Y_grid=Y_grid, t_c_grid=t_c_grid,
+             x_grid=np.array(N_grid) / N_star, N_star=N_star, R=R, conditional=Cnd,
+             marginal=Mrg, R_conf=R_conf, R_coh=R_coh, product=product, resid=resid,
+             max_factor_dev=maxdev, SNR2=SNR2, tau_med=tau_med, tc_50=tc_50,
+             n_psr=n_psr, n_seeds=n_seeds, band=np.array(f_band))
+
+    # ---- figure: heatmap of R + factorisation residual ----
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    x = np.array(N_grid) / N_star
+    fig, ax = plt.subplots(1, 2, figsize=(13.5, 5.2))
+    for a, Z, ttl, cmap, ctr in [
+            (ax[0], R, "R(N,Y) = marginal/conditional", "viridis", True),
+            (ax[1], resid, r"factorisation residual  $R - R(N,0)\,R(1,Y)$", "RdBu_r", False)]:
+        vmax = np.nanmax(np.abs(Z)) if not ctr else 1.0
+        kw = dict(cmap=cmap, shading="auto")
+        if not ctr:
+            kw.update(vmin=-vmax, vmax=vmax)
+        pc = a.pcolormesh(x, Y_grid, Z.T, **kw)
+        if ctr:
+            cs = a.contour(x, Y_grid, Z.T, levels=[0.5], colors="white", linewidths=2)
+            a.clabel(cs, fmt="R=0.5", fontsize=8)
+        a.axvline(1.0, color="k", ls=":", lw=1, alpha=.6)
+        a.axhline(1.0, color="k", ls=":", lw=1, alpha=.6)
+        a.set_xscale("log"); a.set_yscale("log")
+        a.set_xlabel(r"$N/N^*$  (confusion axis)")
+        a.set_ylabel(r"$Y = \mathrm{SNR}^2\,\sigma_\phi^2$  (coherence axis)")
+        a.set_title(ttl, fontsize=10)
+        fig.colorbar(pc, ax=a)
+    fig.suptitle("Prong 2 Stage A.3 -- N x t_c map: confusion x coherence "
+                 f"(max factor. dev {abs(maxdev):.2f})", fontsize=11, y=1.0)
+    fig.tight_layout(); fig.savefig(FIG, dpi=130, bbox_inches="tight")
+    print(f"[ntc] saved {OUT}\n[ntc] saved {FIG}\n[ntc] total {time.time()-t0:.1f}s",
+          flush=True)
+
+
 if __name__ == "__main__":
     import sys, time
     if len(sys.argv) > 1 and sys.argv[1] == "coherence":
         run_coherence_experiment()
+        sys.exit(0)
+    if len(sys.argv) > 1 and sys.argv[1] == "ntcmap":
+        run_ntc_map()
         sys.exit(0)
     OUT = "/home/mattm/projects/HSYMT/CW_transition/prong2_results.npz"
 

@@ -91,7 +91,9 @@ Branches needed: `MattTMiles/discovery`, `MattTMiles/enterprise_extensions`.
   suggesting single-CW phase-up essentially never achievable for realistic pops.
 - **Active work (this session):** self-contained Fisher-information transition
   calculation — conditional vs **marginal** distance information as sources go from
-  few/loud (resolvable) to many/faint (confusion → stochastic). See §6.
+  few/loud (resolvable) to many/faint (confusion → stochastic). See §6. **TOY PHASE
+  CLOSED** (Stages A/A.1/A.2/A.3): confusion and coherence transitions mapped and shown
+  to COMPOUND (not factorise). Next = Stage C (real discovery likelihood, absolute σ_L).
 - **Not explored / open:** systematic sweep at fixed total power; sensitivity to
   GWB mis-specification (frozen-at-truth GP is optimistic here); heterogeneous noise;
   the practical CW-strength / distance-precision threshold (goal "y").
@@ -206,42 +208,34 @@ assembled per-pulsar (F_LL diagonal) to keep memory O(n_src²) not O(n_param·n_
 - marg/cond at key N (fiducial): N=1 → **0.991**, N=10 → 0.986, N\*=8 → 0.987,
   knee=423 → **0.500**, N=1000 → **0.084**.
 
-### Two distinct transitions (do not conflate)
+### Two distinct transitions (do not conflate) — REVISED after Stage A.2
 
-A. SOURCE CONFUSION / RESOLVABILITY  ← what Stage A measured
-   - Controlled by N vs N* = T·Δf (number of resolvable 1/T frequency slots),
-     with a ~50× array-resolution boost from 116 pulsars seeing each source
-     through different (1-cos mu).
-   - An ESTIMATION limit: the array can't separately determine each source's
-     phase once sources crowd within a resolution element, so marginalising the
-     phases destroys distance info. Conditional info (phases known) never
-     collapses (∝N forever); all loss is in resolvability.
-   - RECEDES with longer T. Knee scales as T·Δf (verified, knee/N* ≈ 52).
+A. SOURCE CONFUSION / RESOLVABILITY  (Stage A)
+   - Controlled by N vs N* = T·Δf, with ~50× array-resolution boost (116 psr,
+     varied 1-cos mu). An ESTIMATION limit: can't separate source phases once
+     crowded. Conditional info never collapses (∝N); loss is all in resolvability.
+   - Requires N>1. Knee scales with T·Δf.
 
-B. SIGNAL COHERENCE / DECOHERENCE  ← Farr's transition, PROBED in Stage A.2
-   - Controlled by source coherence time t_c vs Earth-pulsar light-travel time
-     tau_p = L(1-cos mu)/c (thousands of yr for a kpc pulsar).
-   - INTRINSIC: a stochastic field with t_c << tau_p has no expected Earth–pulsar
-     phase correlation, so distance info -> 0 regardless of how well sources are
-     resolved.
-   - ~~INDEPENDENT of T~~ — **CORRECTED by Stage A.2.** Was the pre-registered guess;
-     the Bayesian-Fisher measurement shows decoherence loss DOES grow with T (via
-     SNR accumulation, see Stage A.2). It exists at N=1 (the real distinction from
-     confusion) but is not T-independent. Our monochromatic sources have infinite
-     t_c, so the Stage-A model structurally cannot reach this limit without dphi.
+B. SIGNAL COHERENCE / DECOHERENCE  (Stage A.2) = Farr's transition
+   - STOCHASTIC decoherence only (random per-baseline phase wander, var σ_φ²);
+     NOT deterministic chirp (a chirp is recoverable info and HELPS — opposite sign).
+   - Closed form (N=1): marg/cond = 1/(1 + SNR²·σ_φ²).
+   - MODEL-INDEPENDENT LAW: distance info halves when rms Earth-pulsar phase wander
+     reaches ~1/SNR rad (verified: linear & saturating σ_φ² forms cross at the same
+     SNR²σ_φ²≈1; the t_c value is model-dependent, do NOT quote it as physical).
+   - Two absolute regimes: σ_L → dL/(2π·SNR) (coherent, SNR-limited) ;
+     σ_L → dL·σ_φ/(2π) (decoherent, SNR-INDEPENDENT floor).
+   - Consequence: beyond SNR ~ 1/σ_φ, more strain does NOT improve distances.
+     This is the rigorous form of "a strong CW can phase up the array" — it can't,
+     past the wander floor.
+   - Present at N=1 (zero confusion). 
 
-DISCRIMINATOR (corrected): the clean separator is the **N-axis, not T**. At N=1 there
-is zero confusion, yet a full decoherence transition exists (Stage A.2 Exp1). Both
-transitions happen to scale with T (confusion via T·Δf, coherence via SNR²∝T), so
-growing T does NOT isolate them — N=1 + finite t_c does.
-
-CAVEAT: in a realistic SMBHB background the two roughly coincide (the background's
-stochasticity IS many unresolved binaries), but they are set by different ratios.
-
-METRIC NOTE: for spiky (realistic) populations, marg/cond is misleading — it stays
-high while absolute information is small and carried by a few loud sources
-(Stage A.1: pop conditional plateaus at 2.8e10 vs 2.1e12 uniform, ratio barely
-moves). Switch the headline to absolute sigma_L once Stage C gives trustworthy units.
+BOTH transitions scale with T (confusion via T·Δf; coherence via SNR²∝T) — my earlier
+"coherence is T-independent" was WRONG (physical wander is T-independent, but its
+DETECTABILITY scales with SNR). T-scaling does NOT separate them.
+DISCRIMINATOR: the N-axis. Orthogonal knobs = N (confusion) and t_c (coherence).
+CAVEAT: in a realistic background the two ARRIVE TOGETHER (a background IS many
+unresolved sources), so N=1+finite-t_c is a conceptual isolation, not a real scenario.
 
 **Stage A.2 — the COHERENCE transition (model + measurement).** Gave each source a
 finite coherence time via an INDEPENDENT per-(source,pulsar) pulsar-term phase offset
@@ -272,6 +266,47 @@ coherence` (N=1, 116 psr, 15 yr weekly; ~9 min, dominated by the confusion-knee 
   over the same T: 288/412/555/756, ∝T·Δf).
 - **Files:** coherence model in `prong2_transition.py` (`coherence` CLI),
   `prong2_coherence.npz`, `prong2_coherence_transition.png` (2-panel: Exp1, Exp2).
+
+**Stage A.3 — the N x t_c MAP (toy capstone): confusion x coherence do NOT factorise.**
+Combined model: N fixed-per-source sources, each with a per-(source,pulsar) phase offset
+dphi_{s,p} ~ N(0, tau_{s,p}/t_c). conditional = {phase0,log10h,dphi} all pinned;
+marginal = Schur out all three; R(N,Y)=marg/cond. Narrow band b3-12 (N*=4.26, knee~222
+reachable at N<=256). Run: `python prong2_transition.py ntcmap` (~90 s).
+- **Efficient marginalisation (required):** dphi_{s,p} enters only pulsar p, so F_data's
+  dphi-block is BLOCK-DIAGONAL over pulsars (116 independent N x N blocks). Marginalise
+  dphi by 116 per-pulsar N x N solves -> F_eff over {L,phase0,log10h}, then the dense 2N
+  block. **Gate:** structured == full dense single-Schur Fisher at N=8 to **5.9e-11**
+  (asserted).
+- **Edge gates (anchor the 2-D map to the 1-D stages):** y->0 (t_c->inf) slice reproduces
+  the Stage-A fixed-per-source confusion R_conf(N) to **4.2e-8**; x=1 (N=1) slice
+  reproduces the Stage-A.2 coherence path to **4.7e-15**. Both asserted.
+- **Invariant axes:** x = N/N* (confusion), y = Y (coherence). Y normalised to the N=1
+  half-info point (Y := t_c_50/t_c, t_c_50~1.3e13 s) so Y=1 is the coherence midpoint --
+  this absorbs the O(geometry) antenna 1/(1-cos mu) weighting that makes the bare
+  SNR²·sigma_phi² mis-centred (consistent w/ Stage-A.2 gate ii: location is the invariant,
+  absolute t_c model-dependent). R is median-over-realisations of marg/cond (the stable
+  reduction; do NOT use ratio-of-medians -- they differ at N=1, a bug we hit and fixed).
+- **HEADLINE — they INTERACT, sub-multiplicatively.** max |R - R(N,0)·R(1,Y)| = **0.331**
+  at **(N/N*=12.4, Y=0.27)**, sign **NEGATIVE**: R < product, i.e. the dphi nuisances
+  **COMPOUND** the confusion loss. The R=0.5 contour is **CURVED** (bows toward the
+  origin), not a rectangle -> the two thresholds are not independent. Residual ≈ 0 on the
+  edges (one effect alone) and maximally negative in the interior where confusion and
+  decoherence are both moderate. Physically: crowded sources AND decohered pulsar terms
+  destroy distance information faster than either limit alone -- the realistic SMBHB
+  background (many unresolved + finite-coherence binaries) sits in this compounding
+  interior, so the practical threshold is WORSE than the independent-threshold estimate.
+- **Files:** `prong2_transition.py` (`ntcmap` CLI), `prong2_Ntc_map.npz`,
+  `prong2_Ntc_map.png` (heatmap of R + factorisation residual).
+
+**>>> TOY PHASE CLOSED.** Stages A (confusion), A.1 (robustness/readouts), A.2 (coherence),
+A.3 (interaction map) establish the information-theoretic skeleton. **Next = Stage C:**
+port marginal distance info onto the real discovery likelihood
+(`build_fast_scan_likelihood`, autodiff Hessian marginalising CW params), real
+heterogeneous noise + GWB GP (drop the frozen-at-truth optimism), and report **absolute
+sigma_L in pc** (the toy's schematic ζ=h/2πf normalisation makes only shapes/ratios
+trustworthy, never absolute precision). Cross-check the marginal-info threshold against
+the conditional joint-Δln L metric. Open risk (from §9): discotech's GPU jax may need a
+pinned discovery venv.
 
 ## 7. Cross-cutting issues / caveats flagged
 
@@ -336,6 +371,16 @@ coherence` (N=1, 116 psr, 15 yr weekly; ~9 min, dominated by the confusion-knee 
   transitions scale with T; clean discriminator is N (coherence full at N=1 where
   confusion absent), not T. Corrected §6 "two transitions" accordingly. New files
   prong2_coherence.{npz,png} via `prong2_transition.py coherence`. (Claude + Matt)
+
+- 2026-06-25 (Stage A.3, cronus/4090) — Toy CAPSTONE: the N x t_c map. Combined confusion
+  + coherence; dphi-block marginalised by per-pulsar N x N solves (block-diagonal over
+  pulsars), validated vs dense single-Schur at N=8 (5.9e-11). Edge gates: y->0 == Stage-A
+  confusion (4.2e-8), x=1 == Stage-A.2 coherence (4.7e-15). Headline: the transitions do
+  NOT factorise — max|R - R(N,0)R(1,Y)| = 0.331 at (N/N*=12, Y=0.27), R<product, so
+  decoherence COMPOUNDS confusion (curved 0.5 contour, not a rectangle). Hit+fixed a
+  ratio-of-medians vs median-of-ratios bug (differ at N=1). Marked the TOY PHASE CLOSED;
+  Stage C (discovery likelihood, real noise, absolute sigma_L) is next. New files
+  prong2_Ntc_map.{npz,png} via `prong2_transition.py ntcmap`. (Claude + Matt)
 
 ## 9. Environment (cronus)
 - GPU box cronus = NVIDIA RTX 4090, driver 550.120.
