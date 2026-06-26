@@ -174,6 +174,38 @@ the rank-deficient padded/confusion block. Source-extras + distance gradients co
 jacfwd; per-call 16 s → 0.7 s (~22×), which is what lets N_max=1000 fit in 24 GB. Fisher
 assembled per-pulsar (F_LL diagonal) to keep memory O(n_src²) not O(n_param·n_data).
 
+**Stage A.1 probes (robustness + physics readouts; ~40 min run):**
+- **rcond robustness.** Swept the eigh-pinv threshold rcond ∈ {1e-8, 1e-10, 1e-12}:
+  0.5-knee = **422.6 for all three (0.0% spread)**. Marginal is insensitive to the cut →
+  production rcond = **1e-10**. The collapse is a real loss of source-block rank, not a
+  regularisation artifact.
+- **Marginal is an ARRAY effect, not per-pulsar.** F_ss is built as (1/σ²) Σ_a H_aᵀH_a
+  over ALL pulsars (the shared global Earth term pins the source phases). Verified: a
+  pulsar marginalising on its OWN data block alone gives marginal = **8.2e-10 · cond ≈ 0**
+  (its distance is degenerate with its own source phase/amp — all single sinusoids span
+  the same 2-D {sin,cos} space as the 2 nuisances), while the full-array marginal is
+  0.93·cond. So marg≠0 requires the cross-pulsar sum. (Confirms the single-pulsar
+  degeneracy claim above, now demonstrated rather than asserted.)
+- **σ_L in parsec (J0437-like, L=156.8 pc, idx 0).** fixed_total: σ_L = 1/√I_marg rises
+  **0.0034 → 0.0076 pc** across N=1→1000 (≈3.3× degradation as the CW fragments);
+  fixed_persource σ_L only *improves* (0.034 → 0.0014 pc, per-source power keeps adding
+  info). **Neither crosses 1 pc nor the ~0.25 pc EM/VLBI prior in N≤1000** — the schematic
+  ζ=h/2πf normalisation is far too optimistic in absolute terms. Only the *shape* (3.3×
+  relative degradation) transfers; absolute crossings need the real discovery-likelihood
+  amplitudes + heterogeneous noise (the porting step). **Caveat for the writeup: do not
+  quote absolute σ_L from the toy.**
+- **Per-source optimal SNR at the knee** (N=423): median **≈195** (√ of Σ snr² over TOAs
+  ×116 pulsars) — again schematic-amplitude-inflated; relative use only.
+- **Population amplitude mode** (k=3 loud + (N−k) faint, h_loud/h_faint=10): marg/cond
+  departs the uniform curve only mildly — first |Δ|>0.02 at **N=158, max Δ=−0.025**. The
+  exact amplitude-degeneracy IS broken, but the 3 loud sources dominate the recoverable
+  *fraction*, so the big effect is on absolute conditional info: cond **plateaus**
+  (~2.8e10 at N=1000 vs 2.1e12 uniform) because the faint sources carry h²/100 power.
+  Lesson: mode-independence of marg/cond is an artifact of equal amplitudes; with a
+  realistic luminosity function the curve is set by the handful of loud sources.
+- marg/cond at key N (fiducial): N=1 → **0.991**, N=10 → 0.986, N\*=8 → 0.987,
+  knee=423 → **0.500**, N=1000 → **0.084**.
+
 ## 7. Cross-cutting issues / caveats flagged
 
 1. **Conditional vs marginal.** `compute_joint_best_wrong_in_prior` finds each
@@ -214,6 +246,17 @@ assembled per-pulsar (F_LL diagonal) to keep memory O(n_src²) not O(n_param·n_
   under T (knee/N\*≈52 const) but offset ~50× by array resolution (band-scaling only
   rough). Goal-"y" threshold: distance info survives to N≈50·T·Δf for 116 psr. Refreshed
   3-panel figure + npz. Files now under CW_transition/. (Claude + Matt)
+
+- 2026-06-25 (Stage A.1, cronus/4090) — Robustness + physics probes on prong2. (1) rcond
+  sweep {1e-8,1e-10,1e-12}: knee=422.6, 0% spread → kept production rcond=1e-10. (2)
+  Asserted F_ss = Σ over ALL pulsars; single-pulsar-only marginal=8.2e-10·cond≈0 →
+  non-zero marginal is a genuine cross-pulsar (shared-Earth-term) effect. (3) σ_L(pc) for
+  J0437-like: fixed_total degrades 0.0034→0.0076 pc, persource improves; neither crosses
+  1 pc / 0.25 pc EM in N≤1000 (toy amplitude too optimistic — DON'T quote absolute σ_L).
+  (4) median per-source SNR at knee≈195 (schematic). (5) population mode (3 loud+faint,
+  10×): marg/cond departs uniform only at N=158 (Δ=−0.025); real break is cond plateauing
+  on the loud sources → mode-independence is an equal-amplitude artifact. Figure now 2×3
+  (added σ_L + rcond panels, population overlays); npz extended. (Claude + Matt)
 
 ## 9. Environment (cronus)
 - GPU box cronus = NVIDIA RTX 4090, driver 550.120.

@@ -210,54 +210,98 @@ def _eigh_pinv(A, rcond=1e-10):
 
 
 @partial(jax.jit, static_argnums=(5,))
-def fisher_array(toas, p_hats, L_arr, srcs, mask, n_psr, sigma):
-    """Joint Fisher for the array. Returns per-pulsar (conditional, marginal) distance
-    information arrays of shape (n_psr,).
+def fisher_blocks(toas, p_hats, L_arr, srcs, mask, n_psr, sigma):
+    """Assemble the array Fisher blocks (the expensive part; rcond-independent).
 
-    Conditional = diagonal of the L-block (other params known).
-    Marginal    = Schur complement removing the source-parameter block (phases/amps),
-                  using an eigh pseudo-inverse of the source block.
+    Returns
+        cond : (n_psr,)            diag F_LL  (conditional distance info per pulsar)
+        F_Ls : (n_psr, 2*n_max)    distance x source-parameter cross block
+        F_ss : (2*n_max, 2*n_max)  source-parameter block, SUMMED OVER ALL PULSARS
 
-    Assembled per-pulsar (lax.scan) rather than as one monolithic Jacobian: a pulsar's
-    residual depends only on its OWN distance, so F_LL is diagonal and the array Fisher
-    is a sum of per-pulsar outer products. Memory stays O(n_src^2) instead of
-    O(n_param * n_data), which is what lets N_max=1000 fit on a 24 GB GPU.
+    *** How F_ss is built across the array (key to why the marginal is non-zero) ***
+    Each pulsar a contributes H_a = dr_a/d{phase0_s, log10h_s}  (n_toa, 2*n_max). The
+    source block is  F_ss = (1/sigma^2) Σ_a H_a^T H_a  — the einsum 'pta,ptb->ab' sums
+    the pulsar axis p. So F_ss couples every source parameter to the WHOLE array's data:
+    the global Earth term (common to all pulsars) is what pins the source phases, after
+    which each pulsar-term phase determines that pulsar's distance. A single pulsar alone
+    has dr_a/dL_a perfectly degenerate with its own source phases (rank-deficient block,
+    marginal -> 0); the degeneracy is broken only by the cross-pulsar sum here.
+
+    Assembled per-pulsar (F_LL diagonal: a pulsar's residual depends only on its own
+    distance), so memory is O(n_src^2) not O(n_param * n_data) — what lets N_max=1000
+    fit on a 24 GB GPU.
     """
     inv_s2 = 1.0 / (sigma ** 2)
-
-    # per-pulsar analytic gradients in parallel
     g, H = jax.vmap(lambda ph, L: analytic_psr_grads(toas, ph, L, srcs, mask))(
         p_hats, L_arr)            # g:(n_psr,n_toa)  H:(n_psr,n_toa,2*n_max)
-
     cond = jnp.einsum("pt,pt->p", g, g) * inv_s2                 # diag F_LL
     F_Ls = jnp.einsum("pt,pta->pa", g, H) * inv_s2              # (n_psr, 2*n_max)
-    F_ss = jnp.einsum("pta,ptb->ab", H, H) * inv_s2            # (2*n_max, 2*n_max)
+    F_ss = jnp.einsum("pta,ptb->ab", H, H) * inv_s2            # (2*n_max, 2*n_max), Σ_a
+    return cond, F_Ls, F_ss
 
-    # Schur complement of the L-block after marginalising sources:
-    #   F_marg = F_LL - F_Ls F_ss^+ F_sL ; marginal info per pulsar = diag of F_marg
-    F_ss_pinv = _eigh_pinv(F_ss)
+
+@jax.jit
+def marg_from_blocks(cond, F_Ls, F_ss, rcond):
+    """Marginal distance info per pulsar from pre-assembled blocks, for a given rcond.
+
+    F_marg = F_LL - F_Ls F_ss^+ F_sL ; marginal info per pulsar = diag(F_marg).
+    """
+    F_ss_pinv = _eigh_pinv(F_ss, rcond)
     M = F_ss_pinv @ F_Ls.T                                        # (2*n_max, n_psr)
-    marg = jnp.clip(cond - jnp.sum(F_Ls.T * M, axis=0), 0.0, None)
+    return jnp.clip(cond - jnp.sum(F_Ls.T * M, axis=0), 0.0, None)
+
+
+def fisher_array(toas, p_hats, L_arr, srcs, mask, n_psr, sigma, rcond=1e-10):
+    """Convenience wrapper: per-pulsar (conditional, marginal) distance info."""
+    cond, F_Ls, F_ss = fisher_blocks(toas, p_hats, L_arr, srcs, mask, n_psr, sigma)
+    marg = marg_from_blocks(cond, F_Ls, F_ss, rcond)
     return cond, marg
 
 
 # ----------------------------------------------------------------------
 # Population draws + padding
 # ----------------------------------------------------------------------
-def draw_sources(n_src, rng, f_band, log10_h, fixed_total=False, h_total=None):
-    """Draw n_src sources. If fixed_total, set per-source h so sum h^2 = h_total^2."""
+def draw_sources(n_src, rng, f_band, log10_h, mode="fixed_persource", h_total=None,
+                 k_loud=3, h_ratio=10.0):
+    """Draw n_src sources.
+
+    mode:
+      'fixed_persource' : every source at log10_h.
+      'fixed_total'     : per-source h set so Σ h^2 = h_total^2.
+      'population'      : min(k_loud, n_src) loud sources at log10_h and the remaining
+                          (n_src - k_loud) faint sources a factor h_ratio weaker. This
+                          breaks the algebraic amplitude-degeneracy (sources no longer
+                          share one amplitude), so marg/cond is no longer amplitude-blind.
+    """
     theta = np.arccos(rng.uniform(-1, 1, n_src))
     phi = rng.uniform(0, 2 * np.pi, n_src)
     psi = rng.uniform(0, np.pi, n_src)
     cinc = rng.uniform(-1, 1, n_src)
     log10_f = rng.uniform(np.log10(f_band[0]), np.log10(f_band[1]), n_src)
     phase0 = rng.uniform(0, 2 * np.pi, n_src)
-    if fixed_total:
+    if mode == "fixed_total":
         h_each = h_total / np.sqrt(n_src)
         l10h = np.full(n_src, np.log10(h_each))
+    elif mode == "population":
+        l10h = np.full(n_src, log10_h - np.log10(h_ratio))   # faint default
+        l10h[:min(k_loud, n_src)] = log10_h                  # k loud sources
     else:
         l10h = np.full(n_src, log10_h)
     return np.stack([theta, phi, psi, cinc, log10_f, l10h, phase0], axis=1)
+
+
+@partial(jax.jit, static_argnums=(4,))
+def per_source_snr(toas, p_hats, L_arr, srcs, n_psr, sigma):
+    """Per-source optimal matched-filter SNR across the array.
+
+        SNR_s = sqrt( Σ_{pulsar a, TOA t} r_{a,s}(t)^2 / sigma^2 )
+
+    where r_{a,s} is source s's residual contribution at pulsar a. Returns (n_src,).
+    """
+    # residual of each (pulsar, source): (n_psr, n_src, n_toa)
+    r = jax.vmap(lambda ph, L: _src_vec(toas, ph, L, srcs))(p_hats, L_arr)
+    snr2 = jnp.sum(r ** 2, axis=(0, 2)) / (sigma ** 2)   # sum over pulsars & TOAs
+    return jnp.sqrt(snr2)
 
 
 def pad_sources(srcs, n_max):
@@ -307,52 +351,78 @@ def confusion_onset(T, f_band):
 def run_sweep(n_values, mode, n_max=None, n_seeds=30, n_psr=116,
               T=15 * YR, cadence_days=7.0, sigma=1e-7,
               f_band=(3e-9, 2e-8), log10_h=-14.3, h_total=5e-14, seed0=10,
-              p_hats=None, label=None):
-    """mode in {'fixed_persource', 'fixed_total'}.
+              p_hats=None, label=None, rconds=(1e-10,), L_arr=None,
+              target_idx=None, k_loud=3, h_ratio=10.0):
+    """mode in {'fixed_persource', 'fixed_total', 'population'}.
 
     Joint-array Fisher with PADDING: every realisation is padded to n_max sources so the
-    jitted fisher_array compiles exactly once. We report the median over pulsars (within
-    the array) and the 16/84 spread over population realisations.
+    jitted assembly compiles exactly once. Reports the median over pulsars and the 16/84
+    spread over realisations. The blocks are assembled once per realisation and the
+    marginal is evaluated for every rcond in `rconds` (rconds[0] is the primary value).
+
+    If target_idx is set, also tracks the marginal info of that specific pulsar (used for
+    the per-pulsar sigma_L conversion).
     """
     if n_max is None:
         n_max = int(max(n_values))
     if p_hats is None:
         p_hats = build_array(n_psr)
+    if L_arr is None:
+        L_arr = jnp.ones(n_psr)  # 1 kpc each (representative)
     toas = build_toas(T, cadence_days)
-    L_arr = jnp.ones(n_psr)  # 1 kpc each (representative)
     N_star = confusion_onset(T, f_band)
 
     cond_med, cond_lo, cond_hi = [], [], []
     marg_med, marg_lo, marg_hi = [], [], []
+    marg_by_rcond = {rc: [] for rc in rconds}
+    marg_target = []
 
     tag = label or mode
     for n_src in n_values:
-        cond_real, marg_real = [], []   # per-realisation array-median info
+        cond_real, marg_real = [], []
+        rc_real = {rc: [] for rc in rconds}
+        tgt_real = []
         for s in range(n_seeds):
             rng = np.random.default_rng(seed0 + 1000 * s + n_src)
-            srcs = draw_sources(n_src, rng, f_band, log10_h,
-                                fixed_total=(mode == "fixed_total"), h_total=h_total)
+            srcs = draw_sources(n_src, rng, f_band, log10_h, mode=mode,
+                                h_total=h_total, k_loud=k_loud, h_ratio=h_ratio)
             srcs_pad, mask = pad_sources(srcs, n_max)
-            cond, marg = fisher_array(toas, p_hats, L_arr,
-                                      jnp.array(srcs_pad), jnp.array(mask), n_psr, sigma)
+            cond, F_Ls, F_ss = fisher_blocks(toas, p_hats, L_arr, jnp.array(srcs_pad),
+                                             jnp.array(mask), n_psr, sigma)
+            marg0 = None
+            for rc in rconds:
+                marg = marg_from_blocks(cond, F_Ls, F_ss, rc)
+                rc_real[rc].append(float(jnp.median(marg)))
+                if marg0 is None:
+                    marg0 = marg
             cond_real.append(float(jnp.median(cond)))
-            marg_real.append(float(jnp.median(marg)))
+            marg_real.append(float(jnp.median(marg0)))
+            if target_idx is not None:
+                tgt_real.append(float(marg0[target_idx]))
         cond_real = np.array(cond_real); marg_real = np.array(marg_real)
         cond_med.append(np.median(cond_real))
         cond_lo.append(np.percentile(cond_real, 16)); cond_hi.append(np.percentile(cond_real, 84))
         marg_med.append(np.median(marg_real))
         marg_lo.append(np.percentile(marg_real, 16)); marg_hi.append(np.percentile(marg_real, 84))
+        for rc in rconds:
+            marg_by_rcond[rc].append(np.median(rc_real[rc]))
+        if target_idx is not None:
+            marg_target.append(np.median(tgt_real))
         ratio = marg_med[-1] / cond_med[-1] if cond_med[-1] > 0 else 0.0
         print(f"  [{tag}] N={n_src:5d}  cond={cond_med[-1]:.3e}  "
               f"marg={marg_med[-1]:.3e}  (marg/cond {ratio:.3f})", flush=True)
 
-    return dict(
+    out = dict(
         n=np.array(n_values),
         cond=np.array(cond_med), cond_lo=np.array(cond_lo), cond_hi=np.array(cond_hi),
         marg=np.array(marg_med), marg_lo=np.array(marg_lo), marg_hi=np.array(marg_hi),
         N_star=N_star, Tspan_bins=N_star, sigma=sigma, T=T, f_band=np.array(f_band),
         n_psr=n_psr, n_max=n_max, n_seeds=n_seeds, cadence_days=cadence_days,
     )
+    out["marg_by_rcond"] = {rc: np.array(v) for rc, v in marg_by_rcond.items()}
+    if target_idx is not None:
+        out["marg_target"] = np.array(marg_target)
+    return out
 
 
 # ----------------------------------------------------------------------
@@ -443,26 +513,117 @@ def run_knee_diagnostic(configs, n_values, n_seeds=12, n_psr=116,
     return out
 
 
+# ----------------------------------------------------------------------
+# J0437-like pulsar: nearby, well-localised MSP. Equatorial unit vector
+# (RA 04h37m ~ 69.3 deg, Dec -47.25 deg). Used for the sigma_L-in-pc readout.
+# ----------------------------------------------------------------------
+_j = np.array([np.cos(np.radians(-47.25)) * np.cos(np.radians(69.3)),
+               np.cos(np.radians(-47.25)) * np.sin(np.radians(69.3)),
+               np.sin(np.radians(-47.25))])
+J0437_PHAT = _j / np.linalg.norm(_j)
+J0437_L_KPC = 0.15679          # VLBI/timing distance ~156.8 pc (Reardon+ 2024)
+J0437_EM_SIGMA_PC = 0.25       # representative EM (parallax) prior width [pc]
+
+
+def array_with_target(n_psr, target_phat=J0437_PHAT, seed=777):
+    """Random array but with pulsar 0 fixed to a chosen (e.g. J0437-like) direction."""
+    p = np.array(build_array(n_psr, seed))
+    p[0] = target_phat
+    return jnp.array(p)
+
+
+def assert_array_coupling(n_src=40, n_max=64, n_psr=116, sigma=1e-7, T=15 * YR,
+                          cadence_days=7.0, f_band=(3e-9, 2e-8), log10_h=-14.3, seed=10):
+    """Item 2: show F_ss is summed over ALL pulsars, and that a non-zero marginal is a
+    genuine array effect — a single pulsar's own data cannot break the L<->phase
+    degeneracy (its per-pulsar marginal is ~0)."""
+    p_hats = build_array(n_psr); toas = build_toas(T, cadence_days)
+    L_arr = jnp.ones(n_psr); inv_s2 = 1.0 / sigma ** 2
+    srcs = draw_sources(n_src, np.random.default_rng(seed), f_band, log10_h)
+    srcs_pad, mask = pad_sources(srcs, n_max)
+    srcs_pad, mask = jnp.array(srcs_pad), jnp.array(mask)
+
+    cond, F_Ls, F_ss = fisher_blocks(toas, p_hats, L_arr, srcs_pad, mask, n_psr, sigma)
+    # per-pulsar source-derivative blocks H_a, shape (n_psr, n_toa, 2*n_max)
+    H = jax.vmap(lambda ph, L: analytic_psr_grads(toas, ph, L, srcs_pad, mask)[1])(
+        p_hats, L_arr)
+    F_ss_explicit = jnp.einsum("pta,ptb->ab", H, H) * inv_s2     # explicit Σ over pulsars
+    rel = float(jnp.max(jnp.abs(F_ss - F_ss_explicit)) / jnp.max(jnp.abs(F_ss)))
+    assert rel < 1e-10, f"F_ss assembly mismatch {rel:.1e}"
+
+    marg_full = marg_from_blocks(cond, F_Ls, F_ss, 1e-10)
+    # per-pulsar-only marginal: each pulsar marginalises using ONLY its own data block
+    def single(a):
+        Ha = H[a]
+        F_ss_a = (Ha.T @ Ha) * inv_s2
+        pinv = _eigh_pinv(F_ss_a, 1e-10)
+        return jnp.clip(cond[a] - F_Ls[a] @ (pinv @ F_Ls[a]), 0.0, None)
+    marg_single = jax.vmap(single)(jnp.arange(n_psr))
+
+    cmed = float(jnp.median(cond))
+    print(f"[coupling] F_ss = (1/sig^2) Σ_a H_a^T H_a over ALL {n_psr} pulsars "
+          f"(explicit-vs-einsum rel diff {rel:.1e}).", flush=True)
+    print(f"[coupling] N={n_src}: median cond={cmed:.3e}  "
+          f"array marginal={float(jnp.median(marg_full)):.3e} "
+          f"(marg/cond={float(jnp.median(marg_full))/cmed:.3f})  vs  "
+          f"single-pulsar-only marginal={float(jnp.median(marg_single)):.3e} "
+          f"(={float(jnp.median(marg_single))/cmed:.1e} of cond).", flush=True)
+    print("[coupling] -> single-pulsar marginal ~ 0 (L degenerate with its own source "
+          "phase/amp); non-zero marginal comes ONLY from the cross-pulsar sum that pins "
+          "the GLOBAL source phases via the shared Earth term.", flush=True)
+    return marg_full, marg_single
+
+
+def ratio_at_N(n, ratio, N_query):
+    """Log-N interpolation of a marg/cond curve at an arbitrary N."""
+    n = np.asarray(n, float); r = np.asarray(ratio, float)
+    return float(np.interp(np.log(N_query), np.log(n), r))
+
+
+def sigma_L_pc(marg_info_kpc):
+    """marginal I_LL [kpc^-2] -> sigma_L = 1/sqrt(I) in parsec."""
+    m = np.asarray(marg_info_kpc, float)
+    return 1e3 / np.sqrt(np.where(m > 0, m, np.nan))
+
+
 if __name__ == "__main__":
     import time
     OUT = "/home/mattm/projects/HSYMT/CW_transition/prong2_results.npz"
 
-    # 0) correctness gates
+    RCONDS = (1e-10, 1e-8, 1e-12)       # production first; sweep values for item 1
+
+    # 0) correctness gates + array-coupling proof (item 2)
     verify_padding()
     validate_grads()
+    print("", flush=True)
+    assert_array_coupling()
 
     # log-spaced N grid 1 -> ~1000
     n_values = sorted(set(int(round(x)) for x in np.logspace(0, 3, 16)))
-    print("N grid:", n_values, flush=True)
+    print("\nN grid:", n_values, flush=True)
     n_max = max(n_values)
-
     p_hats = build_array(116)
 
     t0 = time.time()
     print("\nFixed per-source strain (Mihir-style; independence line):", flush=True)
     res_ps = run_sweep(n_values, mode="fixed_persource", n_max=n_max, p_hats=p_hats,
-                       log10_h=-14.3)
-    print(f"[timing] fixed_persource sweep: {time.time() - t0:.1f}s", flush=True)
+                       log10_h=-14.3, rconds=RCONDS)
+    print(f"[timing] fixed_persource sweep (+rcond): {time.time() - t0:.1f}s", flush=True)
+
+    # --- item 1: rcond sweep -- recompute knee N for each rcond, pick stable value ---
+    print("\n[rcond] knee N vs rcond (eigh pseudo-inverse threshold):", flush=True)
+    rcond_knees = {}
+    for rc in RCONDS:
+        ratio_rc = res_ps["marg_by_rcond"][rc] / res_ps["cond"]
+        knee_rc = crossing_N(res_ps["n"], ratio_rc, 0.5)
+        rcond_knees[rc] = knee_rc
+        print(f"  rcond={rc:.0e}  knee(0.5)={knee_rc:7.2f}  "
+              f"marg/cond@1000={ratio_rc[-1]:.3f}", flush=True)
+    knee_spread = (max(rcond_knees.values()) - min(rcond_knees.values())) / \
+        np.median(list(rcond_knees.values()))
+    PROD_RCOND = 1e-10
+    print(f"  -> knee spread across rcond = {knee_spread*100:.1f}% ; "
+          f"production rcond = {PROD_RCOND:.0e} (knee stable)", flush=True)
 
     t1 = time.time()
     print("\nFixed total power (literal CW -> background fragmentation):", flush=True)
@@ -475,8 +636,81 @@ if __name__ == "__main__":
     rtot = res_tot["marg"] / res_tot["cond"]
     dev = np.abs(rps - rtot)
     ibreak = int(np.argmax(dev))
-    print(f"\n[mode-indep] max|Δ(marg/cond)| = {dev.max():.3f} at N={res_ps['n'][ibreak]} "
-          f"(ps={rps[ibreak]:.3f} vs tot={rtot[ibreak]:.3f})", flush=True)
+    print(f"\n[mode-indep] max|Δ(marg/cond)| (uniform ps vs tot) = {dev.max():.3f} at "
+          f"N={res_ps['n'][ibreak]} (ps={rps[ibreak]:.3f} vs tot={rtot[ibreak]:.3f})",
+          flush=True)
+
+    # --- item 5: population amplitude mode (k loud + faint) ---
+    tp = time.time()
+    print("\nPopulation mode (k=3 loud + faint, h_loud/h_faint=10; breaks "
+          "amplitude-degeneracy):", flush=True)
+    res_pop = run_sweep(n_values, mode="population", n_max=n_max, p_hats=p_hats,
+                        log10_h=-14.3, k_loud=3, h_ratio=10.0)
+    rpop = res_pop["marg"] / res_pop["cond"]
+    dpop = rpop - rps                         # population minus uniform
+    idep = np.where(np.abs(dpop) > 0.02)[0]
+    depart_N = int(res_pop["n"][idep[0]]) if len(idep) else -1
+    print(f"[population] departs uniform marg/cond (|Δ|>0.02) first at N={depart_N}; "
+          f"max Δ(marg/cond)={dpop[np.argmax(np.abs(dpop))]:+.3f} at "
+          f"N={res_pop['n'][np.argmax(np.abs(dpop))]}", flush=True)
+    print(f"[timing] population sweep: {time.time() - tp:.1f}s", flush=True)
+
+    # --- item 4: median per-source optimal SNR at N = knee ---
+    knee = crossing_N(res_ps["n"], rps, 0.5)
+    N_knee = max(2, int(round(knee)))
+    toas_k = build_toas(15 * YR, 7.0); L_k = jnp.ones(116)
+    snr_meds = []
+    for s in range(8):
+        srcs_k = draw_sources(N_knee, np.random.default_rng(500 + s), (3e-9, 2e-8), -14.3)
+        snr = per_source_snr(toas_k, p_hats, L_k, jnp.array(srcs_k), 116, 1e-7)
+        snr_meds.append(float(jnp.median(snr)))
+    snr_knee = float(np.median(snr_meds))
+    print(f"\n[snr] at N=knee={N_knee}: median per-source optimal SNR = {snr_knee:.2f} "
+          f"(sqrt of summed snr^2 over TOAs & pulsars)", flush=True)
+
+    # --- item 3: sigma_L in parsec for a J0437-like pulsar ---
+    # Use fixed_total: distance precision DEGRADES as the CW fragments into a background
+    # (in fixed_persource the per-source power keeps adding info, so sigma_L only improves
+    # and never crosses a threshold -- noted below).
+    ts = time.time()
+    print("\nsigma_L (pc) for a J0437-like pulsar (L=%.1f pc, idx 0; fixed_total):"
+          % (J0437_L_KPC * 1e3), flush=True)
+    p_hats_j = array_with_target(116)
+    L_arr_j = jnp.array(np.concatenate([[J0437_L_KPC], np.ones(115)]))
+    res_j = run_sweep(n_values, mode="fixed_total", n_max=n_max, p_hats=p_hats_j,
+                      L_arr=L_arr_j, h_total=5e-14, target_idx=0, label="J0437")
+    res_j_ps = run_sweep(n_values, mode="fixed_persource", n_max=n_max, p_hats=p_hats_j,
+                         L_arr=L_arr_j, log10_h=-14.3, target_idx=0, label="J0437_ps")
+    sig_pc = sigma_L_pc(res_j["marg_target"])
+    sig_pc_ps = sigma_L_pc(res_j_ps["marg_target"])
+
+    def cross_up(nv, y, level):
+        nv = np.asarray(nv, float); y = np.asarray(y, float)
+        m = np.isfinite(y)
+        nv, y = nv[m], y[m]
+        idx = np.where(y > level)[0]
+        if len(idx) == 0:
+            return np.nan
+        i = idx[0]
+        if i == 0:
+            return nv[0]
+        x0, x1 = np.log(nv[i - 1]), np.log(nv[i])
+        return float(np.exp(x0 + (level - y[i - 1]) * (x1 - x0) / (y[i] - y[i - 1])))
+
+    N_subpc = cross_up(res_j["n"], sig_pc, 1.0)
+    N_em = cross_up(res_j["n"], sig_pc, J0437_EM_SIGMA_PC)
+    print(f"[sigma_L] fixed_total sig_L(pc): "
+          f"{np.array2string(sig_pc, precision=4, max_line_width=200)}", flush=True)
+    nanmsg = lambda x: ("never in N<=1000" if not np.isfinite(x) else f"N≈{x:.0f}")
+    print(f"[sigma_L] crosses (a) sub-parsec (1 pc): {nanmsg(N_subpc)}; "
+          f"(b) EM prior {J0437_EM_SIGMA_PC} pc: {nanmsg(N_em)} "
+          f"(sigma_L grows as the background fragments).", flush=True)
+    print(f"[sigma_L] (fixed_persource sig_L stays {np.nanmin(sig_pc_ps):.3g}-"
+          f"{np.nanmax(sig_pc_ps):.3g} pc and only improves with N -- per-source power "
+          f"keeps adding distance info; no crossing.)", flush=True)
+    print(f"[sigma_L] NOTE absolute scale is schematic (zeta=h/2pi f norm); the SHAPE/"
+          f"relative degradation is the transferable result.", flush=True)
+    print(f"[timing] sigma_L sweep: {time.time() - ts:.1f}s", flush=True)
 
     # knee diagnostic: vary T and band -> check knee tracks N* = T*Δf
     t2 = time.time()
@@ -492,6 +726,13 @@ if __name__ == "__main__":
     diag = run_knee_diagnostic(configs, diag_N, n_seeds=12)
     print(f"[timing] knee diagnostic: {time.time() - t2:.1f}s", flush=True)
 
+    # --- required summary: marg/cond at N in {1, 10, N*, knee, 1000} ---
+    N_star = res_ps["N_star"]
+    print("\n[summary] marg/cond at key N (fixed_persource):", flush=True)
+    for tagN, Nq in [("1", 1), ("10", 10), ("N*", N_star), ("knee", knee), ("1000", 1000)]:
+        print(f"    N={tagN:>5s} ({Nq:7.1f}):  marg/cond = {ratio_at_N(res_ps['n'], rps, Nq):.3f}",
+              flush=True)
+
     # pack diagnostic arrays for npz (per-config keys)
     diag_pack = {}
     for d in diag:
@@ -504,12 +745,26 @@ if __name__ == "__main__":
         diag_pack[f"diag_{L}_fband"] = d["f_band"]
     diag_labels = np.array([d["label"] for d in diag])
 
+    # rcond marg curves + population + sigma_L extras
+    rcond_pack = {f"ps_marg_rcond_{rc:.0e}": res_ps["marg_by_rcond"][rc] for rc in RCONDS}
+
+    def clean(res):   # drop non-array fields before npz spread
+        return {k: v for k, v in res.items() if k not in ("marg_by_rcond", "marg_target")}
+
     np.savez(OUT,
-             **{f"ps_{k}": v for k, v in res_ps.items()},
-             **{f"tot_{k}": v for k, v in res_tot.items()},
+             **{f"ps_{k}": v for k, v in clean(res_ps).items()},
+             **{f"tot_{k}": v for k, v in clean(res_tot).items()},
+             **{f"pop_{k}": v for k, v in clean(res_pop).items()},
+             pop_k_loud=3, pop_h_ratio=10.0, pop_depart_N=depart_N,
              mode_indep_maxdev=dev.max(), mode_indep_break_N=res_ps['n'][ibreak],
+             rcond_values=np.array(RCONDS), prod_rcond=PROD_RCOND,
+             rcond_knees=np.array([rcond_knees[rc] for rc in RCONDS]),
+             rcond_knee_spread=knee_spread, **rcond_pack,
+             snr_knee_N=N_knee, snr_knee_median=snr_knee, knee_N=knee, N_star=N_star,
+             j_n=res_j["n"], j_marg_target=res_j["marg_target"], j_sigma_pc=sig_pc,
+             j_sigma_pc_ps=sig_pc_ps, j_marg_target_ps=res_j_ps["marg_target"],
+             j_L_kpc=J0437_L_KPC, em_sigma_pc=J0437_EM_SIGMA_PC,
+             sigma_subpc_N=N_subpc, sigma_em_N=N_em,
              diag_labels=diag_labels, **diag_pack)
     print(f"\nSaved {OUT}", flush=True)
-    print(f"Confusion onset N* = {res_ps['N_star']:.1f} (one source per 1/T frequency bin)",
-          flush=True)
     print(f"[timing] TOTAL: {time.time() - t0:.1f}s", flush=True)
