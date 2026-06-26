@@ -286,15 +286,28 @@ reachable at N<=256). Run: `python prong2_transition.py ntcmap` (~90 s).
   SNR²·sigma_phi² mis-centred (consistent w/ Stage-A.2 gate ii: location is the invariant,
   absolute t_c model-dependent). R is median-over-realisations of marg/cond (the stable
   reduction; do NOT use ratio-of-medians -- they differ at N=1, a bug we hit and fixed).
-- **HEADLINE — they INTERACT, sub-multiplicatively.** max |R - R(N,0)·R(1,Y)| = **0.331**
-  at **(N/N*=12.4, Y=0.27)**, sign **NEGATIVE**: R < product, i.e. the dphi nuisances
-  **COMPOUND** the confusion loss. The R=0.5 contour is **CURVED** (bows toward the
-  origin), not a rectangle -> the two thresholds are not independent. Residual ≈ 0 on the
-  edges (one effect alone) and maximally negative in the interior where confusion and
-  decoherence are both moderate. Physically: crowded sources AND decohered pulsar terms
-  destroy distance information faster than either limit alone -- the realistic SMBHB
-  background (many unresolved + finite-coherence binaries) sits in this compounding
-  interior, so the practical threshold is WORSE than the independent-threshold estimate.
+- **HEADLINE — they INTERACT, sub-multiplicatively (COMPOUND).** The R=0.5 contour is
+  **CURVED** (bows toward the origin), not a rectangle -> the thresholds are not
+  independent, and R falls BELOW the factorised product in the confusion-dominated
+  interior. Crowded sources AND decohered pulsar terms destroy distance information
+  faster than either limit alone -- the realistic SMBHB background (many unresolved +
+  finite-coherence binaries) sits in this compounding region, so the practical threshold
+  is WORSE than the independent-threshold estimate.
+- **ROBUSTNESS RE-CHECK (no re-grid).** The first pass measured the residual with
+  median-of-ratios per cell, which does NOT commute with the product. Recomputed two
+  COMMUTING ways from the saved per-cell median info: (1) Rbar = median(I_marg)/median
+  (I_cond), test |Rbar - Rbar(N,0)Rbar(1,Y)|; (2) info-level (I_marg vs I_cond·Rbar(N,0)
+  Rbar(1,Y), normalised by I_cond = same as (1)). Result: peak deviation drops
+  **0.331 -> 0.202** (at N/N*=27, Y=0.14) but stays **strongly negative (< -0.1)** through
+  the confusion-dominated interior -> **compounding is PHYSICAL, not a reduction
+  artefact**; median-of-ratios merely inflated the magnitude ~50%. The commuting map also
+  reveals SIGN STRUCTURE: a weak POSITIVE lobe at N/N*<1 (mild de-confusion -- random
+  pulsar-term phases slightly aid separation before confusion sets in) and the dominant
+  NEGATIVE (compounding) lobe at N/N*>~3. Verdict kept: COMPOUND, corrected peak ~0.20.
+  (Used median info, not mean, because mean needs per-seed data = a re-grid, prohibited;
+  median is an equally-valid commuting reduction and the sign/magnitude are decisive.)
+  Figure: `prong2_Ntc_map_corrected.png`; arrays added to `prong2_Ntc_map.npz`
+  (`Rbar`, `resid_commuting`, `max_factor_dev_commuting`).
 - **Files:** `prong2_transition.py` (`ntcmap` CLI), `prong2_Ntc_map.npz`,
   `prong2_Ntc_map.png` (heatmap of R + factorisation residual).
 
@@ -381,6 +394,13 @@ pinned discovery venv.
   ratio-of-medians vs median-of-ratios bug (differ at N=1). Marked the TOY PHASE CLOSED;
   Stage C (discovery likelihood, real noise, absolute sigma_L) is next. New files
   prong2_Ntc_map.{npz,png} via `prong2_transition.py ntcmap`. (Claude + Matt)
+
+- 2026-06-25 (Stage A.3 robustness, cronus/4090) — Re-checked the factorisation residual
+  with COMMUTING reductions (no re-grid; used saved per-cell median info). Peak deviation
+  0.331 -> 0.202 but stays < -0.1 in the confusion-dominated interior -> compounding is
+  PHYSICAL, median-of-ratios inflated it ~50%. Commuting map shows a weak positive
+  (de-confusion) lobe at N/N*<1 and the dominant negative (compounding) lobe at N/N*>3.
+  Verdict kept (COMPOUND). prong2_Ntc_map_corrected.png + extra npz keys. (Claude + Matt)
 
 ## 9. Environment (cronus)
 - GPU box cronus = NVIDIA RTX 4090, driver 550.120.
