@@ -586,8 +586,276 @@ def sigma_L_pc(marg_info_kpc):
     return 1e3 / np.sqrt(np.where(m > 0, m, np.nan))
 
 
-if __name__ == "__main__":
+# ======================================================================
+# COHERENCE transition (Stage A.2) -- distinct from the confusion transition.
+#
+# Each source has a finite coherence time t_c. The pulsar term is sampled at a
+# different retarded time along a different sightline for every pulsar, so we add an
+# INDEPENDENT per-(source,pulsar) pulsar-term phase offset dphi_{s,p} (default 0 ->
+# the coherent model). Decoherence is a Gaussian prior on dphi with variance
+#     sigma_phi^2_{s,p} = tau_{s,p} / t_c ,   tau_{s,p} = (L_p/c)(1 - cos mu_{s,p}) [s]
+# (same (1-cos mu) factor as compute_mode_spacing's denominator). Bayesian Fisher
+# F_total = F_data + Pi with Pi = diag(1/sigma_phi^2) on the dphi block only:
+#   t_c -> inf : sigma_phi^2 -> 0  -> Pi -> inf -> dphi PINNED  -> coherent (marg/cond
+#                = the Stage-A N=1 value, only phase0/logh marginalised).
+#   t_c -> 0   : sigma_phi^2 -> inf -> Pi -> 0   -> dphi FREE    -> decoherent. Each L_p
+#                is degenerate with its own dphi_{s,p} (single sinusoid) -> marginal -> 0.
+# This is Farr's coherence limit, isolated at N=1 (zero confusion).
+# ======================================================================
+def coh_single_residual(toas, p_hat, L_kpc, src, dphi):
+    """single_source_residual with an extra pulsar-term phase offset dphi."""
+    theta, phi, psi, cinc, log10_f, log10_h, phase0 = src
+    Fp, Fx, cos_mu = antenna(theta, phi, psi, p_hat)
+    f = 10.0 ** log10_f
+    zeta = (10.0 ** log10_h) / (2.0 * jnp.pi * f)
+    tau_p = (L_kpc * KPC_OVER_C) * (1.0 - cos_mu)
+    Phi_e = 2.0 * jnp.pi * f * toas + phase0
+    Phi_p = Phi_e - 2.0 * jnp.pi * f * tau_p + dphi          # decoherence offset
+    wp = 1.0 + cinc ** 2
+    wx = -2.0 * cinc
+    def wave(Phi):
+        return Fp * wp * jnp.sin(Phi) + Fx * wx * jnp.cos(Phi)
+    return zeta * (wave(Phi_e) - wave(Phi_p))
+
+
+def _coh_residual_from_vec(toas, p_hats, vec, srcs_fixed, n_psr, n_src):
+    """param vec = [L(n_psr), phase0(n_src), log10h(n_src), dphi(n_src*n_psr)]."""
+    L = vec[:n_psr]
+    phase0 = vec[n_psr:n_psr + n_src]
+    logh = vec[n_psr + n_src:n_psr + 2 * n_src]
+    dphi = vec[n_psr + 2 * n_src:].reshape(n_src, n_psr)     # [s, p]
+    srcs = srcs_fixed.at[:, 6].set(phase0).at[:, 5].set(logh)
+
+    def per_psr(p_hat, L_p, dphi_col):                      # dphi_col: (n_src,)
+        r_s = jax.vmap(lambda src, dp: coh_single_residual(toas, p_hat, L_p, src, dp))(
+            srcs, dphi_col)
+        return jnp.sum(r_s, axis=0)                         # (n_toa,)
+    R = jax.vmap(per_psr)(p_hats, L, dphi.T)               # (n_psr, n_toa)
+    return R.reshape(-1)
+
+
+@partial(jax.jit, static_argnums=(4, 5))
+def coherence_blocks(toas, p_hats, L_arr, srcs, n_psr, n_src, sigma):
+    """Data Fisher F over [L, phase0, log10h, dphi] (n_psr small here: N=1 use), plus the
+    tau_{s,p} array. rcond/Pi/t_c applied afterwards in coherence_marg (so one jacfwd
+    serves every t_c)."""
+    n_dphi = n_src * n_psr
+    vec0 = jnp.concatenate([L_arr, srcs[:, 6], srcs[:, 5], jnp.zeros(n_dphi)])
+    J = jax.jacfwd(lambda v: _coh_residual_from_vec(toas, p_hats, v, srcs, n_psr, n_src))(vec0)
+    F = (J.T @ J) / (sigma ** 2)
+    # tau_{s,p} = (L_p/c)(1 - cos mu_{s,p})   [seconds]
+    cos_mu = jax.vmap(lambda src: jax.vmap(lambda ph: jnp.dot(
+        sky_unit(src[0], src[1]), ph))(p_hats))(srcs)        # (n_src, n_psr)
+    tau = (L_arr[None, :] * KPC_OVER_C) * (1.0 - cos_mu)     # (n_src, n_psr)
+    return F, tau
+
+
+def sigma_phi2_linear(tau, t_c):
+    return tau / t_c
+
+
+def sigma_phi2_saturating(tau, t_c, sigma_max2=np.pi ** 2 / 3.0):
+    """Wrapped-phase-capped form: sigma_phi^2 = sigma_max^2 (1 - exp(-tau/t_c))."""
+    return sigma_max2 * (1.0 - jnp.exp(-tau / t_c))
+
+
+def coherence_marg_cond(F, tau, n_psr, n_src, t_c, form, rcond=1e-10, pin_dphi=False):
+    """Marginal/conditional L-info from data-Fisher F + decoherence prior on dphi.
+
+    cond = diag(F_LL) (all nuisances pinned). marg = Schur-complement the nuisance block
+    {phase0, log10h, dphi} out of F_total = F + Pi (Pi on dphi only). pin_dphi=True drops
+    dphi from the nuisance set entirely (the t_c->inf reference / Stage-A coherent value).
+    """
+    nL = n_psr
+    n_pl = 2 * n_src                          # phase0 + log10h count
+    cond = jnp.diag(F)[:nL]
+
+    if pin_dphi:
+        nu = slice(nL, nL + n_pl)             # marginalise only phase0/log10h
+        F_nn = F[nu, nu]
+    else:
+        nu = slice(nL, None)                  # phase0/log10h + dphi
+        sig2 = form(tau, t_c).reshape(-1)     # (n_src*n_psr,)  row-major [s,p]
+        pi = jnp.concatenate([jnp.zeros(n_pl), 1.0 / sig2])
+        F_nn = F[nu, nu] + jnp.diag(pi)
+    F_Ln = F[:nL, nu]
+    pinv = _eigh_pinv(F_nn, rcond)
+    marg = jnp.clip(cond - jnp.sum(F_Ln.T * (pinv @ F_Ln.T), axis=0), 0.0, None)
+    return cond, marg
+
+
+def _cross_x(x, y, level=0.5):
+    """Interpolate (log-x) where a monotone-decreasing y(x) passes through level."""
+    x = np.asarray(x, float); y = np.asarray(y, float)
+    below = np.where(y < level)[0]
+    if len(below) == 0 or below[0] == 0:
+        return np.nan
+    i = below[0]
+    lx = np.log(x[i - 1]) + (level - y[i - 1]) * (np.log(x[i]) - np.log(x[i - 1])) / \
+        (y[i] - y[i - 1])
+    return float(np.exp(lx))
+
+
+def run_coherence_experiment(n_psr=116, T=15 * YR, cadence_days=7.0, sigma=1e-7,
+                             f_band=(3e-9, 2e-8), log10_h=-14.3, n_seeds=24,
+                             seed0=300, rcond=1e-10):
+    """Stage A.2: Farr's COHERENCE transition at N=1 (no confusion)."""
     import time
+    t0 = time.time()
+    OUT = "/home/mattm/projects/HSYMT/CW_transition/prong2_coherence.npz"
+    FIG = "/home/mattm/projects/HSYMT/CW_transition/prong2_coherence_transition.png"
+    p_hats = build_array(n_psr)
+    L_arr = jnp.ones(n_psr)
+    n_src = 1
+
+    def blocks_for_T(Tval, seeds):
+        toas = build_toas(Tval, cadence_days)
+        Fs, taus = [], []
+        for s in seeds:
+            srcs = jnp.array(draw_sources(n_src, np.random.default_rng(seed0 + s),
+                                          f_band, log10_h))
+            F, tau = coherence_blocks(toas, p_hats, L_arr, srcs, n_psr, n_src, sigma)
+            Fs.append(F); taus.append(tau)
+        return Fs, taus
+
+    seeds = list(range(n_seeds))
+    Fs, taus = blocks_for_T(T, seeds)
+    ref_tau = float(np.median([float(jnp.median(t)) for t in taus]))   # seconds
+
+    # coherent reference (dphi pinned) -- the Stage-A N=1 marg/cond
+    ref_ratios = []
+    for F, tau in zip(Fs, taus):
+        c, m = coherence_marg_cond(F, tau, n_psr, n_src, 1.0, sigma_phi2_linear,
+                                   rcond, pin_dphi=True)
+        ref_ratios.append(float(jnp.median(m) / jnp.median(c)))
+    ref_ratio = float(np.median(ref_ratios))
+    print(f"[coh] coherent reference (dphi pinned, N=1, {n_psr} psr): "
+          f"marg/cond = {ref_ratio:.4f}  (Stage-A N=1 value; toy-15psr was ~0.95)",
+          flush=True)
+
+    # ---- Experiment 1: sweep t_c so median tau/t_c spans 1e-3..1e3 ----
+    x_grid = np.logspace(-3, 3, 25)            # = ref_tau/t_c
+    x_gate = 1e-8                              # t_c -> inf
+    forms = {"linear": sigma_phi2_linear, "saturating": sigma_phi2_saturating}
+    exp1 = {}
+    for fname, form in forms.items():
+        ratios = []
+        for x in x_grid:
+            t_c = ref_tau / x
+            rr = [float(jnp.median(m) / jnp.median(c)) for c, m in
+                  [coherence_marg_cond(F, tau, n_psr, n_src, t_c, form, rcond)
+                   for F, tau in zip(Fs, taus)]]
+            ratios.append(float(np.median(rr)))
+        exp1[fname] = np.array(ratios)
+        x_half = _cross_x(x_grid, exp1[fname], 0.5)
+        print(f"[coh] Exp1 [{fname}] marg/cond=0.5 at tau_p/t_c = {x_half:.3g}", flush=True)
+
+    # gate (i): t_c -> inf reproduces coherent reference
+    t_c_inf = ref_tau / x_gate
+    rr_inf = [float(jnp.median(m) / jnp.median(c)) for c, m in
+              [coherence_marg_cond(F, tau, n_psr, n_src, t_c_inf, sigma_phi2_linear, rcond)
+               for F, tau in zip(Fs, taus)]]
+    coh_inf = float(np.median(rr_inf))
+    gate_err = abs(coh_inf - ref_ratio)
+    print(f"[coh][gate i] t_c->inf marg/cond={coh_inf:.4f} vs coherent ref={ref_ratio:.4f} "
+          f"(|Δ|={gate_err:.1e})", flush=True)
+    assert gate_err < 1e-3, f"t_c->inf does not reproduce coherent reference ({gate_err:.1e})"
+
+    x_half_lin = _cross_x(x_grid, exp1["linear"], 0.5)
+    x_half_sat = _cross_x(x_grid, exp1["saturating"], 0.5)
+    shift = x_half_sat / x_half_lin
+    print(f"[coh][gate ii] 0.5-crossing moves {shift:.2f}x between linear and saturating "
+          f"forms (location robust ~ tau_p/t_c~1; shape model-dependent).", flush=True)
+
+    # ---- Experiment 2: fix mid-transition t_c, vary T -> coherence is T-INDEPENDENT ----
+    t_c_mid = ref_tau / x_half_lin             # where marg/cond ~ 0.5
+    Tyrs = np.array([10.0, 15.0, 20.0, 30.0])
+    coh_vsT = []
+    for Ty in Tyrs:
+        Fs_T, taus_T = blocks_for_T(Ty * YR, list(range(12)))
+        rr = [float(jnp.median(m) / jnp.median(c)) for c, m in
+              [coherence_marg_cond(F, tau, n_psr, n_src, t_c_mid, sigma_phi2_linear, rcond)
+               for F, tau in zip(Fs_T, taus_T)]]
+        coh_vsT.append(float(np.median(rr)))
+    coh_vsT = np.array(coh_vsT)
+    # marg/cond = 1/(1 + (tau/t_c)*SNR^2); SNR^2 ~ T  =>  marg/cond ~ 1/(1 + T/T0).
+    inv = 1.0 / coh_vsT - 1.0
+    T0 = float(np.median(Tyrs / inv))         # yr; inv ~ T/T0
+    print(f"[coh] Exp2 coherence marg/cond vs T={Tyrs.tolist()} yr: "
+          f"{np.round(coh_vsT, 4).tolist()}  -> FALSIFIES the T-independence guess: "
+          f"marg/cond falls as ~1/(1+T/{T0:.0f}yr) because the per-baseline phase offset "
+          f"is increasingly resolved as SNR^2~T grows (decoherence penalty = "
+          f"(tau/t_c)*SNR^2). Both transitions scale with T; the clean discriminator is "
+          f"N (coherence is full at N=1 where confusion is ABSENT -- Exp1).", flush=True)
+
+    # confusion knee vs T (band fixed) for the contrast curve
+    print("[coh] confusion knee vs T (for contrast):", flush=True)
+    diag_N = sorted(set(int(round(x)) for x in np.logspace(0, 3, 13)))
+    conf_configs = [(f"T{int(Ty)}", Ty * YR, f_band) for Ty in Tyrs]
+    conf = run_knee_diagnostic(conf_configs, diag_N, n_seeds=12, n_psr=n_psr,
+                               cadence_days=cadence_days, sigma=sigma, log10_h=log10_h)
+    conf_knee = np.array([d["knee"] for d in conf])
+    print(f"[coh] confusion knee vs T: {conf_knee.round(0).tolist()} (scales ~ T·Δf)",
+          flush=True)
+
+    np.savez(OUT, x_grid=x_grid, exp1_linear=exp1["linear"],
+             exp1_saturating=exp1["saturating"], ref_ratio=ref_ratio, ref_tau=ref_tau,
+             coh_inf=coh_inf, x_half_linear=x_half_lin, x_half_saturating=x_half_sat,
+             shape_shift=shift, Tyrs=Tyrs, coh_vsT=coh_vsT, conf_knee=conf_knee,
+             t_c_mid=t_c_mid, n_psr=n_psr, n_seeds=n_seeds, coh_T0_yr=T0)
+
+    # ---- 2-panel figure ----
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
+    fig, ax = plt.subplots(1, 2, figsize=(12.5, 4.8))
+    a = ax[0]
+    a.plot(x_grid, exp1["linear"], "o-", color="tab:blue", lw=2, ms=4,
+           label=r"linear $\sigma_\phi^2=\tau/t_c$")
+    a.plot(x_grid, exp1["saturating"], "s--", color="tab:red", lw=1.8, ms=4,
+           label=r"saturating $\sigma_\phi^2=\frac{\pi^2}{3}(1-e^{-\tau/t_c})$")
+    a.axhline(0.5, color="k", lw=.6, alpha=.5)
+    a.axhline(ref_ratio, color="gray", ls=":", lw=1, alpha=.7)
+    a.axvline(x_half_lin, color="tab:blue", ls=":", lw=1.2)
+    a.text(x_half_lin * 1.1, 0.55, f"0.5 @ {x_half_lin:.2g}", color="tab:blue", fontsize=8)
+    a.axvline(1.0, color="green", ls="--", lw=1, alpha=.6)
+    a.text(1.05, 0.05, r"$\tau_p/t_c=1$", color="green", fontsize=8, rotation=90)
+    a.set_xscale("log"); a.set_xlabel(r"$\tau_p/t_c$  (median over array)")
+    a.set_ylabel("marginal / conditional"); a.set_ylim(0, 1.02)
+    a.set_title("Exp 1: COHERENCE transition (N=1, zero confusion)", fontsize=10)
+    a.grid(alpha=.25, which="both"); a.legend(fontsize=8, loc="lower left")
+
+    a = ax[1]
+    a.plot(Tyrs, coh_vsT, "o-", color="tab:blue", lw=2, ms=6,
+           label="coherence marg/cond (fixed $t_c$)")
+    Tfit = np.linspace(Tyrs.min(), Tyrs.max(), 50)
+    a.plot(Tfit, 1.0 / (1.0 + Tfit / T0), "-", color="tab:blue", lw=1, alpha=.5,
+           label=fr"$1/(1+T/{T0:.0f}\,\mathrm{{yr}})$ (SNR$^2\!\propto T$)")
+    a.axhline(0.5, color="k", lw=.6, ls=":", alpha=.5)
+    a.set_xlabel("T  [yr]"); a.set_ylabel("coherence marg / cond", color="tab:blue")
+    a.set_ylim(0, 1.0); a.tick_params(axis="y", labelcolor="tab:blue")
+    a.set_title("Exp 2: coherence is NOT T-independent (falls via SNR);\n"
+                r"discriminator is N, not T -- confusion knee $\propto T$", fontsize=9.5)
+    a2 = a.twinx()
+    a2.plot(Tyrs, conf_knee, "s--", color="tab:red", lw=2, ms=6,
+            label=r"confusion knee $N$ ($\propto T\Delta f$)")
+    a2.set_ylabel("confusion knee  $N$", color="tab:red")
+    a2.tick_params(axis="y", labelcolor="tab:red")
+    l1, lb1 = a.get_legend_handles_labels(); l2, lb2 = a2.get_legend_handles_labels()
+    a.legend(l1 + l2, lb1 + lb2, fontsize=7.5, loc="upper center")
+    a.grid(alpha=.25)
+    fig.suptitle("Prong 2 Stage A.2 -- COHERENCE transition (N=1, distinct AXIS from "
+                 "confusion; both T-dependent)", fontsize=11, y=1.01)
+    fig.tight_layout(); fig.savefig(FIG, dpi=130, bbox_inches="tight")
+    print(f"[coh] saved {OUT}\n[coh] saved {FIG}\n[coh] total {time.time()-t0:.1f}s",
+          flush=True)
+
+
+if __name__ == "__main__":
+    import sys, time
+    if len(sys.argv) > 1 and sys.argv[1] == "coherence":
+        run_coherence_experiment()
+        sys.exit(0)
     OUT = "/home/mattm/projects/HSYMT/CW_transition/prong2_results.npz"
 
     RCONDS = (1e-10, 1e-8, 1e-12)       # production first; sweep values for item 1

@@ -206,6 +206,73 @@ assembled per-pulsar (F_LL diagonal) to keep memory O(n_src²) not O(n_param·n_
 - marg/cond at key N (fiducial): N=1 → **0.991**, N=10 → 0.986, N\*=8 → 0.987,
   knee=423 → **0.500**, N=1000 → **0.084**.
 
+### Two distinct transitions (do not conflate)
+
+A. SOURCE CONFUSION / RESOLVABILITY  ← what Stage A measured
+   - Controlled by N vs N* = T·Δf (number of resolvable 1/T frequency slots),
+     with a ~50× array-resolution boost from 116 pulsars seeing each source
+     through different (1-cos mu).
+   - An ESTIMATION limit: the array can't separately determine each source's
+     phase once sources crowd within a resolution element, so marginalising the
+     phases destroys distance info. Conditional info (phases known) never
+     collapses (∝N forever); all loss is in resolvability.
+   - RECEDES with longer T. Knee scales as T·Δf (verified, knee/N* ≈ 52).
+
+B. SIGNAL COHERENCE / DECOHERENCE  ← Farr's transition, PROBED in Stage A.2
+   - Controlled by source coherence time t_c vs Earth-pulsar light-travel time
+     tau_p = L(1-cos mu)/c (thousands of yr for a kpc pulsar).
+   - INTRINSIC: a stochastic field with t_c << tau_p has no expected Earth–pulsar
+     phase correlation, so distance info -> 0 regardless of how well sources are
+     resolved.
+   - ~~INDEPENDENT of T~~ — **CORRECTED by Stage A.2.** Was the pre-registered guess;
+     the Bayesian-Fisher measurement shows decoherence loss DOES grow with T (via
+     SNR accumulation, see Stage A.2). It exists at N=1 (the real distinction from
+     confusion) but is not T-independent. Our monochromatic sources have infinite
+     t_c, so the Stage-A model structurally cannot reach this limit without dphi.
+
+DISCRIMINATOR (corrected): the clean separator is the **N-axis, not T**. At N=1 there
+is zero confusion, yet a full decoherence transition exists (Stage A.2 Exp1). Both
+transitions happen to scale with T (confusion via T·Δf, coherence via SNR²∝T), so
+growing T does NOT isolate them — N=1 + finite t_c does.
+
+CAVEAT: in a realistic SMBHB background the two roughly coincide (the background's
+stochasticity IS many unresolved binaries), but they are set by different ratios.
+
+METRIC NOTE: for spiky (realistic) populations, marg/cond is misleading — it stays
+high while absolute information is small and carried by a few loud sources
+(Stage A.1: pop conditional plateaus at 2.8e10 vs 2.1e12 uniform, ratio barely
+moves). Switch the headline to absolute sigma_L once Stage C gives trustworthy units.
+
+**Stage A.2 — the COHERENCE transition (model + measurement).** Gave each source a
+finite coherence time via an INDEPENDENT per-(source,pulsar) pulsar-term phase offset
+dphi_{s,p} (default 0 = coherent), with a Gaussian decoherence prior of variance
+sigma_phi² = tau_{s,p}/t_c, tau_{s,p}=(L_p/c)(1−cos mu). Bayesian Fisher
+F_total = F_data + Pi (Pi=diag(1/sigma_phi²) on the dphi block). cond = dphi pinned;
+marg = Schur-complement {phase0, log10h, dphi}. Run: `python prong2_transition.py
+coherence` (N=1, 116 psr, 15 yr weekly; ~9 min, dominated by the confusion-knee contrast).
+- **Gate (i):** t_c→∞ (sigma_phi²→0 ⇒ dphi pinned) reproduces the coherent N=1 value
+  **0.9931** to **3.4e-6** (asserted). NB this is the 116-psr number; the 15-psr toy was
+  ~0.95.
+- **Exp 1 (headline, clean isolation):** at N=1 there is ZERO confusion, so the
+  marg/cond vs tau_p/t_c curve is Farr's decoherence uncontaminated. It falls
+  **0.99 → 0** across tau_p/t_c = 1e-3 → 1e3; **0.5-crossing at tau_p/t_c = 0.0144**
+  (linear form). Decoherence bites early (t_c ≈ 70·tau_p) because dphi_{s,p} is *exactly*
+  anti-parallel to ∂r/∂L per baseline ⇒ marg/cond = 1/(1 + (tau/t_c)·SNR²).
+- **Gate (ii) shape-robustness:** saturating form sigma_phi²=(π²/3)(1−e^{−tau/t_c})
+  moves the 0.5-crossing to 0.0044 — a **0.30× shift** (factor ~3). The transition
+  LOCATION (tau_p/t_c ≪ 1, order-of-magnitude) is robust; the exact coefficient and
+  SHAPE are model-dependent. **Absolute t_c values are model-dependent — only the
+  existence and the location-scaling (∝ tau_p) are the claim.**
+- **Exp 2 (falsified hypothesis, reported honestly):** fixed t_c (mid-transition),
+  vary T=10/15/20/30 yr → coherence marg/cond = **0.62/0.52/0.45/0.35**, i.e. it FALLS
+  with T as **1/(1+T/16 yr)**. The pre-registered guess that decoherence is
+  T-independent is **wrong**: the constant per-baseline offset is increasingly resolved
+  as SNR²∝T grows, so the penalty is (tau/t_c)·SNR². Both transitions therefore scale
+  with T; **the clean discriminator is the N-axis (Exp1), not T-scaling** (confusion knee
+  over the same T: 288/412/555/756, ∝T·Δf).
+- **Files:** coherence model in `prong2_transition.py` (`coherence` CLI),
+  `prong2_coherence.npz`, `prong2_coherence_transition.png` (2-panel: Exp1, Exp2).
+
 ## 7. Cross-cutting issues / caveats flagged
 
 1. **Conditional vs marginal.** `compute_joint_best_wrong_in_prior` finds each
@@ -257,6 +324,18 @@ assembled per-pulsar (F_LL diagonal) to keep memory O(n_src²) not O(n_param·n_
   10×): marg/cond departs uniform only at N=158 (Δ=−0.025); real break is cond plateauing
   on the loud sources → mode-independence is an equal-amplitude artifact. Figure now 2×3
   (added σ_L + rcond panels, population overlays); npz extended. (Claude + Matt)
+
+- 2026-06-25 (Stage A.2, cronus/4090) — Built the COHERENCE transition (Farr): per-
+  (source,pulsar) pulsar-term phase offset dphi with Gaussian decoherence prior
+  sigma_phi²=tau_p/t_c; Bayesian Fisher F_data+Pi; marg = Schur out {phase0,logh,dphi}.
+  Gate (i) t_c→∞ reproduces coherent N=1 = 0.9931 to 3.4e-6 (asserted). Exp1 (N=1, zero
+  confusion = clean isolation): marg/cond 0.99→0 vs tau_p/t_c, 0.5-crossing at
+  tau_p/t_c=0.0144; gate (ii) saturating form shifts it 0.30× (location robust, shape
+  model-dependent). Exp2 FALSIFIED the T-independence guess: coherence marg/cond falls
+  1/(1+T/16yr) because the constant baseline offset is resolved as SNR²∝T → both
+  transitions scale with T; clean discriminator is N (coherence full at N=1 where
+  confusion absent), not T. Corrected §6 "two transitions" accordingly. New files
+  prong2_coherence.{npz,png} via `prong2_transition.py coherence`. (Claude + Matt)
 
 ## 9. Environment (cronus)
 - GPU box cronus = NVIDIA RTX 4090, driver 550.120.
