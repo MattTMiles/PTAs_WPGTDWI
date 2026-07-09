@@ -3,3 +3,6 @@ partim_sim/
 __pycache__/
 signal_recovery/
 partim_real/
+.venv-holodeck/
+.ipynb_checkpoints/
+*.pid
