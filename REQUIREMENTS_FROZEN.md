@@ -15,7 +15,7 @@ two external editable git checkouts. This file records the actual runtime state.
 | dep | checkout path | commit (canonical) | notes |
 |---|---|---|---|
 | **discovery** | `/home/mattm/soft/discovery` (editable, `src/discovery`) | **`136b270f`** (`136b270f1891c28ae6d9840930a9dfbcf41fd52d`) — merge commit "Merge branch 'main' of github.com/MattTMiles/discovery", 2026-03-17 01:01:48, branch `main`; parent = `81966f9` | ACTUAL installed/`main` checkout; imported as `discovery` / `discovery.matrix`. See note below. |
-| **enterprise_extensions** | `/home/mattm/soft/enterprise_extensions` (editable) | `d43fef9` (`d43fef99d0aa786ec6b08dbc2fd56dcce10f26f5`) — "updates for det/CW signals", 2025-11-11 | reports `enterprise_extensions.__version__ == 3.0.3` |
+| **enterprise_extensions** | `/home/mattm/soft/enterprise_extensions` (editable) | `f73b8e0` (`f73b8e0b99d6bdafe43491f6a55087d71e9fb6b4`) — "cw_block_circ: default evolve=True", 2026-07-11 | reports `enterprise_extensions.__version__ == 3.0.3` |
 
 Both checkouts were **clean** (no uncommitted changes) at snapshot time.
 
@@ -121,7 +121,7 @@ colorama==0.4.6
 -e git+https://github.com/MattTMiles/discovery.git@136b270f1891c28ae6d9840930a9dfbcf41fd52d#egg=discovery
 emcee==(conda 1734122663166)
 enterprise-pulsar==3.4.4
--e git+https://github.com/MattTMiles/enterprise_extensions.git@d43fef99d0aa786ec6b08dbc2fd56dcce10f26f5#egg=enterprise_extensions
+-e git+https://github.com/MattTMiles/enterprise_extensions.git@f73b8e0b99d6bdafe43491f6a55087d71e9fb6b4#egg=enterprise_extensions
 ephem==4.2.1
 fastapi==0.136.3
 healpy==1.19.0
