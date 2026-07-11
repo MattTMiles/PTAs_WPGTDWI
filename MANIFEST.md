@@ -112,8 +112,14 @@ mistake stale output for current. Need a deprecation note, NOT deletion:**
 ## E. UNKNOWN — can't classify from headers alone
 
 - `global_covar.cvm` (2025-08-18, root) — best guess: cached enterprise global covariance matrix.
-- `data_products/b20_cw_curn_r0.pkl` + `_w_flags.pkl` (~20 MB, git-tracked) — best guess:
-  20-pulsar CW+CURN bundled simulation dataset; no doc reference ties results to it.
+- `data_products/b20_cw_curn_r0.pkl` + `_w_flags.pkl` (~20 MB, git-tracked) — **provenance
+  IDENTIFIED (SHOVEL, 2026-07): the full 116-pulsar `enterprise.pulsar_edited.Tempo2Pulsar`
+  array with an injected CW + CURN, realisation 0** (opcode walk: `list` of 116 `Tempo2Pulsar`,
+  113 distinct `Jhhmm±ddmm` names; the same array as the 116 `data_products/*.feather`). **`b20`
+  is a build/batch tag, NOT "20 pulsars."** `r0.pkl` dumped 2025-10-04; `_w_flags.pkl` re-dumped
+  2025-10-14 (matches the frozen feather-set date) with backend/system `_flags` populated and a
+  newer numpy. Generated during the Oct-2025 `hessian_check_enterprise_edited` lnL work (intro
+  commit `45882ad`). Still no doc ties a banked *result* to it → keep as benign data artifact.
 - `CW_lnL_check/holodeck_bundled_population_sample.npz` (16 MB) — holodeck SMBHB population
   sample; regenerable via `make_holodeck_bundled_population.py` (present), but not doc-cited.
 
@@ -176,7 +182,8 @@ Reproducibility of the compute rests on prose in §9 + these external git checko
 
 Not in the top-10-by-file but largest by *tree*: `.venv-holodeck/` 715 MB (regenerable; D).
 Most large items are embedded-output notebooks or caches (regenerable); the only genuine
-unique data are the two `b20_*.pkl` (provenance UNKNOWN) and the frozen feathers.
+unique data are the two `b20_*.pkl` (provenance IDENTIFIED — 116-psr Tempo2 CW+CURN sim r0,
+Oct-2025; see §E) and the frozen feathers.
 
 ---
 
@@ -203,6 +210,6 @@ unique data are the two `b20_*.pkl` (provenance UNKNOWN) and the frozen feathers
 7. **New §Q1 sub-project** — register `MAIN_PROJECT_QUESTIONS/Q1/` (ring-PTA MAP experiments,
    Dec-2025 run) as a distinct effort not covered by this tracker; reconcile with the
    backlog's "inverse-direction Q1".
-8. **Data provenance** — label `data_products/b20_cw_curn_r0*.pkl` and `global_covar.cvm`
-   (currently UNKNOWN), and add `.venv-holodeck/`, `*.pid`, non-`CW_transition` `__pycache__`
-   to `.gitignore`.
+8. **Data provenance** — `data_products/b20_cw_curn_r0*.pkl` now LABELLED (116-psr Tempo2
+   CW+CURN sim r0, Oct-2025; §E); `global_covar.cvm` still UNKNOWN. Add `.venv-holodeck/`,
+   `*.pid`, non-`CW_transition` `__pycache__` to `.gitignore`.

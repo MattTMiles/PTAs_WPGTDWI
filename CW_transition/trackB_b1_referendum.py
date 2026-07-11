@@ -281,10 +281,15 @@ def z_needle(G, boxhalf, g0, tag):
         rising = [k for k in range(D) if evals[k] <= 0 and micro[k] > 0]
         print(f"     *** {D-npos} NON-POSITIVE curvature direction(s) at truth. Of these, "
               f"{len(rising)} actually RISE at |s|=1e-7 x cap (dg > 0). ***", flush=True)
-        print(f"     Interpretation: negative curvature + dg<0 at every scanned scale = a MICRO-DIP "
-              f"at truth inside a globally sharp peak (fringe-entropy gain beating lnL_ref loss at "
-              f"sub-fringe offsets), NOT a saddle. Z_needle is then still a well-defined local "
-              f"integral, but it is NOT a Laplace integral -- quadrature only.", flush=True)
+        far = logscan[-1]
+        print(f"     Interpretation: negative curvature at truth with dg RISING at the smallest "
+              f"scanned offsets and FALLING far out (dg at |s|=cap: "
+              f"{np.array2string(far, precision=0)}) = a MICRO-DIP at truth inside a globally sharp "
+              f"peak. Mechanism: lnL_marg = lnL_ref + sum_p m_p with m_p >= 0; lnL_ref is maximal at "
+              f"truth (zero-noise Asimov) but every m_p GROWS as its pulsar de-registers, so a "
+              f"sub-fringe offset can buy more fringe entropy than it costs. The mode is a thin "
+              f"SHELL, not a point: NOT a saddle, and NOT a Laplace integral -- quadrature only. "
+              f"Peak displacement ~{np.max(np.abs(micro)):.2f} nat above truth.", flush=True)
 
     # ---- per-eigenvector quadrature: BRACKET the peak, then integrate inside it ----
     # The first Tier-A pass set the integration range from the eigenvalue (6 sigma, or the whole
@@ -294,33 +299,40 @@ def z_needle(G, boxhalf, g0, tag):
     # signature of an unresolved peak. Range must come from the FUNCTION, not from the curvature.
     DROP = 30.0                       # bracket where lnL_marg has fallen DROP nat below the peak
 
-    def _edge(k, sign, cap):
-        """smallest |s| along +/- evec_k where dg <= -DROP; bisect on a log-bracketed scan."""
-        s = min(1e-7, 0.5 * cap)
-        for _ in range(40):                      # expand
-            if s >= cap:
-                return cap, False                # never drops inside the box -> flag
-            d = G((sign * s * evecs[:, k])[None])[0] - g0
-            if d <= -DROP:
-                break
-            s *= 1.7
-        lo, hi = s / 1.7, min(s, cap)
-        for _ in range(18):                      # bisect
-            mid = 0.5 * (lo + hi)
-            d = G((sign * mid * evecs[:, k])[None])[0] - g0
-            if d <= -DROP:
-                hi = mid
-            else:
-                lo = mid
-        return hi, True
+    # BATCHED bracket search. A sequential expand+bisect calls G() one point at a time, and
+    # lnmarg pads every call to T_CHUNK particles to keep one compiled shape -- so each single
+    # point cost a full 32-particle batch (~32x waste, ~100 min over 12 edges). Instead: one dense
+    # log-grid per (dim, sign), evaluated in ONE batch, with the -DROP crossing interpolated in
+    # log s. Same contour, ~10x fewer padded calls.
+    NG = 28
+    caps = np.array([np.min(boxhalf / (np.abs(evecs[:, k]) + 1e-30)) for k in range(D)])
+    grids = [np.geomspace(max(1e-8, 1e-7 * caps[k]), caps[k], NG) for k in range(D)]
+    pts = []
+    for k in range(D):
+        for sign in (-1.0, +1.0):
+            for s in grids[k]:
+                pts.append(sign * s * evecs[:, k])
+    dg_all = (G(np.array(pts)) - g0).reshape(D, 2, NG)
 
     edges = np.zeros((D, 2)); closed = np.zeros(D, bool)
     for k in range(D):
-        cap = np.min(boxhalf / (np.abs(evecs[:, k]) + 1e-30))
-        em, okm = _edge(k, -1.0, cap)
-        ep, okp = _edge(k, +1.0, cap)
-        edges[k] = (em, ep); closed[k] = okm and okp
-        print(f"       eig{k}: bracket [-{em:.3e}, +{ep:.3e}] (cap {cap:.2e}) "
+        for si, sign in enumerate((-1.0, +1.0)):
+            d = dg_all[k, si]
+            below = np.where(d <= -DROP)[0]
+            if len(below) == 0:
+                edges[k, si] = caps[k]           # never drops DROP nat inside the box
+                ok = False
+            else:
+                i = below[0]
+                if i == 0:
+                    edges[k, si] = grids[k][0]
+                else:                            # linear interpolation in log s onto dg = -DROP
+                    x0, x1 = np.log(grids[k][i - 1]), np.log(grids[k][i])
+                    y0, y1 = d[i - 1], d[i]
+                    edges[k, si] = float(np.exp(x0 + ((-DROP) - y0) * (x1 - x0) / (y1 - y0)))
+                ok = True
+            closed[k] = ok if si == 0 else (closed[k] and ok)
+        print(f"       eig{k}: bracket [-{edges[k,0]:.3e}, +{edges[k,1]:.3e}] (cap {caps[k]:.2e}) "
               f"{'closed' if closed[k] else 'OPEN -> peak not contained in box'}", flush=True)
 
     def lnJ(nq):
@@ -373,7 +385,8 @@ def _resample(w, rng):
     return np.searchsorted(np.cumsum(w), pos)
 
 
-def z_box(G, boxhalf, N, seed, needle_sig, n_mcmc=4, tag="", target_acc=0.25, max_mcmc=14):
+def z_box(G, boxhalf, N, seed, needle_sig, n_mcmc=4, tag="", target_acc=0.25, max_mcmc=20,
+          adapt_acc=0.35):
     """Tempered SMC for ln Z over the tier box.
 
     STRENGTHENED (pre-registered, Matt 2026-07-09). The first Tier-A pass used a FIXED number of
@@ -385,10 +398,37 @@ def z_box(G, boxhalf, N, seed, needle_sig, n_mcmc=4, tag="", target_acc=0.25, ma
     """
     rng = np.random.default_rng(seed)
     D = len(boxhalf)
-    X = rng.uniform(-boxhalf, boxhalf, size=(N, D))
-    L = G(X)
-    beta = 0.0; logZ = 0.0; s = 0.5; stage = 0
+    ckpt_path = f"{CWT}/b1_ref_{tag}_s{seed}_ckpt.npz"
     ess_hist = []; acc_hist = []
+    # RESUME (C1a): each SMC's first act is to look for its OWN checkpoint and pick up from the
+    # last completed stage. The checkpoint (written at the end of every stage below) carries the
+    # full state INCLUDING the bit-generator state, so a resumed run is bit-identical to an
+    # uninterrupted one (RNG draws continue from exactly where they were). A shape mismatch
+    # (different N/D box) or a corrupt file falls back to a fresh start rather than resuming wrong.
+    resumed = False
+    if os.path.exists(ckpt_path):
+        try:
+            ck = np.load(ckpt_path, allow_pickle=True)
+            if tuple(ck["X"].shape) == (N, D):
+                X = np.array(ck["X"]); L = np.array(ck["L"])
+                beta = float(ck["beta"]); logZ = float(ck["logZ"]); stage = int(ck["stage"])
+                s = float(ck["s"])
+                rng.bit_generator.state = ck["rng_state"].item()
+                ess_hist = [float(v) for v in np.atleast_1d(ck["ess"])]
+                ah0 = np.atleast_2d(ck["acc_hist"])
+                acc_hist = [tuple(map(float, r)) for r in ah0] if ah0.size else []
+                resumed = True
+                print(f"     [smc {tag} s{seed}] RESUME from {os.path.basename(ckpt_path)}: "
+                      f"stage {stage}, beta={beta:.4f} (bit-exact continuation)", flush=True)
+            else:
+                print(f"     [smc {tag} s{seed}] ckpt shape {tuple(ck['X'].shape)} != "
+                      f"({N},{D}); ignoring, fresh start", flush=True)
+        except Exception as e:
+            print(f"     [smc {tag} s{seed}] ckpt load failed ({e!r}); fresh start", flush=True)
+    if not resumed:
+        X = rng.uniform(-boxhalf, boxhalf, size=(N, D))
+        L = G(X)
+        beta = 0.0; logZ = 0.0; s = 0.5; stage = 0
     while beta < 1.0 - 1e-12:
         def ess_at(db):
             lw = db * L; lw = lw - lw.max()
@@ -427,7 +467,11 @@ def z_box(G, boxhalf, N, seed, needle_sig, n_mcmc=4, tag="", target_acc=0.25, ma
             take = inbox & (np.log(rng.random(N)) < a)
             X[take] = Xp[take]; L[take] = Lp[take]
             a_i = float(take.mean()); accs.append(a_i); nsw += 1
-            s = float(np.clip(s * np.exp(a_i - 0.234), 1e-6, 1.0))
+            # adapt TOWARD `adapt_acc`, which must sit ABOVE the gate's target_acc.
+            # Adapting to the RW optimum 0.234 while gating on acc >= 0.25 is
+            # self-contradictory: the scale adaptation drives acceptance below the gate,
+            # every stage exhausts max_mcmc, and adding seeds cannot fix a kernel problem.
+            s = float(np.clip(s * np.exp(a_i - adapt_acc), 1e-6, 1.0))
             if nsw >= n_mcmc and np.mean(accs[-n_mcmc:]) >= target_acc:
                 break
         acc = float(np.mean(accs[-n_mcmc:]))
@@ -435,8 +479,12 @@ def z_box(G, boxhalf, N, seed, needle_sig, n_mcmc=4, tag="", target_acc=0.25, ma
         print(f"     [smc {tag} s{seed}] sweeps={nsw} "
               f"stage {stage}: beta={beta:.4f} ESS={ess:.0f} "
               f"acc={acc:.2f} Lmax={L.max():.1f} logZdens={logZ:.3f}", flush=True)
-        np.savez(f"{CWT}/b1_ref_{tag}_s{seed}_ckpt.npz", beta=beta, logZ=logZ, X=X, L=L,
-                 stage=stage, ess=np.array(ess_hist))
+        # checkpoint the FULL resumable state at each stage boundary (C1a). rng_state makes the
+        # resume bit-exact; s and acc_hist restore the RW-scale and the acceptance history the
+        # return value / gate depend on.
+        np.savez(ckpt_path, beta=beta, logZ=logZ, X=X, L=L, stage=stage,
+                 ess=np.array(ess_hist), s=s, acc_hist=np.array(acc_hist),
+                 rng_state=np.array(rng.bit_generator.state, dtype=object))
     excised = int(np.sum(np.all(np.abs(X) < 5.0 * needle_sig, axis=1)))
     lnV = float(np.sum(np.log(2 * boxhalf)))
     ah = np.array(acc_hist)                      # (stage, 3) = beta, acc, sweeps
@@ -460,6 +508,14 @@ def mode_run(args):
         print(f"  data = CW(truth) + noise draw seed {args.noise_seed}", flush=True)
     else:
         print(f"  data = zero-noise Asimov", flush=True)
+
+    # RUN KEY (C1b): the Asimov production run keeps its canonical, un-suffixed names
+    # (b1_referendum_tier{tier}.npz -- breakeven and the doc tables load these). A NOISY run
+    # (smoke test or a B1 realisation) is keyed by noise_seed on every artifact it writes --
+    # SMC checkpoint tag, needle-diagnostic npz, and final output -- so it can never overwrite
+    # the Asimov artifacts or a different realisation's.
+    noise_sfx = f"_noisy_n{args.noise_seed}" if args.noise else ""
+    runtag = f"t{args.tier}" + (f"_n{args.noise_seed}" if args.noise else "")
 
     G = TargetedMarg(P, data, mask1)
     half_f, half_mc, prov = tier_boxes(P, args.tier, args.sig_p)
@@ -486,11 +542,11 @@ def mode_run(args):
     (lnZn_q, lnZn_l, evals, evecs, sig_needle, dJ, rich, npos, prof,
      edges, closed, logscan) = z_needle(G, boxhalf, g0, f"tier{args.tier}")
     if args.needle_only:
-        np.savez(f"{CWT}/b1_needlediag_tier{args.tier}.npz", g0=g0, lnZn_quad=lnZn_q,
+        np.savez(f"{CWT}/b1_needlediag_tier{args.tier}{noise_sfx}.npz", g0=g0, lnZn_quad=lnZn_q,
                  lnZn_lap=lnZn_l, evals=evals, evecs=evecs, sig_needle=sig_needle,
                  doubling=dJ, richardson=rich, npos=npos, prof=prof, boxhalf=boxhalf,
                  edges=edges, closed=closed, logscan=logscan)
-        print(f"\n  [needle-only] saved b1_needlediag_tier{args.tier}.npz", flush=True)
+        print(f"\n  [needle-only] saved b1_needlediag_tier{args.tier}{noise_sfx}.npz", flush=True)
         return 0
 
     print(f"\n  -- Z_box [tier {args.tier}] (tempered SMC, needle excised) --", flush=True)
@@ -501,8 +557,9 @@ def mode_run(args):
     # this machinery is 0.05 nat, so a 2-nat scatter is a mixing failure, not irreducible noise.
     while sd < args.max_seeds:
         t0 = time.time()
-        r = z_box(G, boxhalf, args.N, sd, sig_needle, n_mcmc=args.mcmc, tag=f"t{args.tier}",
-                  target_acc=args.target_acc, max_mcmc=args.max_mcmc)
+        r = z_box(G, boxhalf, args.N, sd, sig_needle, n_mcmc=args.mcmc, tag=runtag,
+                  target_acc=args.target_acc, max_mcmc=args.max_mcmc,
+                  adapt_acc=args.adapt_acc)
         r["wall"] = time.time() - t0
         runs.append(r); sd += 1
         print(f"     [smc s{sd-1}] ln Z_box = {r['logZ']:.3f} (density {r['logZ_density']:.3f} "
@@ -541,9 +598,25 @@ def mode_run(args):
     print(f"  >>> f = {f:.6g} +- {sig_f:.4g}   (2-sigma band "
           f"[{max(f-2*sig_f,0):.4g}, {min(f+2*sig_f,1):.4g}])", flush=True)
     lam = np.exp(d / G.D)
-    print(f"  BREAK-EVEN: shrink every active dim by {lam:.4g}x "
+    print(f"  BREAK-EVEN (f = 0.5): shrink every active dim by {lam:.4g}x "
           f"-> f box +-{np.round(half_f*lam,6)}, mc box +-{np.round(half_mc*lam,6)} scaled", flush=True)
-    print(f"              (mc break-even in dex: {np.round(half_mc*lam*0.5,6)})", flush=True)
+
+    # BREAK-EVEN AT THE PRE-REGISTERED THRESHOLD (Matt, amendment 1). The binding axis is mc; the
+    # f box is already supplied by the EM period. Shrinking ONLY the 3 mc dims by lambda_mc scales
+    # Z_box by lambda_mc^3 (uniform-plateau-density approximation, as R's theta* used). Solve
+    #   lnZn - (lnZbox + 3 ln lambda_mc) = logit(0.95)
+    LOGIT95 = np.log(0.95 / 0.05)
+    lam_mc = float(np.exp((d - LOGIT95) / C.N_LOUD))
+    be_mc_scaled = half_mc * lam_mc
+    be_mc_dex = be_mc_scaled * TE.phi_scale(P)[I_MC]
+    deficit = 1.0 / lam_mc
+    print(f"  BREAK-EVEN (f = 0.95, mc axis only): lambda_mc = {lam_mc:.4g}", flush=True)
+    print(f"    mc box that would give f = 0.95: +-{np.round(be_mc_scaled,6)} scaled "
+          f"= +-{np.round(be_mc_dex,6)} dex", flush=True)
+    print(f"    Tier {args.tier} mc box is +-{np.round(half_mc,6)} scaled -> "
+          f"DEFICIT FACTOR = {deficit:.3g}x", flush=True)
+    print(f"    (the factor an external mc constraint -- eccentricity's kappa, a better D_L, or a "
+          f"louder source's sigma(log10_h) -- must supply on top of this tier)", flush=True)
 
     # PASS/FAIL WITH ERROR BARS (pre-registered, amendment 2)
     if not gate_ok or not np.isfinite(sig_f):
@@ -560,15 +633,16 @@ def mode_run(args):
     if not gate_ok:
         print(f"  (quadrature doubling |dlnJ| = {dJ:.3f}; Richardson {rich:.2e}; "
               f"{npos}/{G.D} positive-curvature eigs)", flush=True)
-    np.savez(f"{CWT}/b1_referendum_tier{args.tier}{'_noisy' if args.noise else ''}.npz",
-             tier=args.tier, g0=g0, lnl0=lnl0, lnZn_quad=lnZn_q, lnZn_lap=lnZn_l,
+    np.savez(f"{CWT}/b1_referendum_tier{args.tier}{noise_sfx}.npz",
+             tier=args.tier, noise=bool(args.noise), noise_seed=int(args.noise_seed),
+             g0=g0, lnl0=lnl0, lnZn_quad=lnZn_q, lnZn_lap=lnZn_l,
              lnZbox=lnZp, lnZbox_err=lnZp_e, f=f, sigma_f=sig_f, nseed=nseed,
              seed_spread=spread, acc_hi=acc_hi, gate_ok=gate_ok, verdict=verdict,
              lnZbox_all=lz, boxhalf=boxhalf, evals=evals,
              sig_needle=sig_needle, doubling=dJ, richardson=rich, npos=npos, prof=prof,
              edges=edges, closed=closed, logscan=logscan, breakeven_lambda=lam,
              half_f=half_f, half_mc=half_mc, prov=prov, N=args.N, seeds=args.seeds)
-    print(f"  saved b1_referendum_tier{args.tier}.npz", flush=True)
+    print(f"  saved b1_referendum_tier{args.tier}{noise_sfx}.npz", flush=True)
     return 0
 
 
@@ -581,12 +655,19 @@ if __name__ == "__main__":
     ap.add_argument("--seeds", type=int, default=2, help="minimum seeds before the gate is tested")
     ap.add_argument("--max_seeds", type=int, default=5, help="add seeds until the gate passes")
     ap.add_argument("--mcmc", type=int, default=4, help="minimum MCMC sweeps per SMC stage")
-    ap.add_argument("--max_mcmc", type=int, default=14, help="cap on sweeps per stage")
+    ap.add_argument("--max_mcmc", type=int, default=20, help="cap on sweeps per stage")
+    ap.add_argument("--adapt_acc", type=float, default=0.35,
+                    help="RW scale adapts toward this; MUST exceed --target_acc")
     ap.add_argument("--target_acc", type=float, default=0.25, help="high-beta acceptance floor")
     ap.add_argument("--gate_spread", type=float, default=0.3, help="max seed spread, nat")
     ap.add_argument("--sig_p", type=float, default=SIG_P_OVER_P)
     ap.add_argument("--needle_only", action="store_true",
                     help="run only the Z_needle diagnostic (Hessian + eigen-profiles), skip SMC")
     a = ap.parse_args()
+    if a.adapt_acc <= a.target_acc:
+        sys.exit(f"CONFIG ERROR: --adapt_acc ({a.adapt_acc}) must EXCEED --target_acc "
+                 f"({a.target_acc}). The RW scale adapts toward adapt_acc, so gating on a higher "
+                 f"acceptance can never be satisfied: every stage exhausts --max_mcmc and the "
+                 f"seed loop then adds seeds to fix what is a kernel problem.")
     print(f"jax {jax.__version__}, {jax.devices()}", flush=True)
     sys.exit(mode_run(a))

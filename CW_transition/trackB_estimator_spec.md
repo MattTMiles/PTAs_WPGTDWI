@@ -891,6 +891,301 @@ whether any tier is legitimate conditioning for B1.0-1.4.
     pipeline have merged**: lever (ii) is not an alternative to lever (iii), it is the missing
     ingredient lever (iii) needs.
 
+## B1 STEP 2 + 1D + 2C (2026-07-09/10) -- THE TARGETED REFERENDUM, THE LAST DOOR, AND THE
+## BREAK-EVEN CURVE. VERDICT: THE TARGETED SCENARIO HAS ITS OWN INFORMATION WALL.
+
+### HEADLINE (the mechanism, not the number)
+
+**Conditioning the (f, mc) PRIOR BOXES barely moves the evidence -- the plateau does not fill them.
+What moves the evidence is LIKELIHOOD STRUCTURE, which the eccentric harmonic comb supplies and no
+prior box can.** Measured across three tiers and a four-point response curve, below.
+
+Files: `trackB_b1_referendum.py`, `trackB_b1_softcascade.py`, `b1_step2_table.py`;
+`b1_referendum_tier{A,B,C}.npz`, `b1_softcascade.npz`; logs/b1_ref_tier*.log,
+logs/b1_softcascade.log. Zero-noise Asimov; truth-placed needle quadrature LABELLED.
+
+### The object and the tiers
+
+R's count-once star-topology fringe marginal, verbatim, with the SKY of every loud source FIXED
+at truth (the EM-counterpart baseline) and ACTIVE dims = (log10_fgw, log10_mc) x 3 loud = 6.
+Extrinsics fixed at truth -- and this is now MEASURED, not asserted: the pilot's M2 shows census
+P(true) is flat in (cos_inc, log10_h, phase0, psi) out to delta = 1e-2 scaled, so their Laplace
+factors do cancel between needle and box (the justification R1/R2 assumed).
+
+Identity reproduced: `lnL_marg(truth) = 405686.3434 = lnL(truth) 405413.51 + fringe entropy 272.83`.
+
+### TIER C (sky + EM period + host D_L) -- the most generous physically-defensible conditioning
+
+`sigma(log10_mc) = (3/5) sqrt(sigma_logh^2 + ((2/3) sigma_logf)^2 + sigma_logDL^2)`, i.e. set by
+the ARRAY's own sigma(log10_h) plus the host redshift -- NOT by anything else the counterpart
+supplies. FROZEN at 4 seeds (see the gate convention below):
+
+| quantity | value |
+|---|---|
+| ln Z_needle (bracketed quadrature, `\|dlnJ\| = 0.055` STABLE, 6/6 brackets closed) | 405629.6337 |
+| ln Z_box (4 seeds: 405633.906 / 405632.985 / 405631.878 / 405633.369) | 405633.035, std 0.859, s.e.m. 0.429 |
+| d = ln Z_needle - ln Z_box | **-3.4008 nat** |
+| **f(C)** | **0.0323 +- 0.0134**; 2-sigma band [0.0055, 0.0591] |
+| pre-registered verdict (f - 2sig >= 0.95?) | **FAIL by 16.1x** |
+| gap / sampler scatter | 3.96x |
+| break-even lambda_mc = exp((d - logit 0.95)/3) | 0.1206 -> deficit 8.29x **[SUSPENDED -- see the saturation note]** |
+
+**~97% of the targeted posterior's evidence sits on the wrong-fringe plateau even with the sky
+exact, the frequency pinned by an EM period, and the chirp mass constrained by the host distance.**
+
+A and B have strictly wider mc boxes (the generative prior; ln V_box = -7.72 vs C's -17.82), so
+they cannot pass where C fails; they are measured for the table, not for the verdict.
+
+
+### SATURATION NOTE (2026-07-09) -- THE DEFICIT FACTOR IS SUSPENDED, THE VERDICT IS NOT
+
+The break-even above assumed `Z_box ∝ lambda_mc^3` (the uniform-plateau-density approximation R
+used for theta* = 0.188 deg). **Tier A's SMC falsifies that assumption for these boxes.** Tier A's
+6-D box is e^{10.1} ~ 24000x larger in volume than Tier C's, yet
+
+    ln Z_box(A) = 405632.432  (density 405640.148 + lnV -7.716)
+    ln Z_box(C) = 405633.035  (density ~405651.7   + lnV -17.816)
+
+agree to within the 0.86-nat sampler scatter. Z_box is an INTEGRAL, so Z_box(A) >= Z_box(C)
+necessarily; measuring them equal means **the plateau's evidence has SATURATED -- it is confined
+well inside Tier C's box** (consistent with the log-scan: lnL_marg falls 919 nat by the box edge).
+Enlarging the mc box adds volume carrying negligible likelihood, so Z_box stops responding.
+
+CONSEQUENCES, separated:
+- **f(C) = 0.0323 +- 0.0134, FAIL by 16.1x: UNAFFECTED.** A measured ratio of two measured
+  evidences; no extrapolation enters it.
+- **The soft-cascade FAIL: UNAFFECTED.** Independent of any box argument.
+- **DEFICIT = 8.29x: SUSPENDED.** It extrapolates Z_box across exactly the range over which Z_box
+  is now shown to be insensitive. The EXISTENCE of a deficit is safe; the NUMBER is not.
+- The two-term price (sigma_h x11.3 AND sigma_logDL <= 1.0%; or kappa >= 8.29) inherits the
+  suspension: those numbers are functions of the deficit and must be requoted after it is measured.
+
+THE FIX IS A MEASUREMENT, NOT AN ARGUMENT: run Z_box on a deliberately SHRUNKEN mc box and read the
+true break-even off the response curve Z_box(lambda_mc). Until then, quote only: no static tier
+concentrates the targeted posterior (f(C) = 0.032, failing 0.95 by 16x), and the soft cascade
+cannot bootstrap.
+
+**TIER-GRADIENT (the emerging headline).** Conditioning the (f, mc) PRIOR BOXES barely moves the
+evidence at all, because the plateau does not fill them. What moves it is LIKELIHOOD STRUCTURE --
+which is what an eccentric harmonic lever buys and what a prior box cannot.
+
+
+### THE THREE-TIER TABLE (frozen 4-seed protocol; `b1_step2_table.npz`)
+
+| tier | conditioning | ln Z_needle | ln Z_box | d (nat) | f | +-2sig | gate |
+|---|---|---|---|---|---|---|---|
+| A | sky only | 405629.637 | 405632.017 | -2.380 | 0.0847 | +-0.131 | FAILED |
+| B | + EM period | 405629.634 | 405632.619 | -2.986 | 0.0481 | +-0.0227 | FAILED |
+| C | + host D_L | 405629.634 | 405632.734 | -3.101 | 0.0431 | +-0.0369 | FAILED |
+
+(Tier C frozen at 4 seeds reads f = 0.0323 +- 0.0134; the table's auto-ingest used the completed
+5-seed npz, f = 0.0431 +- 0.0185. Both FAIL identically; the discrepancy is recorded, not resolved
+by preference.)
+
+- **Z_needle is tier-independent to 0.003 nat** (405629.6367 / .6337 / .6337): three boxes, two
+  independent bracket algorithms, one local integral. This also retroactively confirms that the
+  first (broken-quadrature) f(A) = 0.769 was inflated by ~2.2 nat.
+- **The tier gradient is FLAT, and mildly INVERTED**: f = 0.085 -> 0.048 -> 0.043 as conditioning
+  TIGHTENS. Counterpart information does not help. Z_box(A) >= Z_box(C) is required (an integral
+  over a 24000x larger volume cannot shrink); measured -1.02 +- 0.95 nat, i.e. consistent with
+  EQUALITY at ~1 sigma. That equality IS saturation.
+- All three tiers: gate FAILED on the range statistic, verdict FAIL on the +-2sigma band by
+  4.4x-13x. Two instruments, two statements.
+
+### STEP 2C -- THE BREAK-EVEN RESPONSE CURVE (`trackB_b1_breakeven.py`, `b1_breakeven_curve.npz`)
+
+Z_box measured at lambda_mc in {1 (banked), 0.3, 0.12, 0.05}, 2 seeds each, f-box held at Tier C's.
+Needle excision 0.0% at EVERY lambda -> all four points are clean plateau evidences.
+
+| lambda_mc | mc box (dex, median) | ln Z_box | +-sem | f |
+|---|---|---|---|---|
+| 1.0 | 0.0652 | 405633.035 | 0.429 | 0.032 |
+| 0.3 | 0.0196 | 405631.754 | 0.616 | 0.107 |
+| 0.12 | 0.0078 | 405630.535 | 0.174 | 0.289 |
+| 0.05 | 0.0033 | 405628.910 | 0.664 | 0.673 |
+
+**(a) SATURATION SCALE.** Z_box begins responding at lambda ~ 0.3: **the plateau's own chirp-mass
+extent is ~0.02 dex.** A newly measured quantity -- the width of the wrong-fringe plateau in Mc.
+(The knee is marginal at 0.3: a 1.28-nat drop against a 1.23-nat threshold; the response is
+unambiguous by lambda = 0.12.)
+
+**(b) TRUE BREAK-EVEN.** ln Z_box never falls to the f = 0.95 target (405626.689) inside the
+measured range -> **lambda* < 0.05: a BOUND, not a value.**
+
+**(c) CORRECTED DEFICIT: > 20x**, replacing the suspended 8.29x. **The suspension was vindicated:
+the real price is WORSE than the proportionality implied.** Even shrinking the mc box 20x reaches
+only f = 0.673 -- it still fails. (A log-linear extrapolation of the last two points would give
+lambda* ~ 0.015, deficit ~66x. NOT REPORTED AS A RESULT: extrapolating through an assumed scaling
+is exactly the error this curve exists to correct.)
+
+### THE PRICE, REQUOTED OFF THE CURVE
+
+sigma(log10_mc) delivered by Tier C = 0.0364 / 0.0217 / 0.0205 dex. Break-even needs a box below
+lambda* < 0.05 of that, i.e. **sigma(log10_mc) < ~0.003 dex, a > 20x improvement.**
+
+Setting sigma_h -> 0 leaves a FLOOR of 0.00301 dex set entirely by the assumed sigma(log10 D_L) =
+0.005 dex (host z to ~1%). At the corrected (>20x) deficit that floor is at or ABOVE the requirement
+for every loud source: **strain alone cannot close it, and neither can any counterpart-supplied prior
+box.** The two-term price (sigma_h x11.3 AND sigma_logDL <= 1.0%) was computed off the 8.29x deficit
+and is SUPERSEDED; requote as: sigma(log10_mc) must improve by > 20x, which no combination of
+(position, period, host distance) delivers.
+
+**WEAVE's kappa >= 8.3 at e >~ 0.6 INHERITS THE SUSPENSION.** The MECHANISM stands -- an eccentric
+harmonic comb supplies likelihood structure a prior box cannot. The THRESHOLD re-prices off the
+curve: kappa must now exceed the >20x bound, not 8.29. The e-value that delivers it is the E-TRACK's
+Fisher calculation, NOT made here. Do not quote an eccentricity until the E-track produces it.
+
+### THE (SUPERSEDED) PRICE ARITHMETIC, kept for the audit trail
+
+| | loud0 | loud1 | loud2 |
+|---|---|---|---|
+| sigma(log10_h) delivered by the array | 0.0604 | 0.0359 | 0.0337 |
+| sigma(log10_mc) delivered (Tier C) | 0.0364 | 0.0217 | 0.0205 |
+| sigma(log10_mc) needed for f = 0.95 | 0.0044 | 0.0026 | 0.0025 |
+
+Setting sigma_h -> 0 leaves a FLOOR of **0.00301 dex**, set entirely by the assumed
+sigma(log10 D_L) = 0.005 dex (host z to ~1%). That floor is BELOW loud0's requirement but ABOVE
+loud1's and loud2's by 1.15x and 1.22x. **So the deficit is not closed by strain alone: even a
+perfectly measured amplitude leaves the two quieter loud sources short, because the host distance
+becomes the binding term.** Closing it requires BOTH:
+- sigma(log10_h) improved ~11.3x. With sigma_h ~ 1/SNR ~ T^{-1/2} that is T x 128 ~ **2840 yr**;
+  at fixed T it is ~1 dex louder in strain (log10_h ~ -12.2 vs the population's -13.25).
+- sigma(log10 D_L) <= 0.0044 dex, i.e. **<= 1.0% in D_L** (vs the 1.16% assumed).
+
+Or, substituting for the pair: an eccentric-harmonic lever **kappa >= 8.29**. (The e-value that
+delivers kappa = 8.29 is the E-TRACK's measurement, NOT made here; do not quote an eccentricity
+until the E-track's Fisher map produces it.)
+
+### STEP 1D -- THE SOFT-CASCADE PROBE (the last door), pre-registered, one probe one verdict
+
+STEP 1's R_a >= 1 is the HARD criterion (when can a fringe be LOCKED). It does not ask what a
+SOFT, posterior-weighted mixture leaks: at R ~ 0.27 a soft fix spreads weight over ~4 fringes
+rather than locking one, and a 4-fringe mixture still carries chirp-mass information. Tier-C
+conditioning, Asimov, <= 5 iterations, NO hard fixes anywhere. Mc update = the width of the
+mixture-marginalised posterior (`lnL_marg` + tier prior). Truth (n_true = 0) scores W only; it
+never steers the loop.
+
+| iter | sigma(log10_mc) dex, loud0/1/2 | S = sum_p max_n q_p - S_prior | W = sum_p [1 - q_p(n_true)] | # pulsars whose W GREW |
+|---|---|---|---|---|
+| 0 | 2.03e-3 / 4.00e-4 / 5.0e-5 | +12.525 | 114.821 | -- |
+| 1 | 2.5e-4 / 2.75e-2 / 9.4e-4 | +12.968 | 114.873 | 54 |
+| 2 | 8.3e-4 / 1.9e-4 / 8.88e-3 | +12.456 | 113.473 | 36 |
+| 3 | 2.5e-4 / 1.7e-4 / 1.32e-3 | +12.447 | 113.479 | 61 |
+| 4 | 5.0e-5 / 1.2e-4 / 1.23e-3 | +12.467 | 113.459 | 65 |
+| 5 | 5.0e-5 / 1.1e-4 / 5.6e-4 | +12.778 | 113.125 | 70 |
+
+per-iter shrink factors [0.057, 0.306, 3.335, 1.428, 1.153]; cumulative 3.773x; **monotone = False**;
+**W grew**. **VERDICT: FAIL -- the door is checked and closed.**
+
+Cumulative shrinkage exceeds 1.3x but is NOT a leak: the per-iteration factors swing two orders as
+the point moves between local modes, which is exactly why the pre-registration demanded monotonicity.
+Independently, the number of pulsars concentrating on FALSE fringes climbs 54 -> 70 -- the soft
+analogue of the GPS wrong-fix, softened but not cured.
+
+**WHY it cannot compound (the mechanism).** sigma_mc is ALREADY 1e-4..1e-3 dex at iteration 0, far
+NARROWER than the 0.0026-0.0044 dex needed. The local mode was never the problem. Median q_max sits
+flat at 0.067 -> 0.070 (~16 effective fringes per pulsar, unchanged) and S is flat at +12.5 -> +12.8.
+The missing information is not local curvature; it is WHICH of ~16 fringes, and that choice never
+sharpens. Local width != global concentration: the referendum already showed the evidence lives on
+the plateau.
+
+### VERDICT -- and the frontier statement
+
+**Targeted certification of a CIRCULAR source has its own information wall.** The pulsar term is a
+kyr-baseline TIMESTAMP of the source phase; it cannot be read without the CLOCK RATE. The clock rate
+is fdot, i.e. Mc. A 22-yr Earth term cannot measure fdot (Delta_phi_E ~ 0.05 rad; information gain
+over the prior 1.00-1.73x). The best physically-defensible EM conditioning -- position + period +
+host D_L -- still leaves sigma(log10_mc) **8.29x too loose**, the soft cascade cannot bootstrap it
+(probe FAIL, monotonicity and wrong-fix both), and no static tier concentrates the posterior
+(f(C) = 0.032, failing 0.95 by 16x).
+
+The wall is a FUNCTION with a PRICE, not an impossibility:
+  (i)   sigma(log10_h) x 11.3 better  [T x 128 ~ 2840 yr, or ~1 dex louder], **AND**
+  (ii)  sigma(log10 D_L) <= 1.0%  [the counterpart is CO-BINDING; strain alone floors at 0.00301 dex]
+  (iii) OR an eccentric-harmonic lever kappa >= 8.29, which substitutes for both.
+
+Lever (ii) of the design theorem is therefore not an alternative to lever (iii) -- **it is the
+missing ingredient lever (iii) needs.** The E-track's eccentric map is now the PRICED next
+experiment: it must deliver kappa >= 8.29.
+
+**R's blind verdict is UNAFFECTED.** The micro-dip and the (f, mc) volume contest live in the dims
+R held fixed at truth; R's sky-plane Z_needle had 6/6 positive curvature and quad/Laplace agreement
+at 0.2 nat. **f = 6.9e-7 stands**, and including mc as an active dim would only shrink Z_needle
+further, so it stands FIRMER.
+
+### The needle is a thin SHELL, not a point (doc note)
+
+The Hessian of lnL_marg at truth over the (f, mc) dims has **5/6 positive curvature eigenvalues and
+one negative** (lambda = -1.32e9), stable under Richardson (`|H(h)-H(h/2)|/max|H| = 2.4e-2`) and at
+steps 0.3x the sharpest eigen-sigma. It is NOT a saddle: lnL_marg falls 159 nat at 1x base and
+919 nat at the box edge along that same eigenvector. It is a **MICRO-DIP at truth**: lnL_marg =
+lnL_ref + sum_p m_p with m_p >= 0; lnL_ref is maximal at truth (zero-noise Asimov) but every m_p
+GROWS as its pulsar de-registers, so a sub-fringe offset buys more fringe entropy than it costs.
+The local max sits ~1e-5 scaled from truth, 0.12 nat higher. CONSEQUENCE: Z_needle is a well-defined
+local integral but **NOT a Laplace integral** -- quadrature only, and negative eigenvalues must never
+be clipped (clipping turns a non-curving direction into a wide Gaussian and INFLATES Z_needle, i.e.
+biases toward the answer that lets B1 proceed).
+
+## CONVENTION -- SMC EVIDENCE GATES (adopted 2026-07-09, after two self-defeating gates)
+
+Two gates written during B1 STEP 2 were **structurally unsatisfiable**, in the same way: the
+prescribed remedy moved the gated statistic AWAY from its target. Both are recorded because the
+failure mode is not obvious and will recur.
+
+1. **`acc >= 0.25` while the RW scale adapts toward 0.234.** The scale update
+   `s <- s*exp(acc - 0.234)` drives acceptance to the RW optimum 0.234, i.e. BELOW the gate.
+   Every high-beta stage exhausted `max_mcmc` (observed: sweeps=14, acc=0.24) and the seed loop
+   then added seeds -- which cannot change a kernel property. FIX: adapt toward `adapt_acc`
+   (0.35), strictly above `target_acc` (0.25), with a startup assert. After the fix the same
+   stage ran at sweeps=3, acc=0.29: the strengthened sampler is both correct AND cheaper.
+2. **Seed "spread" defined as `max - min`.** A RANGE grows monotonically with the number of
+   seeds, so "add seeds until spread <= 0.3 nat" is defeated by its own remedy. Observed on
+   Tier C: 0.920 nat (2 seeds) -> 2.028 nat (3 seeds) -> 2.028 (4 seeds).
+
+**CONVENTION GOING FORWARD.**
+- The SMC mixing gate is the sample **std** at a FIXED, pre-registered seed count -- never a
+  range, never a statistic whose remedy inflates it.
+- The **s.e.m.** (std/sqrt(nseed)) is what propagates into the verdict's error bar.
+- A gate must never prescribe a remedy that moves the gated statistic the wrong way. If the
+  gate cannot be met by the remedy, the gate is measuring the sampler, not the science.
+- A FAILED mixing gate and a FIRM verdict are TWO INSTRUMENTS, TWO STATEMENTS. Report both.
+  A mixing scatter of s nat cannot overturn an evidence gap of d nat when d >> s; say so with
+  the numbers rather than suppressing the verdict or laundering the gate.
+
+## CONVENTION -- LOGICALLY-REDUNDANT MEASUREMENTS RETAIN AUDIT VALUE (adopted 2026-07-09)
+
+A measurement whose OUTCOME is implied by another is not thereby uninformative: it tests the
+ASSUMPTIONS the primary measurement conditions on. Tier A and Tier B were argued twice (by me) to
+be "logically foreclosed" by f(C) -- their mc boxes are strictly wider, so f(A), f(B) < f(C) must
+hold. Run anyway for the table, Tier A's very first seed FALSIFIED the uniform-plateau-density
+assumption on which the Tier-C break-even (and hence the whole price paragraph) rested: its box is
+24000x larger in volume yet ln Z_box matched C's to within the sampler scatter, i.e. the plateau
+had SATURATED. Saturation is invisible from a single box BY CONSTRUCTION -- it can only be seen by
+comparing boxes. **Never drop a redundant arm to save time when the primary result is conditioned
+on an untested proportionality.**
+
+Corollary, adopted with it: a break-even / threshold is a RESPONSE CURVE, never a single point
+extrapolated through an assumed scaling. Measure Z at >= 3 box scales, locate the saturation knee,
+and report a BOUND when the crossing lies outside the measured range.
+
+## CONVENTION -- SMC WALL-CLOCK ACCOUNTING (2026-07-09)
+SMC seed wall time is ~98% `sweeps x (one G call)`: Tier C s0 37 sweeps -> 1924 s predicted vs
+1978 s actual; Tier A s0 56 -> 2912 vs 2976. Delays are MAX-SWEEP GRINDING at high beta, not GPU
+contention and not idle-waiting. Diagnose slowness by counting sweeps before blaming the device.
+
+## CONVENTION -- FENCED AGENTS NEVER QUOTE IN-FLIGHT ARTIFACTS (2026-07-11)
+A fenced (read-only, no-doc-write) fleet agent reports against BANKED state only -- committed docs
+and frozen npz -- never against a run still in progress or an uncommitted working-tree artifact.
+An in-flight number can still move (a seed loop can add seeds, an SMC stage can re-mix), so a fenced
+quote of it is a snapshot that may be falsified by the time the writer folds it in. The writer (this
+session) is the ONLY party that reconciles fleet reports against the live tree and edits the
+canonical docs; the fleet writes standalone codenamed reports (SCOUT / SHOVEL / GALLERY / WEAVE /
+...) and the writer folds their BANKED numbers in. This is why the three ACCRE census/Q1/siren
+reports are consolidated here by the writer rather than self-committed by the agents that produced
+them. (Companion conventions this week: SMC evidence gates = sample **std** at a fixed pre-registered
+seed count + s.e.m., never a range or a remedy that moves the gated statistic the wrong way, above;
+and logically-redundant measurements are RETAINED for audit value -- both in the sections above.)
+
 ## STATUS -- TRACK B CLOSED
 - Verdict TERMINAL and COMPLETE (deliverable R done 2026-07-08: f=6.9e-7, INFORMATION-THEORETIC
   NO-GO). Machinery BANKED, all gated + reusable by B1 / E-track:
@@ -898,7 +1193,8 @@ whether any tier is legitimate conditioning for B1.0-1.4.
   F-stat seeder (sky-only NMS 25 deg, 3/3), repaired-hygiene soft-EM float. NB the soft-EM M-step is
   numerically CHAOTIC (cond ~4e10) -- for any future use, replace Adam with a Newton/trust-region
   step or profile the extrinsics (spec sec 3).
-- Queue head = E-TRACK (spec in the HELD list) + the sharpened lever-(ii) lane-measurement objective.
+- Queue head = E-TRACK (spec: `CW_transition/WEAVE_etrack_merged_spec.md`, added this commit) +
+  the sharpened lever-(ii) lane-measurement objective.
 - B1 REFRAMED: noisy ensembles test the CONDITIONAL pipeline (given the source-localised regime),
   NOT cold-start certification.
 

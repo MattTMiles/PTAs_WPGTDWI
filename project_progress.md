@@ -1826,6 +1826,105 @@ not the absolute Fisher heights.
   trackB_b1_ladder.py, trackB_b1_referendum.py; b1_pilot_m{1,2,3,4}.npz, b1_ladder.npz,
   b1_loopgain.npz, b1_cascade_tiers.npz; logs/b1_*.log. NOT committed. (Claude + Matt)
 
+- **2026-07-09 (B1 STEP 2 + STEP 1D -- THE TARGETED REFERENDUM AND THE LAST DOOR; the targeted
+  scenario has its OWN information wall, and it is PRICED. cronus/4090, jug-gpu).** STEP 1 closed
+  with no cascade ignition at any tier. STEP 2 asked the evidence question R asked blindly, now with
+  the sky supplied: does the fringe-marginalised posterior concentrate at truth over the two
+  REMAINING registration axes (log10_fgw, log10_mc)? Object = R's count-once star-topology marginal
+  verbatim (`lnL_marg(truth) = 405686.3434 = lnL(truth) + fringe entropy 272.83`, reproduced).
+  Extrinsics fixed at truth is now MEASURED not assumed (pilot M2: census P(true) flat in
+  inc/h/phase0/psi to 1e-2 scaled, so their Laplace factors cancel).
+  **TIER C** (sky + EM period sigma_P/P=1e-3 + host D_L; mc box set by the ARRAY's own
+  sigma(log10_h) via log10 h = (5/3)log10 Mc + (2/3)log10 f - log10 D_L), frozen at 4 seeds:
+  ln Z_needle = 405629.6337 (bracketed quadrature, |dlnJ|=0.055 STABLE, 6/6 brackets closed);
+  ln Z_box = 405633.035 (std 0.859, s.e.m. 0.429); d = **-3.4008 nat**; **f(C) = 0.0323 +- 0.0134**,
+  2-sigma band [0.0055, 0.0591] -> **FAIL by 16.1x** (gap/scatter = 3.96). Break-even
+  lambda_mc = 0.1206 -> deficit 8.29x **[SUSPENDED: Tier A's Z_box shows the plateau has SATURATED -- its box is 24000x larger in volume yet ln Z_box agrees with C's to within the 0.86-nat scatter, so Z_box is NOT proportional to the box volume and the break-even extrapolation is invalid. f(C) and the soft-cascade FAIL are unaffected; the deficit NUMBER must be re-measured on a shrunken mc box]**. ~97% of the targeted posterior's evidence sits on the
+  wrong-fringe plateau even with the sky EXACT. **THE PRICE HAS TWO TERMS**: sigma(log10_mc)
+  delivered 0.0364/0.0217/0.0205 dex vs needed 0.0044/0.0026/0.0025; but setting sigma_h -> 0 leaves
+  a FLOOR of 0.00301 dex set by the assumed 1% host distance -- BELOW loud0's need, ABOVE loud1's and
+  loud2's by 1.15x/1.22x. So strain alone cannot close it: need sigma(log10_h) x11.3 (T x128 ~
+  **2840 yr**, or ~1 dex louder) **AND** sigma(log10 D_L) <= 1.0% -- the counterpart is CO-BINDING.
+  Or an eccentric-harmonic **kappa >= 8.29** substituting for both (the e-value is the E-TRACK's to
+  measure; not quoted here).
+  **STEP 1D SOFT-CASCADE PROBE (the last door; pre-registered, one probe one verdict).** R_a>=1 is
+  the HARD lock criterion; a soft posterior-weighted mixture at R~0.27 spreads over ~4 fringes and
+  might still leak Mc. Tier-C conditioning, Asimov, 5 iters, NO hard fixes; Mc update = width of the
+  mixture-marginalised posterior; truth scores the wrong-fix column only. Result: per-iter sigma_mc
+  shrink [0.057, 0.306, 3.335, 1.428, 1.153] -- cumulative 3.77x but **NON-MONOTONE**; false-fringe
+  mass W = 114.8 -> 113.1 while the number of pulsars whose W GREW climbs **54 -> 70** (the soft
+  analogue of the GPS wrong-fix). **VERDICT FAIL: THE DOOR IS CHECKED AND CLOSED.** Mechanism:
+  sigma_mc is ALREADY 1e-4..1e-3 dex at iter 0, far narrower than the 0.0026-0.0044 needed -- the
+  local mode was never the problem; median q_max is flat 0.067->0.070 (~16 effective fringes/pulsar,
+  unchanged) and S flat +12.5->+12.8. The missing information is not local curvature but WHICH of ~16
+  fringes, and that choice never sharpens. Local width != global concentration.
+  **FRONTIER STATEMENT:** the pulsar term is a kyr-baseline TIMESTAMP; it cannot be read without the
+  CLOCK RATE; the clock rate is fdot, i.e. Mc; a 22-yr Earth term cannot measure fdot (Delta_phi_E ~
+  0.05 rad, info gain over prior 1.00-1.73x). **Design-theorem lever (ii) is not an alternative to
+  lever (iii) -- it is the ingredient lever (iii) is missing.** The E-track's eccentric map is the
+  PRICED next experiment: it must deliver kappa >= 8.29.
+  **R UNAFFECTED (one line):** the micro-dip and the (f,mc) contest live in dims R held at truth;
+  R's sky-plane Z_needle had 6/6 positive curvature and quad/Laplace agreement at 0.2 nat --
+  **f = 6.9e-7 stands, and FIRMER** (including mc shrinks Z_needle).
+  **NEEDLE = a thin SHELL, not a point.** Hessian of lnL_marg at truth over (f,mc): 5/6 positive,
+  one NEGATIVE (-1.32e9), Richardson-stable (2.4e-2) at steps 0.3x the sharpest eigen-sigma. Not a
+  saddle (lnL_marg falls 159 nat at 1x base, 919 at the box edge along that eigenvector) but a
+  MICRO-DIP at truth: lnL_marg = lnL_ref + sum_p m_p, m_p >= 0 grows as a pulsar de-registers, so a
+  sub-fringe offset buys more entropy than it costs; the local max sits ~1e-5 scaled away, 0.12 nat
+  higher. Z_needle is therefore quadrature-only, NEVER Laplace, and negative eigenvalues must never
+  be clipped (clipping inflates Z_needle -- biased toward letting B1 proceed).
+  **METHOD FAILURES RECORDED (both self-defeating gates, spec CONVENTION section).** (1) `acc>=0.25`
+  gated while the RW scale adapted toward 0.234 -> every high-beta stage exhausted max_mcmc
+  (sweeps=14, acc=0.24) and the remedy (add seeds) cannot change a kernel property; fixed by adapting
+  toward 0.35 with a startup assert -- the fixed sampler is both correct AND cheaper (same stage:
+  sweeps=3, acc=0.29). (2) seed "spread" defined as max-min is a RANGE, which GROWS with seeds, so
+  "add seeds until spread<=0.3" is defeated by its own remedy (0.920 -> 2.028 at seed 2). Tier C's
+  SMC gate is therefore recorded **FAILED-AS-SPECIFIED**, while the verdict is **SEPARATELY FIRM**
+  (0.86-nat scatter vs a 3.40-nat gap). New convention: mixing gates = std at a FIXED pre-registered
+  seed count; s.e.m. for the verdict; never a remedy that moves the gated statistic the wrong way.
+  Also caught before use: an unresolved-peak quadrature returning its own grid spacing (sum lnJ fell
+  by exactly -ln2 per doubling) -- fixed by bracketing the -30-nat contour from the FUNCTION, not the
+  curvature; and a first soft-cascade run whose sigma_mc came out 0/nan because inv(Hpos+Pi) is not
+  PD and because 3e-6 steps measure the razor, not the marginal width (replaced by profile
+  half-widths). Files: trackB_b1_referendum.py, trackB_b1_softcascade.py, b1_step2_table.py;
+  b1_referendum_tierC.npz, b1_softcascade.npz; logs/b1_ref_tier*.log, logs/b1_softcascade.log.
+  B1.0-1.5 and the E-track map NOT started. NOT committed. (Claude + Matt)
+
+- **2026-07-10 (B1 STEP 2 CLOSE-OUT: three-tier table + break-even RESPONSE CURVE; the suspended
+  deficit was too OPTIMISTIC. cronus/4090, jug-gpu).** Completed Tiers A and B on the frozen 4-seed
+  protocol and measured the break-even as a CURVE rather than extrapolating a point.
+  **THREE-TIER TABLE:** f(A)=0.0847+-0.131 (sky only), f(B)=0.0481+-0.0227 (+EM period),
+  f(C)=0.0431+-0.0369 (+host D_L); ln Z_needle tier-independent to **0.003 nat** across three boxes
+  and two independent bracket algorithms. All three gates FAILED on the range statistic; all three
+  verdicts FAIL on the +-2sigma band by 4.4x-13x. **The tier gradient is FLAT and mildly INVERTED**
+  (f falls as conditioning tightens): Z_box(A) >= Z_box(C) is required by integration over a 24000x
+  larger volume, and is measured at -1.02 +- 0.95 nat, i.e. EQUAL -- which IS saturation.
+  **BREAK-EVEN CURVE** (lambda_mc = 1/0.3/0.12/0.05, 2 seeds each, needle excision 0.0% everywhere):
+  ln Z_box = 405633.035 / 405631.754 / 405630.535 / 405628.910; f = 0.032/0.107/0.289/0.673.
+  **(a) SATURATION SCALE: the plateau's own chirp-mass extent is ~0.02 dex** -- a newly measured
+  quantity. **(b) lambda* < 0.05 -> a BOUND.** **(c) CORRECTED DEFICIT > 20x**, replacing the
+  suspended 8.29x -- **the suspension was vindicated and the real price is WORSE than the
+  proportionality implied**; even a 20x-shrunken mc box only reaches f=0.673. (A log-linear
+  extrapolation gives ~66x; NOT reported -- that is the very error the curve exists to correct.)
+  **CONSEQUENCE:** sigma(log10_mc) must improve >20x, i.e. below ~0.003 dex, while the sigma_h -> 0
+  floor set by a 1% host distance is 0.00301 dex: **no combination of (position, period, host
+  distance) delivers it.** The two-term price (sigma_h x11.3 AND D_L <= 1.0%) is SUPERSEDED.
+  WEAVE's kappa>=8.3 / e>~0.6 threshold INHERITS the suspension -- mechanism stands, threshold
+  re-prices above the >20x bound; the e-value is the E-track's to compute.
+  **HEADLINE (mechanism, not number): conditioning the (f,mc) PRIOR BOXES barely moves the evidence
+  because the plateau does not fill them; what moves it is LIKELIHOOD STRUCTURE, which the eccentric
+  harmonic comb supplies and no prior box can.** Method conventions added to the spec: (i) mixing
+  gates = std at a FIXED seed count, never a range (max-min GROWS with seeds: 0.920 -> 2.028 -> 4.087
+  observed); (ii) a break-even is a RESPONSE CURVE, never a point through an assumed scaling;
+  (iii) logically-redundant arms retain AUDIT value -- Tier A, twice argued "foreclosed", falsified
+  the uniform-density assumption the whole price rested on, and saturation is invisible from one box
+  BY CONSTRUCTION; (iv) SMC wall time is ~98% sweeps x (one G call) -- count sweeps before blaming
+  the device. Files: trackB_b1_breakeven.py, b1_breakeven_curve.npz, b1_step2_table.npz,
+  b1_referendum_tier{A,B,C}.npz; logs/b1_ref_tier{A,B}.log, logs/b1_breakeven.log,
+  logs/b1_step2_table.log. Finiteness verified on VALUES (the only NaNs are BY DESIGN: lnZn_lap is
+  refused when curvature is non-PD; loopgain's next-rung R is undefined when no free pulsars remain).
+  B1.0-1.5 and the E-track map NOT started. NOT committed. (Claude + Matt)
+
 ## 9. Environment (cronus)
 - GPU box cronus = NVIDIA RTX 4090, driver 550.120.
 - Toy/Fisher work (prong2_transition.py): isolated venv with jax 0.4.28
