@@ -1203,3 +1203,158 @@ The FIRST NO-GO write-up's float-DEPENDENT chain carries a contamination asteris
 float), L1 (search-space spec off it), L2 blind search + re-solve (seeded by it). UNAFFECTED and
 banked: L2b / L2c (fixed-integer pull-in; geometry + Hessian at truth) and F2 (pure geometry). The
 Repair-3 float supersedes the L0/L1/L2 float but reaches the SAME wall.
+
+---
+
+# THE CERTIFICATION CRITERION (criterion-v1, adopted 2026-07-12) — CANONICAL
+
+This section is **THE criterion**. Every certification number in this repo is stated under it.
+It supersedes the raw Bayesian bar (`P_true > 0.9`) and the two-layer gate of `FORGE_b1_loop.md`
+§9; both are preserved below as superseded-with-trail. Code: `CW_transition/trackB_criterion.py`
+(fits the floor and emits the table from the banks; asserts the invariants; no new realisations).
+
+## The three layers
+
+For pulsar `a`, with `dlnL_a` = the likelihood-only fringe gap (best minus runner-up peak,
+prior-free), `K_counted,a` = the counted candidate fringes, `q_max,a` = the E-step fringe
+posterior's modal mass:
+
+    DETECTION      dlnL_a > max( ln K_counted,a , DLNL_FLOOR )      DLNL_FLOOR = 9.01 nat
+    CERTIFICATION  q_max,a > 0.9   (strict: > 0.99)   applied ONLY within detections
+
+- **Layer 1, `ln K` — the trials factor.** The fringe-breaking evidence must beat the number of
+  fringes it chose among. Relative, per-pulsar. This is GEO's `ident` / "flat count".
+- **Layer 2, `DLNL_FLOOR` — the absolute floor.** NEW in criterion-v1. Layer 1 alone is a
+  likelihood-ratio test whose bar collapses for a tightly-EM-prior'd pulsar: J0437-4715 has
+  `ln K = 1.39 nat`, the array minimum, so a pure-noise fluctuation clears it. The floor is the
+  absolute evidence a detection must carry regardless of how few fringes it had to beat.
+- **Layer 3, `q_max` — the Bayesian bar.** Retained, but demoted: it is now a *quality* bar on
+  something already established as a detection, not itself a detection statistic.
+
+**Certification is defined on `q_max`, NOT on `P_true`** (binding invariant; `trackB_criterion.py`
+asserts it). `P_true > 0.9` does not reproduce the banked certifications: the cells where
+`q_max > 0.9` but `P_true <= 0.9` are exactly the **wrong-certifications** (2 in Arm A, 8 in Arm B).
+Within detections `q_max == P_true` — i.e. once a cell passes the detection gate, the modal fringe
+*is* the true fringe. Scoring on `P_true` would silently define wrong-certs out of existence.
+
+## Derivation of DLNL_FLOOR = 9.01 nat
+
+Fitted against the **89 banked null realisations** (`reports/flat_*.npz`), 27 of which are nulls:
+
+| null bank | n | construction |
+|---|---|---|
+| `null` (910000) | 12 | 3 loud sources scrambled (the original B1.2 line) |
+| `nullL` | 5 | 3 loud scrambled, 13 faint at truth |
+| `nullA` | 5 | ALL 16 sources scrambled (honest Cornish-Sampson) |
+| `nullN` | 5 | **NO CW in the data**, recovery at the true source |
+
+At `floor = 0` (i.e. the FORGE §9 two-layer gate) **9 null cells still certify**. The criterion is
+the *smallest floor that zeroes all of them*. Because detection uses a strict `>`, that floor is
+exactly the largest `dlnL` among those 9 cells:
+
+| kind | pulsar | dlnL | ln K | q_max |
+|---|---|---|---|---|
+| **nullN** | **J1713+0747** | **9.009** | 6.752 | 1.000 | ← the binding cell: pure noise, no CW |
+| nullL | J1713+0747 | 7.211 | 6.752 | 0.999 |
+| null | J1713+0747 | 6.778 | 6.752 | 0.999 |
+| null | J1909-3744 | 5.831 | 4.190 | 1.000 |
+| nullA | J1909-3744 | 4.679 | 4.220 | 0.974 |
+| null | J0437-4715 | 3.599 | **1.386** | 0.998 |
+| nullL | J0437-4715 | 3.304 | 1.792 | 0.984 |
+| null | J0437-4715 | 1.960 | 1.792 | 0.997 |
+| nullA | J0437-4715 | 1.679 | **1.386** | 0.994 |
+
+`floor_min = 9.0094` nat → **adopted `DLNL_FLOOR = 9.01`** (rounded UP, so the zeroing property is
+preserved). FORGE §9.3 predicted "~8 nat"; the measured value is **9.01**, and the cell that sets it
+is a **`nullN` J1713 fluctuation on data containing no CW at all** — the floor is set by pure noise,
+not by a mis-modelled source.
+
+**SMALL-K ANATOMY — verified.** J0437-4715's residual false alarms (the §9.3 pathology: `ln K = 1.39`
+beaten by noise) sit at `dlnL = 3.60 / 3.30 / 1.96 / 1.68`. **All four die at any floor ≥ 3.60 nat**,
+i.e. with **5.4 nat to spare** below the adopted floor. The small-K false-alarm channel is closed
+decisively, not marginally.
+
+## THE MARGIN — and it is thin
+
+| quantity | value |
+|---|---|
+| null-side margin | **0 by construction** — the floor IS the largest null `dlnL` |
+| signal-side margin | **0.29 nat** — lowest surviving real detection (GEO, J1909, `dlnL = 9.30`) |
+| Arm-A margin | 0.49 nat (lowest survivor `dlnL = 9.50`, J1909) |
+| **Arm-B margin** | **NEGATIVE** — Arm B's largest `dlnL` is **8.0**, *below* the null max 9.01 |
+
+**State this margin whenever the floor is quoted.** The floor is the **maximum of a 27-realisation
+null sample** — the noisiest order statistic there is. A 28th null realisation could exceed it. The
+criterion is honest about what it is: a floor calibrated to the nulls we have, with a 0.29-nat gap to
+the nearest thing it is trying to keep. It is not a comfortable separation, and no amount of restating
+makes it one.
+
+The consequence, stated plainly: **noisy Arm B contains no cell whose likelihood gap exceeds the worst
+pure-noise false alarm in the null banks.** That is not a thresholding artefact — it is the finding.
+
+## REGISTRATION-TOLERANCE SENSITIVITY — UNMEASURED, and it is a real gap
+
+The check flagged before adoption: the null banks pass through the seeded pipeline, and this spec
+(§ "certification tolerance", L286) puts the source-parameter certification tolerance at **~1e-4
+scaled**. Does the floor move with the registration/seeder tolerance?
+
+**It cannot be answered from the banks.** Every one of the 27 null realisations carries
+`tol_scale = 0.0` — a single point, no grid. The floor is therefore calibrated **at perfect
+registration only**.
+
+The one available off-tolerance datum is `wrongpos` (`tol_scale = 5.0`, i.e. 5× the certification
+tolerance, n=2, B1.4): its sole certification is **J0437-4715, `dlnL = 4.41`, on the TRUE fringe** —
+a *correct* certification, and the 9.01-nat floor **kills it**. So at 5× tolerance the floor is
+already destroying true positives, and we have no null bank at that tolerance to say whether it is
+also still suppressing false ones.
+
+**Open, and it gates any above-onset claim: bank nulls on a `tol_scale` grid and re-fit.** Until then
+the floor is stated as calibrated at `tol_scale = 0` and the tolerance-dependence is an acknowledged
+unknown, not a solved one. IGNITE should carry this.
+
+## Superseded, with trail
+
+| criterion | GEO/draw | Arm A/real | Arm B/real | null/real | status |
+|---|---|---|---|---|---|
+| Bayesian `P_true > 0.9` | 4.50 ± 1.48 | 2.87 ± 1.48 | 1.43 ± 1.05 | **0.8 – 2.8** | **SUPERSEDED** — no detection statistic; carries a source-independent floor |
+| two-layer `dlnL > ln K` ⊕ `q>0.9` (FORGE §9) | 1.35 ± 0.82 | 0.33 ± 0.54 | 0.13 ± 0.43 | **0.2 – 0.4** | **SUPERSEDED** — null still fires, from small-K |
+| **three-layer (criterion-v1)** | **0.275** | **0.067** | **0.000** | **0.000** | **CANONICAL** |
+
+Neither superseded number was wrong as *measured*; both were wrong as *interpreted*. The Bayesian
+count was never a detection statistic, and the two-layer gate's `ln K` bar is not a floor for a
+pulsar whose `K` is 4.
+
+## CONVENTION — confidence without a detection statistic is prior-pinning in disguise
+
+Adopted 2026-07-12, from the two-layer lesson.
+
+`P_true > 0.9` / `q_max > 0.9` is a statement about **where posterior mass sits among candidate
+fringes**, not about **whether there is anything there to find**. A pulsar with a tight EM prior
+concentrates >0.9 of its mass on the MAP fringe **from the prior tail alone** — measured in `nullN`:
+pure noise, no CW in the data, and it still certifies. The Bayesian bar cannot tell that apart from a
+detection, because it never asked the question.
+
+**Rule: every confidence bar must sit downstream of a detection statistic that can return zero.**
+A criterion that cannot fire on a null is not a criterion. Before quoting any posterior-mass
+threshold, state what had to be *detected* first, and show the null.
+
+Corollary, and the reason this cost a re-score: the same prior-pinning that makes J0437-4715 the
+*robust* certifier (survives sky redraws, noise, off-prior-mean truth, and a wrong counterpart) is
+what makes it fire on pure noise. **Robustness to source error and vulnerability to noise are the
+same property viewed from two sides.** Tiny `K` cuts both ways, always.
+
+## CONVENTION — summary files carry raw statistics, not only verdicts
+
+Adopted 2026-07-12. FORGE's B1.0 production npz stored booleans (`cert90`, `wrong90`) but not the
+`dlnL` they were derived from. When §3's null anatomy demanded a re-cut on a *different* criterion,
+the verdicts were useless and the run had to be re-executed on the cluster purely to extract an
+array that already existed in memory (job 12496241, 420 s). **Bank the statistic, not the verdict:**
+a verdict answers one question, a statistic answers the ones you have not thought of yet. Any
+summary npz must carry the continuous quantities (`dlnL`, `lnK`, `q_max`, `P_true`, `on_true`) that
+a re-scoring could need.
+
+## CONVENTION — reports and their empirical basis travel together
+
+Adopted 2026-07-12. `FORGE_b1_loop.md` §9 was written against `flat_*.npz`; the report reached
+`reports/` and the banks did not, and the criterion could not be fitted until they followed.
+**A report is not landed until the arrays it is scored from are landed with it.**

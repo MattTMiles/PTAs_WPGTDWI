@@ -1189,6 +1189,17 @@ not the absolute Fisher heights.
 4. **No global CW proposal / no tempering** → missed CW modes unrecoverable.
 5. **Homogeneous 1 µs WN (nb 05)** overstates weak pulsars; real arrays are dominated
    by a few good pulsars — also the lever for the Deller/VLBI targeting science case.
+6. **The certification floor is calibrated at `tol_scale = 0` only** (criterion-v1, §10). All 27
+   banked nulls sit at perfect registration; there is no tolerance grid. The single off-tolerance
+   datum (`wrongpos`, 5× the certification tolerance) shows the 9.01-nat floor **killing a correct,
+   on-true-fringe certification**. The floor's behaviour at realistic registration error is
+   **unknown**, and it gates any above-onset claim. Bank nulls on a `tol_scale` grid and re-fit.
+7. **The floor's margin is thin (0.29 nat) and rests on the max of a 27-sample null.** The maximum
+   is the noisiest order statistic; a 28th null realisation could exceed it. Quote the margin with
+   the floor, always. More null realisations would tighten it and are cheap.
+8. **B1.3's DAMPED verdict was measured below onset** (§10.5). It is sound as measured and
+   gate-independent, but it does not speak to loop behaviour when seeded with *genuine* detections.
+   Do not quote it as a statement about the above-onset loop.
 
 ## 8. Running log
 
@@ -1925,6 +1936,47 @@ not the absolute Fisher heights.
   refused when curvature is non-PD; loopgain's next-rung R is undefined when no free pulsars remain).
   B1.0-1.5 and the E-track map NOT started. NOT committed. (Claude + Matt)
 
+- **2026-07-12** — **CRITERION-V1 ADOPTED + THE ACCRE CAMPAIGN CONSOLIDATED (tag `criterion-v1`).**
+  Five fenced ACCRE agents (GEO, RING, SIREN, ATLAS, FORGE) landed in `reports/` with their banks.
+  **THE CRITERION (three-layer):** `DETECTION dlnL > max(ln K_counted, 9.01 nat)` ⊕
+  `CERTIFICATION q_max > 0.9 (strict 0.99) within detections`. The absolute floor is NEW and is the
+  whole point: FORGE §9's two-layer gate (`dlnL > ln K` ⊕ Bayesian) still let the null fire, because
+  a tightly-EM-prior'd pulsar has so low a trials bar (J0437-4715: `ln K = 1.39`, the array minimum)
+  that pure noise clears it. **`DLNL_FLOOR = 9.01` nat is FITTED to the 27 banked null realisations:
+  the smallest floor that zeroes ALL null certifications.** The binding cell is a **`nullN`
+  J1713+0747 fluctuation at `dlnL = 9.009` on data containing NO CW AT ALL** — the floor is set by
+  pure noise, not by a mis-modelled source. (FORGE predicted ~8 nat; measured 9.01.) **Small-K
+  anatomy verified:** J0437's residual false alarms (3.60/3.30/1.96/1.68) all die at any floor ≥3.60,
+  i.e. **5.4 nat to spare**. **THE MARGIN IS THIN AND IS STATED EVERYWHERE IT IS QUOTED: 0.29 nat**
+  to the lowest surviving real detection, with the floor fitted to the **max of a 27-sample null** —
+  the noisiest order statistic there is. **RE-SCORE (banked npz only, no new realisations):
+  GEO 4.50 → 1.35 → 0.275/draw; Arm A 2.87 → 0.33 → 0.067/real; Arm B 1.43 → 0.13 → 0.000/real;
+  all nulls → 0.000 (by construction).** Wrong-certs 2→0 (A) and 8→0 (B): the gate does not merely
+  thin the count, **it perfectly purifies what is left — every surviving cert on real data is on the
+  TRUE fringe.** **HEADLINE: the honest arm (B, truth off the prior mean) detects NOTHING under a
+  gate the null cannot pass — its largest fringe gap (8.0) is BELOW the worst pure-noise false alarm
+  (9.01).** The conditional ceiling under real noise, honestly gated, is **zero**. **BINDING
+  INVARIANTS** (asserted in code): certification is on **`q_max`, not `P_true`** — the cells where
+  `q_max>0.9` but `P_true<=0.9` ARE the wrong-certs, so scoring on `P_true` would define them out of
+  existence; and **GEO has no wrong-cert field by construction** (its criterion is defined on the true
+  fringe) — not synthesised. **B1.3 DAMPED ANNOTATED:** the verdict is sound as measured and is
+  unaffected by the gate (it turns on N_cert *growth*), but it was **measured BELOW ONSET** — the loop
+  was seeded from a set that, honestly gated, does not exist. **Above-onset loop behaviour is OPEN;
+  IGNITE queued.** **TOLERANCE GAP, OPEN AND FLAGGED:** all 27 nulls carry `tol_scale = 0.0` — no
+  grid — so the floor is calibrated at perfect registration only; the one off-tolerance datum
+  (`wrongpos`, `tol_scale=5`) shows the floor **killing a CORRECT certification** (J0437, `dlnL=4.41`,
+  on the true fringe). Bank nulls on a tol grid and re-fit; this gates any above-onset claim.
+  **CONVENTIONS ADDED:** (i) **confidence without a detection statistic is prior-pinning in
+  disguise** — every confidence bar must sit downstream of a statistic that CAN RETURN ZERO
+  (`nullN`: pure noise, no CW, still certified 0.8/real at the Bayesian bar); corollary —
+  **robustness to source error and vulnerability to noise are the same property, viewed from two
+  sides** (tiny K, both ways); (ii) **summary files carry raw statistics, not only verdicts** (FORGE
+  banked `cert90` but not the `dlnL` under it → a cluster re-run to extract an array that had existed
+  in memory); (iii) **reports and their empirical basis travel together.** Consolidation of all five
+  campaigns in §10; criterion + derivation + margin + caveat in the spec. Code:
+  `CW_transition/trackB_criterion.py` (fits the floor, emits the table, asserts the invariants).
+  Gates: 8/8 b1_core + census triple bit-identical. (Claude + Matt)
+
 ## 9. Environment (cronus)
 - GPU box cronus = NVIDIA RTX 4090, driver 550.120.
 - Toy/Fisher work (prong2_transition.py): isolated venv with jax 0.4.28
@@ -1933,3 +1985,312 @@ not the absolute Fisher heights.
 - discovery lives in the shared `discotech` env (separate jax) — DO NOT modify it.
 - OPEN RISK for Stage C: confirm discotech's jax can init the GPU; if it shares the
   broken jax, Stage C Hessian is CPU-bound or needs a pinned discovery venv.
+---
+
+## 10. CONSOLIDATION — the ACCRE campaign (GEO / RING / SIREN / ATLAS / FORGE), 2026-07-12
+
+Five fenced ACCRE agents ran against banked machinery; primary sources are in `reports/`
+(`GEO_geometry_ensemble.md`, `RING_q1_modernized.md`, `SIREN_payoff_chain.md`,
+`ATLAS_etrack_map.md`, `FORGE_b1_loop.md`) with their banks alongside. This section is the
+canonical consolidation. **Every certification number here is stated under the criterion-v1
+three-layer gate** (`CW_transition/trackB_estimator_spec.md`, "THE CERTIFICATION CRITERION");
+the Bayesian-bar numbers these campaigns originally reported are preserved as
+superseded-with-trail, because they are what the reports say and the trail is the point.
+
+### 10.0 THE CRITERION, and what it did to every count (criterion-v1)
+
+    DETECTION      dlnL_a > max( ln K_counted,a , 9.01 nat )
+    CERTIFICATION  q_max,a > 0.9  (strict 0.99)   within detections
+
+The floor is fitted to the 27 banked null realisations: the smallest value that zeroes **all**
+null certifications. Derivation, margin, and the tolerance caveat are in the spec. Certification
+is defined on `q_max`, not `P_true` — scoring on `P_true` defines wrong-certs out of existence.
+
+**THE FINAL TABLE** (banked npz only, no new realisations; `trackB_criterion.py` reproduces it):
+
+| population | N | Bayesian `P>0.9` | two-layer (FORGE §9) | **criterion-v1** | strict | wrong-cert |
+|---|---|---|---|---|---|---|
+| GEO zero-noise / draw | 40 | 4.50 ± 1.48 | 1.35 ± 0.82 | **0.275** | 0.275 | n/a¹ |
+| FORGE B1.0 Arm A / real | 30 | 2.87 ± 1.48 | 0.33 ± 0.54 | **0.067** | 0.067 | **0** |
+| FORGE B1.0 Arm B / real | 30 | 1.43 ± 1.05 | 0.13 ± 0.43 | **0.000** | 0.000 | **0** |
+| nulls (loud-scr / all-16-scr / no-CW) | 27 | 0.8 – 2.8 | 0.2 – 0.4 | **0.000** | 0.000 | **0** |
+
+¹ GEO carries **no wrong-cert field by construction** — its Bayesian criterion is defined on the
+true fringe, so "wrong-cert" is not a notion that exists there. Not synthesised. (Binding invariant.)
+
+The null is zero **by construction** — that is what the floor was fitted to do — so the null row is
+not evidence, it is the definition. **The margin is what carries the information: 0.29 nat** between
+the floor and the lowest surviving real detection (GEO J1909, `dlnL = 9.30`). Thin, and stated as such.
+
+**Surviving detectors, per pulsar:** GEO zero-noise — J1909-3744 (0.225), J0437-4715 (0.025),
+J1713+0747 (0.025). Arm A — J1909-3744 (0.067). **Arm B — none.**
+
+**THE HEADLINE, and it is a hard one.** Under a detection gate calibrated so the null cannot fire,
+the noisy conditional pipeline with truth off the prior mean (**Arm B — the honest arm**) detects
+**nothing**: its largest fringe gap (`dlnL = 8.0`) is **below the worst pure-noise false alarm in
+the null banks (9.01)**. Zero-noise GEO retains 0.275/draw and Arm A 0.067/real, both carried almost
+entirely by **J1909-3744**. FORGE §9.4 said the noisy pipeline "does not detect above its own null";
+criterion-v1 makes that exact rather than comparative. **The conditional ceiling under real noise,
+honestly gated, is zero.** Not small — zero.
+
+What survives is *not* nothing, and the distinction matters: on real data **every** surviving
+certification is on the TRUE fringe (0 wrong-certs, both arms, down from 2 and 8). The gate does not
+merely thin the count, it perfectly purifies what is left. The discriminator that survives real
+noise is **fringe correctness, not count excess**.
+
+### 10.1 GEO — the geometry ensemble (40 isotropic sky redraws, zero-noise ceilings)
+
+- **The count.** Bayesian **4.5 ± 1.5** (range 1–9; strict 1.6 ± 1.0, range 0–4) → two-layer 1.35 →
+  **criterion-v1 0.275/draw**. The census's single draw (3) sits at the **25th percentile**. The
+  question "is it 3±1 or 0–6?" is answered *neither* — at the Bayesian bar. Under criterion-v1 the
+  honest answer is **~0.3 genuine zero-noise detections per sky**, i.e. the Bayesian 4.5 was ~94 %
+  prior/trials-driven.
+- **THE NAMES ARE A MEASURE-ZERO OUTCOME.** The census triple {J0711, J1713, J1909} is reproduced
+  in **0 of 40** skies. 34/40 draws have ≥1 census name fail. Jaccard 0.384 ± 0.132.
+  *"The standing caveat — 'the count is plausibly robust; the names are not' — is half right, and
+  the wrong half was the reassuring one."*
+- **SKY-CONDITIONAL SEED SETS ARE MANDATORY.** L1013-1020's "the real seed set is J0711/J1713/J1909"
+  is a **one-draw statement**; an estimator bootstrapping from that literal triple bootstraps from a
+  set that never recurs. Seed from **J1909-3744** (certifies 38/40) and compute the seed set **per
+  realisation**. **J0437-4715 (32/40) belongs in any such set and is currently absent from it** —
+  the census omitted the array's best-measured pulsar (smallest K, K_lit = 3.07) because seed-3000
+  happened to be one of its 8/40 failures.
+- **THE SELECTION FUNCTION.** Certification frequency correlates with `1−cos μ` to the nearest loud
+  source **negatively and entirely through the fringe-breaking evidence**: stratified within-pulsar
+  ρ(1−cos μ, dlnL) = **−0.25** against ρ(1−cos μ, K_counted) = **+0.01**. The trials factor is
+  *blind* to the loud sources (at N_CW=16 the fringe spacing is set by whichever of the 16 has the
+  largest f(1−cos μ) — generically a faint one). P(certify) is flat at **0.045–0.058** for
+  μ ≲ 56°, falling **5–6×** to **0.009** in the top decile. Marginal correlations (ρ = −0.029) say
+  "geometry doesn't matter" and are **confounded by pulsar identity** — a trap; stratify.
+- **POOL THEN SELECTION — the two-stage frame.** *"Registration at truth is necessary but not
+  sufficient for certification: the carrier set is the pool of pulsars whose combs co-register, and
+  certification then selects from that pool by prior width and fringe-breaking margin."* Union-18
+  (certifies ≥1/40) vs P1's carrier-18 (registers at truth) share 15; the equal size is a
+  **coincidence of two different quantities**, not agreement.
+- **THE J1909 HEMISPHERE ANECDOTE.** J1909's non-certifying mean 1−cos μ = **1.0386** sits *just past
+  the hemisphere boundary* (1−cos μ = 1 ⇔ cos μ < 0): **the only 2 of 40 skies that break the array's
+  most reliable pulsar are the two that put every loud source in the opposite hemisphere from it.**
+  Geometry, caught in the act.
+
+### 10.2 RING — Q1 modernised (does a bad distance prior bias the sky?)
+
+- **THE BIAS HEADLINE.** **Bad pulsar-distance priors BIAS the sky localisation. They do not merely
+  broaden it.** At `log10_fgw = −8` every non-exact distance prior drives the sky MAP **3–6° off
+  truth**, **independent of SNR**, while the 90 % area shrinks 4–17× per SNR doubling. **Coverage
+  therefore degrades as the signal gets louder**: `inside90` = 0.90 → 0.50 → **0.00** at SNR 5/10/20.
+  **Proven, not inferred** — the zero-noise control gives bias **2.73–5.28°** for every imperfect
+  tier and **exactly 0.0000°** for the exact tier, in all four configurations.
+- **THE TIER LADDER IS BINARY, NOT GRADED** (at fgw=−8). κ = exp(−½[2ω₀(1−cos μ)(kpc/c)σ_d]²) demands
+  **σ_d < 3.02 pc** for κ > ½. Exactly **1 of 30** ring pulsars qualifies (J0437-4715, σ_d = 1 pc).
+  At fgw = −9 the threshold relaxes 10× (σ_d < 30 pc), 5 of 30 qualify, and the ladder becomes
+  genuinely graded. Bias collapses only once κ̄ reaches 0.290 → **0.033°**, a 54× reduction:
+  *"the mechanism, isolated: bias ∝ un-modelled pulsar-term power, and nothing else."*
+- **THE GAIA NO-OP.** Gaia's factor-1.6 moves κ̄ 0.0433 → 0.0550 and buys **1.0–1.8×** in area while
+  *degrading* `inside90`. **A factor-1.6 distance improvement is worth nothing for CW localisation at
+  fgw = 1e-8** (1.6 % in D). What matters is crossing the coherence threshold — **a VLBI /
+  timing-parallax regime, not a Gaia one.**
+- **FIVE STOP-POINTS** (full text in `RING_q1_modernized.md` §7; cited, not restated):
+  **S-1** coarse+zoom grid search refines the wrong peak (61 % of realisations, 100 % at SNR 20) —
+  *a grid will not do*, a sampler or two-stage earth-then-pulsar search is required.
+  **S-2** the tier ladder is binary at fgw=−8 and the Gaia tier is a no-op — the experiment as
+  specified cannot resolve a tier2 ladder there.
+  **S-3** the harness's timing-model prior is internally inconsistent (enterprise `1e-14·N_toa` vs
+  discovery `1e-14·N_toa/N_par`, factor ≈19) — harmless at fgw=−8, **breaks fgw=−9** (likelihood
+  under-assumes noise power by 6.42×). **Treat every fgw ≲ −9 *noisy* result from this harness as
+  uncalibrated.**
+  **S-4** with a GWB, even exact distances undercover (`inside90` 0.40–0.50 vs nominal 0.90) —
+  physics vs estimator error not separated; **do not quote the scenario-C tier3 coverage number**.
+  **S-5** RING ran the wrong "real" prior — `CW_transition/best_distances.txt` (canonical, git-tracked)
+  was wrongly believed absent. **Impact on conclusions: none** (κ̄ 0.043→0.033, same coherent set).
+  Impact on what it enables: large — canonical means differ by **1.40 σ** on J0437, a **0.55 rad**
+  pulsar-term phase error, which is a ready-to-run mis-centred-prior arm.
+
+### 10.3 SIREN — the payoff chain (what certified pulsar terms are FOR)
+
+- **THE PAYOFF.** *"Conditional on N_seed certified pulsar terms, a single loud circular SMBHB
+  (per-source Earth-term SNR ≈ 33–54) is localised in luminosity distance to **σ(D_L)/D_L ≈ 6–12 %**
+  for N_seed = 3–5, against **332 %** from the Earth term alone, because the kyr-baseline pulsar terms
+  measure the chirp mass (σ(log10 Mc): 0.866 dex → 7e-4–0.03 dex) and thereby break the
+  chirp-mass/distance degeneracy. This is the same 10–30 % fractional-distance class that dark-siren
+  H₀ programmes already treat as cosmologically useful — reached, in the nanohertz band, by three
+  certified pulsar terms rather than by an electromagnetic counterpart."*
+- **THE MECHANISM IS LAG DIVERSITY, NOT COUNT.** Adding a seed at a lag you already have buys
+  nothing (N1→N2 adds J0437 at τ=0.55 kyr next to J1909 at 0.69: gain **1.02–1.07×, essentially
+  nothing**). Adding a *different* lag buys a lot, **longer or shorter**: N3→N5 adds the two
+  *shortest* lags (τ≈0.22 kyr) and improves σ(log10 Mc) by **5.8×** while adding **+0.07 %** of mc
+  lever. The gain is not lever — it is breaking the Mc↔f_gw degeneracy: `∂Δφ_p/∂log10 f ∝ τ_p` but
+  `∂Δφ_p/∂log10 mc ∝ ḟ τ_p²`, so their ratio ∝ τ_p. Short-lag pulsars are near-pure **frequency**
+  probes (J1744: g_f/g_mc = 2400); pinning f_gw with them **frees the long lags to measure Mc**.
+  *"'How many pulsars?' is the wrong question. Three well-chosen seeds beat five badly-chosen ones.
+  Two seeds at the same lag are one seed."*
+- **THE CERTIFICATION / SIREN TARGET TENSION — the campaign's structural finding.**
+  **Certifiability ∝ 1/τ; payoff ∝ τ².** The registration tolerance is `tol ≈ 1/(2π f τ_p)`, so the
+  design theorem's "wide lanes from nearby pulsars" names the **nearest** pulsars — hence the
+  **shortest** lags — while the chirp-mass lever goes as **τ²**. **The pulsars that are easiest to
+  certify are the worst chirp-mass measurers, and the ratio goes as τ³.** J0711 (τ=0.220 kyr) has the
+  loosest lane and an mc lever of 0.408 rad/dex; B1937+21 (τ=7.768 kyr) has a lane 35× tighter and a
+  lever **4100× larger**. **The certification target list and the siren target list are different
+  lists, and they anti-correlate as τ³.** The design-theorem target list optimises the wrong objective
+  if the goal is the standard siren; the right objective is a **lag-diverse** set — short lags to
+  certify and pin f_gw, long lags to carry Mc.
+- **THE CRAMÉR-RAO CAVEAT — verbatim, and it governs every σ above:**
+  > **These are Cramér–Rao bounds on zero-noise Asimov data with the fringe integers given.** A
+  > noisy realisation scatters; a full posterior with free integers can only be wider. Frozen GP
+  > hyperparameters (≤ 9 %, D5) and a single source (no confusion penalty) are the standing
+  > optimisms. The sky is free, which is the one place SIREN is *conservative* relative to the
+  > B1 targeted scenario.
+
+  **Every σ SIREN quotes is a lower bound.** And SIREN is a **GIVEN-SEEDS FORECAST**: achievability
+  is Track B's question, and Track B's answer is the information-theoretic NO-GO (f = 6.9e-7).
+  Under criterion-v1, Arm B certifies **0.000** seeds per realisation — so SIREN's N_seed = 3–5
+  columns currently price a resource the noisy pipeline **cannot deliver at all**. The payoff is
+  real; the road to it is not through cold-start certification.
+- **Cross-report coupling worth keeping:** RING says only sub-3-pc (VLBI-class) σ_d matters; SIREN's
+  headline arm B *assumes* 0.1 pc seed distances — i.e. exactly that regime. The 0.1 pc premise is
+  load-bearing for short-lag seeds (arm C degrades N5 by 5.0×) but irrelevant (0.2 %) for the
+  long-lag triple.
+
+### 10.4 ATLAS — the E-track map (where does the eccentric comb self-clock?)
+
+- **THE SELF-CLOCKING CORNER.** **Eccentric (e ≳ 0.6), massive (Mc ≳ 10⁹ M⊙), high in the band
+  (f_orb ≳ 10⁻⁸ Hz).** At `(f_orb = 10⁻⁸, Mc = 10⁹)` the comb self-clocks — σ(log10_mc) improves
+  >20× — from **e ≈ 0.58**; the threshold rises to e ≈ 0.70–0.84 at lower Mc or f_orb = 10⁻⁸·⁵.
+  **Below f_orb = 10⁻⁸ the comb is buried in the red-noise/GWB band and NEVER self-clocks, at any e.**
+  **The first source must live at the TOP of the band.**
+- **THE QUALIFYING STATEMENT — the corner clears the *relative* bound, not the *absolute* one.**
+  κ_measured ≥ 20 by e ≈ 0.5–0.65, and marginal σ(log10_mc) reaches **0.008–0.02 dex** (a 40–115×
+  improvement) — which clears the **>20× relative** bound but **does not clear the ~0.003-dex
+  absolute certification floor** (best in the valid tier: 0.0075 dex, **2.5× short**). Two distinct
+  criteria that earlier work conflated; keep them apart. (And κ ≥ 20 is a *third* 20 — WEAVE's
+  Δφ_E ≳ 1 rad self-clock threshold on the conditional Fisher — not the σ-improvement bound.)
+- **κ IS FREQUENCY-DEPENDENT** — the content white-noise `(n_eff/2)F(e)` cannot capture. At
+  f_orb=10⁻⁸ measured κ tracks the analytic (11.0 vs 5.6 at e=0.5). At **10⁻⁸·⁵ it vastly exceeds**
+  it (2216 vs 172 at e=0.8) — the comb's higher harmonics reach further into the sensitive band. At
+  **10⁻⁹ it is *below* analytic** at moderate e (0.92 vs 5.6) — the fundamental sits where red noise
+  buries it, so spreading power to the comb *reduces* the chirp Fisher until e climbs out (601 at e=0.8).
+- **THE THROTTLE (the honest surprise).** Conditional chirp Fisher κ is enormous (~33 000× at e=0.9)
+  but marginal σ(log10_mc) improves only ~40–115×: **the comb's chirp information is largely
+  degenerate with e and f_orb.** Only at high e does the comb geometry (tooth spacing → f_orb,
+  amplitude ratios → e) break the degeneracy. **Eccentricity's value is CONDITIONING, not magnitude.**
+- **M3 — MARGINAL RANK-3 IGNITION.** WEAVE's clock-cancellation ceiling holds only under strict
+  harmonicity; broken honestly (Peters e(t) decay + 1PN periastron advance γ̇, RK4, autodiffed).
+  Verdict: **the cancellation does NOT simply survive — it BREAKS at high e** (R_rank3/R_scalar up to
+  **41.6**). But ignition (`R_a ≥ 1`) is reached **only at τ_a = 0.3 kyr** (the nearest pulsars),
+  **3 cells at f_orb=10⁻⁹, 4 at 10⁻⁸·⁵, max R = 3.53**; at τ_a ≥ 1 kyr, **no ignition**. So: a
+  refutation of the pure cancellation at high e, plus a **marginal, shortest-lag-only, ceiling
+  ignition — not a clean null, and not a robust cascade ignition.**
+- **M4 — THE SOURCE IS ITS OWN SIREN.** An eccentric source at `(f_orb=10⁻⁸, Mc ≳ 10⁹, e ≳ 0.58)`
+  reaches **σ(D_L)/D_L ≈ 12–14 %** — the dark-siren-useful class — **from its own Earth term, with
+  ZERO certified pulsar terms.** SIREN reached the same class only with 3 certified seeds (which the
+  census recurs in 0 of 40 skies, and which criterion-v1 says the noisy pipeline delivers 0.000 of).
+  **Eccentricity substitutes the counterpart's own clock for the missing certified pulsar terms** —
+  but only above the relative bound, so a residual **factor ~2–5 in σ_mc** remains for the EOB tier.
+  *This is the door B1.3 said was the only one, and ATLAS has now found the handle on it.*
+- **THE EOB-TIER VALIDITY LIMIT.** The comb is a **toy tier** (circular-kernel harmonic stack, fdot
+  tie only). The F(e)-boosted `mc_n` makes the chirp term go negative — the harmonic "coalesces"
+  within the span — at the extreme e×Mc×f_orb corner; the clip is **binary** (a cell is fully valid
+  or its whole comb coalesces → **TOY-TIER INVALID**, flagged, its κ **not** read as "not
+  self-clocking"). **5 of 63 cells flagged; 0 dropped.** Decisively: **the cells that would clear the
+  0.003-dex absolute floor (e ≳ 0.85) are exactly the toy-invalid ones.** The map's most important
+  corner is the corner it cannot see. **The EOB tier (arXiv:2511.19611) is required there** — it is
+  not a refinement, it is the load-bearing next step.
+- Figures: `reports/atlas_M2_contour_kappa.png` (self-clocking min-e contour + κ validation),
+  `reports/atlas_M3_ignition.png` (rank-3 ignition R_a(e) vs the R=1 line).
+- Consistency flag, carried not hidden: the npz `e` column for the M4 rows holds the κ≥20 min-e
+  (0.516/0.526/0.501) while the markdown labels it `e* (>20×)` (0.59/0.58/0.66); σ_mc was evaluated
+  at the npz values. Do not silently reconcile.
+
+### 10.5 FORGE — the B1 loop under real noise
+
+- **B1.0, THE A→B PRICE (relative, and it survives the re-score).** Arm A (truth at the prior mean)
+  reproduces the census count under real noise; **Arm B (truth drawn off the prior mean — the honest
+  case) halves the certified count and quadruples the wrong-certification rate.**
+  Bayesian 2.87 → 1.43; wrong-certs 2 → 8 (and 0 → 3 at P>0.99). Under criterion-v1: **0.067 → 0.000**,
+  wrong-certs **0 → 0**. Registration-from-the-prior-mean was worth ~2× in yield and was suppressing
+  essentially all confident wrong certs. **The A→B price is a *relative* statement and is unaffected
+  by the gate** (Arm A 0.067 still > Arm B 0.000).
+- **PRIOR-PINNED vs DATA-DRIVEN — the per-pulsar split, sharpened by the re-score.** J0437-4715 (the
+  sole Anchor-Census K≤3 pulsar) certifies 13/30 in Arm B and is on the TRUE fringe **13/13 (100 %)**;
+  every Arm-B wrong-certification comes from the **data-driven** census/loud-broken pulsars (J1909×3,
+  J1713×3, J0711×1, J1603×1) — **never from the anchor**. But criterion-v1 shows J0437's Bayesian
+  robustness is **genuine at zero noise** (GEO detect-freq 0.65 → final 0.025) and **prior-pinning
+  under real noise** (Arm B: 0.10 → **0.000**). And the same tiny K makes it the dominant residual
+  *null* false-alarm source. **Tiny K cuts both ways** — see the spec's prior-pinning convention.
+- **B1.1 CALIBRATION — the pipeline is calibrated, and that was never the problem.** The reliability
+  curve tracks (claimed q_max 0.51→0.96 vs realized true-fringe fraction), BH-FDR@0.05 gives realized
+  true fraction **1.000**. **Per-claim posteriors are sound on signal-present data.** The failure was
+  never miscalibration — it was that **a calibrated confidence with no detection statistic under it
+  still fires on pure noise** (§3's null). Calibration and detection are different questions.
+- **B1.2 THE SCRAMBLED NULL — the finding that forced the criterion.** The null **fired**: Bayesian
+  certs 2.2/real (loud scrambled), 2.8/real (all 16 scrambled), and **0.8/real with NO CW in the data
+  at all**. Scrambling all 16 does **not** reduce the count vs scrambling 3 — **the first hypothesis
+  (that the faint sources stayed coherent) is REFUTED.** The floor is **intrinsic to the Bayesian
+  criterion**: a prior-pinned floor (~0.8/real, pure noise) plus a noise-lock excess (→2.8/real) when
+  a wrong source model meets real CW data. Under criterion-v1 all four null banks read **0.000**.
+- **B1.4 WRONG-POSITION — PASS with mechanism.** Counterpart offset by 5× the certification tolerance:
+  every loud-source-*dependent* certification vanishes; the lone survivor is J0437, on the TRUE
+  fringe, certifying from its own EM prior independent of the source position. Fails loud exactly
+  where it should, stays correct exactly where it should. **NB under criterion-v1 the 9.01-nat floor
+  also kills this correct survivor** (`dlnL = 4.41`) — see the spec's tolerance caveat; this is the
+  single datum we have off `tol_scale = 0`, and it says the floor is aggressive under mis-registration.
+- **B1.5-lite — GEOMETRY, NOT WEATHER, SETS THE YIELD.** Across 10 skies × 3 noise weathers the sky
+  draw dominates the variance (g03 gives 3–4 across all weathers; g05/g06/g08 give 0–1). Consistent
+  with GEO's geometry-driven selection function.
+- **B1.3 — THE HOGG PHASE-UP LOOP. VERDICT: (iii) DAMPED.** 12 Arm-B realisations, source-fit channel
+  wired in (certified fringes fixed → re-fit (f, mc) on noisy data → shrink σ(log10_mc) → open the
+  registration gate → re-certify). **0/12 realisations grew past their round-0 seed set**; median
+  N_cert 1 → 1; pooled next-cycle gain **0.00**; σ(log10_mc) within-loop shrink **1.00× (saturates
+  immediately)**. Two measured mechanisms: (1) **local σ_mc is not the bottleneck** — the fit does
+  reach 1.4e-4 dex, far below the 0.003-dex bound, but that tight *local* width never becomes
+  *global fringe concentration*; the missing information is *which of ~16 fringes*, and the
+  chirp-mass channel does not sharpen that choice. (2) **the seed set is wrong-fringe-poisoned** —
+  the census-sky realisation seeds {J1603, J1713, J1909}, **all three on the WRONG fringe**, so the
+  loop bootstraps from FALSE fringes. **The loop cannot hot-wire its own clock.**
+
+  > ⚠️ **B1.3 DAMPED WAS MEASURED BELOW ONSET.** The verdict is sound *as measured* and is
+  > **unaffected by criterion-v1** (it turns on N_cert *growth*, not on the gate). But it was measured
+  > in a regime where criterion-v1 now says the honest detection count is **0.000/realisation** — the
+  > loop was fed a seed set that, under a gate the null cannot pass, **does not exist**. A loop
+  > started from zero genuine detections cannot compound, and that is arithmetic, not physics.
+  > **Above-onset loop behaviour is OPEN.** Whether the phase-up channel compounds when it is seeded
+  > with *genuine* detections — the regime ATLAS's self-clocking corner supplies — is untested and
+  > is not what B1.3 measured. **IGNITE campaign queued** (launches on tag `criterion-v1`). Do not
+  > quote DAMPED as a statement about the above-onset loop.
+
+### 10.6 WHAT THE WEEK SETTLES, AND WHAT IT OPENS
+
+**Settled.**
+1. **Cold-start certification is closed** (information-theoretic NO-GO, f = 6.9e-7) and criterion-v1
+   now shows the *conditional* pipeline under real noise, honestly gated, detects **zero** in the
+   honest arm. The ceiling is not modest — it is absent.
+2. **The census's names are a measure-zero outcome** (0/40 skies). Any seed set must be
+   sky-conditional and anchored on J1909 + J0437, never the published triple.
+3. **Distance priors bias the sky**, provably, and the bias is SNR-independent while the credible
+   region shrinks — **coverage degrades as the signal gets louder**. Gaia does not help; VLBI would.
+4. **The certification target list and the siren target list are different lists, anti-correlated as
+   τ³.** Optimising for certifiability actively de-optimises the payoff.
+5. **The phase-up loop does not self-clock from a below-onset seed set** (B1.3 DAMPED, doubly
+   confirmed — statically and dynamically).
+
+**Open.**
+1. **The above-onset loop** — B1.3's DAMPED verdict does not speak to it. **IGNITE.**
+2. **The floor's registration-tolerance dependence** — the nulls are banked at `tol_scale = 0` only.
+   The one off-tolerance datum shows the floor killing a *correct* certification. **Bank nulls on a
+   tol grid and re-fit.** This gates any above-onset claim.
+3. **The EOB tier** — ATLAS's map cannot see the corner that matters (e ≳ 0.85 is toy-invalid), and
+   that is exactly where the absolute 0.003-dex floor would be cleared.
+4. **The margin is thin** — 0.29 nat between the floor and the lowest surviving real detection, with
+   the floor fitted to the max of a 27-realisation null sample. More nulls would tighten it.
+
+### 10.7 CONVENTIONS ADDED THIS WEEK (full text in the spec)
+
+- **Confidence without a detection statistic is prior-pinning in disguise.** Every confidence bar
+  must sit downstream of a detection statistic **that can return zero**. A criterion that cannot fire
+  on a null is not a criterion. `nullN` — pure noise, no CW — certified 0.8 pulsars/realisation at
+  the Bayesian bar. Corollary: **robustness to source error and vulnerability to noise are the same
+  property viewed from two sides** (tiny K, both ways).
+- **Summary files carry raw statistics, not only verdicts.** FORGE banked `cert90` but not the `dlnL`
+  under it; a re-cut on a different criterion then required re-running the cluster job purely to
+  extract an array that had existed in memory. **Bank the statistic, not the verdict.**
+- **Reports and their empirical basis travel together.** A report is not landed until the arrays it
+  is scored from are landed with it.
