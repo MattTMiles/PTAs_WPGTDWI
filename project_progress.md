@@ -1999,6 +1999,14 @@ superseded-with-trail, because they are what the reports say and the trail is th
 
 ### 10.0 THE CRITERION, and what it did to every count (criterion-v1)
 
+> ⚠️ **SUPERSEDED BY criterion-v2 (§10.9).** The constant `9.01` is **retired**: IGNITE (§10.8)
+> measured the floor to be a *function*, `floor(h, T, tol) ∝ h^1.66`, of which 9.01 is only the
+> census-loudness value. **Every number in §10.0–§10.7 below stands exactly as measured** and is
+> gated bit-identically (`CW_transition/criterion_v2_gates.py`, G1–G3) — nothing here is retracted.
+> What changes is the *scope*: these are census-loudness numbers, and they may not be extrapolated
+> to other loudnesses, baselines, or registration tolerances. Read §10.0–§10.7 as a fixed cell of
+> the map §10.8 later drew.
+
     DETECTION      dlnL_a > max( ln K_counted,a , 9.01 nat )
     CERTIFICATION  q_max,a > 0.9  (strict 0.99)   within detections
 
@@ -2257,6 +2265,18 @@ noise is **fringe correctness, not count excess**.
   > is not what B1.3 measured. **IGNITE campaign queued** (launches on tag `criterion-v1`). Do not
   > quote DAMPED as a statement about the above-onset loop.
 
+  > ⚠️ **ANSWERED BY IGNITE (§10.8), AND BOTH VERDICTS ARE IMPLEMENTATION-SPECIFIC.** IGNITE ran the
+  > loop above onset: it does not merely fail to compound, it **cascades into wrong certifications**
+  > (§10.8.3). **B1.3's DAMPED and IGNITE's CASCADE are verdicts on ONE M-step implementation — the
+  > HARD-LOCK — and on NOTHING ELSE.** Neither is a verdict on Hogg's iterated phase-up *per se*.
+  > Both ran an M-step that pins each certified pulsar at its MAP fringe **centre** and fits the
+  > source against that delta. **That is not the M-step this spec specifies.** Spec §3 is explicit:
+  > the source update is **soft, fringe-posterior-weighted** — `Q(θ) = Σ_p Σ_n q_p(n)·lnL(θ, L_p(n))`
+  > — i.e. it *marginalises* the fringe uncertainty rather than committing to a fringe. **The spec's
+  > own soft-fix discipline predicted the failure that the hard-lock produced.** Do not read DAMPED
+  > or CASCADE as "the loop is dead"; read them as "the hard-locked loop is dead." **The soft loop is
+  > untested above onset. That is IGNITE-2's question.**
+
 ### 10.6 WHAT THE WEEK SETTLES, AND WHAT IT OPENS
 
 **Settled.**
@@ -2273,14 +2293,24 @@ noise is **fringe correctness, not count excess**.
    confirmed — statically and dynamically).
 
 **Open.**
-1. **The above-onset loop** — B1.3's DAMPED verdict does not speak to it. **IGNITE.**
-2. **The floor's registration-tolerance dependence** — the nulls are banked at `tol_scale = 0` only.
-   The one off-tolerance datum shows the floor killing a *correct* certification. **Bank nulls on a
-   tol grid and re-fit.** This gates any above-onset claim.
+1. ~~**The above-onset loop**~~ — **CLOSED BY IGNITE (§10.8.3), for the HARD-LOCKED loop only.**
+   It cascades into wrong certifications. The **soft** (spec-§3) loop remains untested above onset:
+   **IGNITE-2.**
+2. ~~**The floor's registration-tolerance dependence**~~ — **CLOSED BY IGNITE (§10.8.2), and it
+   INVERTED**: the null floor barely moves with tolerance; the *true-positive* channel is what dies.
+   The `wrongpos` pathology was an artifact of applying a tol = 0 floor to a tol = 5 realisation.
 3. **The EOB tier** — ATLAS's map cannot see the corner that matters (e ≳ 0.85 is toy-invalid), and
-   that is exactly where the absolute 0.003-dex floor would be cleared.
-4. **The margin is thin** — 0.29 nat between the floor and the lowest surviving real detection, with
-   the floor fitted to the max of a 27-realisation null sample. More nulls would tighten it.
+   that is exactly where the absolute 0.003-dex floor would be cleared. **STILL OPEN — and it is now
+   the queue head**, because §10.8.4 shows the certification road is a variance play while the
+   eccentric Earth-term siren is the expectation-value road.
+4. ~~**The margin is thin**~~ — **SUPERSEDED (§10.9, D2).** The 0.29 nat is now known to sit **inside
+   the floor's own ±5-nat sampling scatter** and carries no evidential weight. And "bank more nulls"
+   does **not** fix it: the max-of-N estimator's scatter is *flat in N*. **The estimator had to
+   change, and did.** No criterion-v1 verdict moves.
+5. **NEW — the wrong-counterpart hole.** D1 (§10.9) adopts the counterpart-matched null family, which
+   by construction has **no defence against a wrong counterpart** — IGNITE's scrambled loop detects
+   2/5. The purity layer (D3) is the intended defence and is **on test, not adopted**. Until IGNITE-2
+   reports, this hole is **open and stated**.
 
 ### 10.7 CONVENTIONS ADDED THIS WEEK (full text in the spec)
 
@@ -2294,3 +2324,207 @@ noise is **fringe correctness, not count excess**.
   extract an array that had existed in memory. **Bank the statistic, not the verdict.**
 - **Reports and their empirical basis travel together.** A report is not landed until the arrays it
   is scored from are landed with it.
+
+### 10.8 IGNITE — the certification ONSET MAP and the above-onset loop (ACCRE, 2026-07-12)
+
+Primary source `reports/IGNITE_onset_map.md`; empirical basis `reports/ignite_bank.npz` (2 070
+stage-0/1 realisations × 116 pulsars, raw statistics per the lean-npz convention), 35 `ig_loop*.npz`
+Stage-2 trajectories, `ignite_analysis.npz`, 3 figures. **Every number below re-derives from the
+bank** (`CW_transition/criterion_v2_gates.py`, G4–G8). 24 cells: h ∈ {−13.25, −13.0, −12.75, −12.5}
+× T ∈ {15, 20, 30} yr × {lit, vlbi}; 50 Arm-B signal realisations + 30 fresh nulls per cell, floors
+refit per cell, never inherited.
+
+#### 10.8.1 THE FLOOR IS NOT A CONSTANT — it is loudness-relative
+
+**`dlnL_floor ∝ h^1.66` (counterpart-matched) and `∝ h^1.88` (all-null)**, measured in every
+baseline and tier. **The mechanism runs on data containing NO CW at all:** the E-step evaluates a
+model whose pulsar-term amplitude ∝ h, and the per-fringe likelihood carries a **matched-filter
+cross term linear in the MODEL amplitude** — so the null's fluctuations grow with the loudness of
+the *hypothesis*, not of the data. With a *scrambled* source meeting loud real data the noise-lock
+grows ∝ h², which is why the all-null family scales more steeply.
+
+**Consequence: the certified count is NON-MONOTONE in h.** Making the source louder raises the bar
+almost as fast as it raises the signal (T = 20 vlbi: 0.72/real at −13.25 → **0.38/real at −12.5**).
+**9.01 nat was the census-loudness value of a function, and nothing more.**
+
+#### 10.8.2 THE ONSET MAP — baseline-driven, not loudness-driven
+
+Correct certifications/realisation, **counterpart-matched (`fN`) calibration** — with the
+**all-null (`fALL`) blind-robust column beside it, permanently, per D1**:
+
+| T | tier | corr certs/real over h = {−13.25, −13.0, −12.75, −12.5} | **h\* (>1)** | `fALL` |
+|---|---|---|---|---|
+| 15 | lit | 0.14, 0.06, 0.16, 0.48 | — | no onset |
+| 15 | vlbi | 0.16, 0.22, 0.14, 0.52 | — | no onset |
+| 20 | lit | 0.08, 0.72, 0.56, 0.54 | — | no onset |
+| 20 | vlbi | 0.72, 0.72, 0.68, 0.38 | — | no onset |
+| 30 | lit | 0.32, 0.96, **1.54**, 0.94 | **−12.75** | no onset |
+| 30 | vlbi | **1.16**, 0.78, 0.98, 1.46 | **−13.25** | no onset |
+
+- **h\* = −12.75 (30 yr, lit) and −13.25 (30 yr, VLBI). NO onset at T = 15 or 20 yr anywhere in the
+  box. NO cell reaches 3 correct certs/real.** T^{5/2} `fdot`/coherence leverage beats the h^{1.66}
+  floor race; **louder alone does not.**
+- **Under `fALL` the map NEVER ignites** — best cell **0.24 certs/real, of which 0.22 correct**,
+  against a >1 bar, at every one of the 24 cells. *(Both numbers travel: the house rule is that count
+  and correctness are quoted together.)* **The choice of null family is a physics decision that gates
+  every downstream claim** — see D1 (§10.9).
+- **VLBI's gain is exactly where RING said it would be**: it converts the union-18's trials mass
+  (ΣK 88 454 → **470**) into detections at fixed `dlnL`.
+- **THE TOLERANCE HOLE IS CLOSED, AND IT INVERTS.** The pure-noise floor is **flat-to-mildly-rising
+  and small** in registration tolerance (0.00 → 0.00 → 2.06 → **4.37 nat** at tol = 0/1/2/5). It is
+  the **TRUE-POSITIVE channel that dies of mis-registration** (true certs 0.14 → **0.00**/real by
+  tol = 5), and **no per-tol refit floor kills a single surviving true positive**. criterion-v1's
+  "9.01 kills the correct `wrongpos` J0437" pathology was an **artifact of applying a tol = 0 floor
+  to a tol = 5 realisation.**
+- **THE FLOOR'S OWN SCATTER IS ±5 NAT per 30-null refit** (four independent redraws of one statistic:
+  {8.48, 14.03, 8.09, 4.37}). **Every margin in this campaign — criterion-v1's 0.29 nat and IGNITE's
+  0.01–2.0 nat — is inside the calibration noise.** See D2.
+
+#### 10.8.3 PURITY COLLAPSES ABOVE ONSET, AND THE LOOP CASCADES
+
+**Purity.** Wrong certifications (cert with `on_true = False`) per 50 realisations: 0–2 at T = 15,
+up to 6 at T = 20, and **23/50 at the (−12.75, 30 yr, lit) onset cell.** criterion-v1's *"the gate
+perfectly purifies what is left"* was a **census-loudness artifact**: above onset, the same
+noise-lock that raises the floor gives **wrong** fringes floor-beating gaps. **Fringe correctness —
+the one discriminator that survived real noise at census loudness — degrades exactly where the count
+turns on.** The wrong certs concentrate in the wide-prior, data-driven pulsars (J1909, J1045, J1603,
+J1713); **the anchor J0437 supplies 20/50 correct certs at the onset cell with 0 wrong.** Above
+onset the workhorse **flips from J1909 to J0437** — tiny K wins once `max(lnK, floor)` is
+floor-dominated. **Any above-onset count without a purity number beside it is meaningless.**
+
+**The loop. Both pre-registered STOPs fired. The measured behaviour is a fourth mode:**
+
+| cell (h, T, tier; `fN` floor) | grew past seed | seeds → finals | wrong at fixed point | scrambled loop |
+|---|---|---|---|---|
+| −13.25, 30, vlbi; 5.46 | 2/10 | Σ15 → Σ28 | **26 of 28 wrong** | **2/5 DETECT (all wrong)** |
+| −13.00, 30, vlbi; 15.55 | 1/10 | Σ5 → Σ6 | 5 of 6 wrong | — |
+| −12.75, 30, lit; 30.89 | **6/10, incl. 2 runaways (3→116)** | Σ20 → **Σ359** | **356 of 359 wrong** | — |
+
+**A WRONG-CERTIFICATION CASCADE.** By raw count the loop "compounds" spectacularly (3 → 116 in three
+iterations); **essentially every certification it adds is on a false fringe.** The genuine
+(on-true) certified count **never grows in any of the 30 realisations**. The fit does not merely fail
+to compound — **it destroys the correct registration it was fed** (17 of 20 certs at the *quiet*
+fixed points are wrong post-fit, vs an 8–15 % wrong-rate in the raw seeds). Once the source is
+mis-fit, the loop is *a wrong source meeting loud real data* — the exact configuration whose
+noise-lock sets the `fALL` floor — and `σ(log10 mc)` collapses to ~1e-5 dex, opening the
+registration gate for everything. **Tight local width + wrong global registration = confident
+nonsense.**
+
+> ⚠️ **THE MECHANISM IS THE HARD LOCK, AND THE VERDICT IS SCOPED TO IT.** The instability is a
+> **GPS wrong-fix failure at loop level**. B1.3's and IGNITE's M-step **pins each certified pulsar at
+> its MAP fringe CENTRE** — up to half a fringe off the true within-fringe offset — and fits the
+> source against that delta. That mis-pin biases the (f, mc, extrinsics) gradient; one damped Newton
+> step moves the source materially (`src_mc_off` up to **1.6 dex in a single step**); the re-E-step at
+> the moved source re-registers the fringes; and the poison compounds.
+>
+> **THIS IS NOT THE M-STEP THE SPEC SPECIFIES.** Spec §3 is explicit that the source update is
+> **soft and fringe-posterior-weighted** — `Q(θ) = Σ_p Σ_n q_p(n)·lnL(θ, L_p(n))` — it
+> **marginalises** the fringe uncertainty instead of committing to a fringe. Hard-locking replaces
+> `q_p(n)` with a delta at the MAP. **The spec's own soft-fix discipline predicted exactly this
+> failure, and the implementation did not follow it.**
+>
+> **Therefore: B1.3's DAMPED and IGNITE's CASCADE are verdicts on the HARD-LOCKED implementation
+> ONLY. Neither is a verdict on Hogg's iterated phase-up per se.** The **soft loop is untested above
+> onset**, and that — not a repair of the hard lock — is **IGNITE-2's question.**
+
+#### 10.8.4 THE JOIN — the certification corner is the self-clocking corner, plus "near"
+
+Read with ATLAS: the first source had to be *eccentric (e ≳ 0.6), massive (Mc ≳ 10⁹), at the top of
+the band* to self-clock. **IGNITE adds the fourth requirement: NEAR.** Only the
+(Mc ≳ 10^9.5, f_orb = 10⁻⁸) corner clears onset beyond the Virgo distance, and only in the VLBI tier
+at 30 yr; the (10⁹, 10⁻⁸) reference cell must sit **within ~8 Mpc**. Against SCOUT's population
+clock — N̄_detectable ≲ 0.01–0.1 (current), O(0.1–1) (SKA), **at −13.75-class loudness**, while
+IGNITE's onset is **0.5–1.0 dex louder still** — the honest read:
+
+**Nature does not supply a source above h\* at any epoch this campaign models
+(N_joint(h > h\*) ≪ N_joint(−13.75) ≲ 0.1). The honest-certification programme is a VARIANCE PLAY on
+the loud-nearby tail, not an expectation-value plan.** The expectation-value road remains ATLAS's
+**eccentric Earth-term standard siren (M4), which needs no certified pulsar terms at all.**
+
+---
+
+### 10.9 CRITERION-V2 — THE THREE DECISIONS (adopted 2026-07-12, tag `criterion-v2`)
+
+Full text and derivations in the spec (`CW_transition/trackB_estimator_spec.md`, "THE CERTIFICATION
+CRITERION (criterion-v2)"). Gates: `CW_transition/criterion_v2_gates.py` — **8/8 PASS + census
+triple bit-identical**, banked npz only, no GPU.
+
+    DETECTION      dlnL_a > max( ln K_counted,a , floor(h, T, tol) )
+    CERTIFICATION  q_max,a > 0.9  (strict 0.99)   within detections
+    PURITY         co-registration statistic R_a  — PRE-REGISTERED TEST, NOT ADOPTED
+
+**D1 — NULL FAMILY: counterpart-matched (`fN`) is operative; all-null (`fALL`) is the permanent
+blind-robust column.** *Rationale:* a **targeted** analysis faces exactly the counterpart-matched
+null — a real counterpart exists by construction, and the false alarm it can actually suffer is
+noise mimicking fringe-breaking **under the correct model**. Sky-scrambles answer a **blind-search**
+question the targeted analysis does not ask; calibrating against them imports a bar the scenario
+never has to clear. **The alternative's consequence is recorded permanently and travels in every
+onset table: under `fALL` there is NO ONSET ANYWHERE in the modelled grid** (best cell 0.24 certs,
+0.22 correct). **The price of D1 is a stated hole:** `fN` has no defence against a wrong counterpart
+(IGNITE's scrambled loop detects 2/5). **D3 is the intended replacement defence — it rejects a wrong
+counterpart on GEOMETRY (the pulsars disagree) rather than on AMPLITUDE (a floor tall enough to
+outrun the noise-lock), which is how it closes the hole without closing the window.** Until D3
+reports, **the hole is open and stated.**
+
+**D2 — THE FLOOR IS A FUNCTION, AND ITS ESTIMATOR CHANGED.** `9.01` is **retired**. The criterion
+takes `floor(h, T, tol) ∝ h^1.66`, refit per cell.
+
+> **The part that the data forced.** criterion-v1's floor is the **max of N nulls**. The null
+> offender statistic is itself a max over pulsars, so it lies in the **Gumbel domain by
+> construction** — and there **`sd(max_N) = 1.283·β`, INDEPENDENT of N**, while
+> `E[max_N] = μ + β·ln N` **creeps up without bound**. Measured: sd(max_N) = 8.91 / 8.68 / 8.79 /
+> 8.74 nat at N = 10/30/100/1000. **FLAT.**
+>
+> **So banking more nulls does not stabilise the criterion-v1 floor — it inflates it.** IGNITE's own
+> recommendation ("more nulls per cell is the single cheapest credibility purchase") is **half right,
+> and this is the correction: the estimator had to change first.** Worse, max-of-N has **no fixed
+> false-alarm rate** — it is implicitly the `1 − 1/(N+1)` quantile, so **its stringency was an
+> accident of how many nulls happened to be banked.**
+
+**Adopted estimator:** the **(1 − α) quantile at a STATED per-realisation FPR**, via a Gumbel
+tail fit — `floor = μ̂ + β̂·z(α)`, **α = 0.05** (criterion-v1's max-of-27 was implicitly α ≈ 0.036,
+so this is an explicit, N-independent version of a bar previously set by accident). Its scatter
+**does** shrink: `sd(floor̂) = 2.80·β/√N`. **Sizing:** **N ≥ 100 nulls/cell** (scale-free:
+sd < 10 % of the floor at *any* loudness) and **N ≥ 150 at the onset cells** (absolute: sd < 1 nat).
+A 1-nat absolute target at the loud h = −12.5 cells would need N ≈ 2 000–5 000 and is **explicitly
+not adopted** — it over-specifies a 45-nat floor. Cost: ~2 GPU-hours for 150 × 24 cells.
+**The sizing was always cheap; what was missing was the check that the estimator converges.**
+
+*Tolerance:* flat-to-mild in the null, **true-positive-killing in the signal** (§10.8.2).
+*criterion-v1's 0.29-nat margin:* **annotated as WITHIN CALIBRATION NOISE** (±5 nat), carrying no
+evidential weight — **superseded-with-trail, per convention. No criterion-v1 verdict moves:** Arm B's
+largest `dlnL` is 8.0 against a floor whose scatter band is 4–14 nat, so *"the honestly-gated noisy
+pipeline detects nothing at census loudness"* **never depended on the margin.** What dies is the
+margin's precision, not the result's sign.
+
+**D3 — PURITY LAYER: a pre-registered TEST, not an adoption.** The statistic makes **the needle's
+co-registration** — *the true source is the unique point where every pulsar's fringe comb
+co-registers* — into a number. A pulsar on the wrong fringe does not merely err; it **demands a
+different source** than its neighbours do. Cheapest sufficient form, computable from the **banked**
+`mapk`/`n_true_grid` and analytic lag-levers with **no new likelihood evaluations** (the unknown
+true-source displacement cancels in the difference): a **leave-one-out chi-square** on each
+candidate's implied source solution against the one implied by the other detected pulsars,
+`R_a = (u_a − u_R)ᵀ(Σ_a + Σ_R)⁻¹(u_a − u_R)`, vetoing at `p = 0.01`. It should have teeth: the wrong
+fringes IGNITE certifies are **|Δk| = 25–395**, not ±1 neighbours.
+
+**Recorded IN ADVANCE — the detected-set form has a measured CEILING** (G8, onset cell): the
+statistic is **undefined for a singleton detection** (nothing to co-register against), so undefined
+**must** default to PASS, and the detected-set variant can therefore kill **at most 20 of the 23
+wrong certs (87 %)** — it **cannot** reach 100 % at any threshold. An all-pulsar reference set (every
+pulsar has a fringe posterior and a lever, detected or not) has **no such ceiling** and is the
+variant expected to carry the test.
+
+**PRE-REGISTERED, BINDING, THRESHOLD FIXED BEFORE LOOKING.** Applied to IGNITE's banked Stage-1
+cells, the layer must **(a)** kill **≥90 %** of the 23 wrong certs at the (−12.75, 30, lit) onset
+cell; **(b)** preserve **≥90 %** of true certs at both onset cells; **(c)** leave **zero** certs on
+all three null banks — *and, the substantive part, report its rejection rate on the `nullA`/`nullL`
+**detections**, which is the only number that measures whether it buys back the wrong-counterpart
+robustness D1 gave up*; **(d)** kill the Stage-2 **scrambled loop's 2/5 detections**.
+**ADOPTION IS CONDITIONAL ON (a)–(d). No partial adoption, no post-hoc threshold tuning.** If they
+are not all met, the layer is **not adopted** and the 23/50 wrong-certification rate **stands as
+measured**, quoted beside every above-onset count.
+
+**Convention added:** *a calibrated threshold must state its false-alarm rate and its sampling
+scatter.* An order statistic is not a threshold: its stringency drifts with sample size and its
+scatter never shrinks. **"Bank more nulls" is a credibility purchase only if the estimator
+converges** — otherwise it is just a stricter, equally noisy bar.
