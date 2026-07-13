@@ -1660,3 +1660,165 @@ scatter of that estimator at the N actually banked.** A threshold whose sampling
 the margin it is defending is not defending anything — and until it is measured, you cannot know
 which case you are in. **Corollary: "bank more nulls" is not automatically a credibility purchase.
 It is one only if the estimator converges.**
+
+---
+
+# CRITERION-v2.1 (adopted 2026-07-12, tag `criterion-v2.1`) — CANONICAL
+
+**The operative criterion is UNCHANGED from criterion-v2. What v2.1 adds is two rejections, each by
+its own pre-registration, and the conventions they forced.**
+
+    DETECTION      dlnL_a > max( ln K_counted,a , floor(h, T, tol) )     [D1 family, D2 estimator]
+    CERTIFICATION  q_max,a > 0.9  (strict 0.99)   applied ONLY within detections
+    PURITY         NONE. Both candidate layers were tested and BOTH ARE REJECTED.
+
+## D3 — PURITY LAYER (per-pulsar): **TESTED, REJECTED** (IGNITE-2, `reports/IGNITE2_softloop.md` §1)
+
+Scorecard against the pre-registration of D3.3: **(a) PASS** (23/23 = 100 % of wrong certs killed;
+the `R_det` control landing at exactly its pre-recorded 87 % ceiling, which shows the co-registration
+idea is what does the work); **(b) FAIL** — 2/77 = **3 %** (lit) and 39/58 = **67 %** (vlbi) of TRUE
+certifications survive, against a **≥90 %** bar; **(c)** 42/42 = 100 % rejection of `nullA`/`nullL`
+detections; **(d) FAIL** — 5 of 6 scrambled-loop certifications killed, one survives (J1909-3744,
+Δk = −4, `R_all` = 4.65 against the 9.21 bar). **NOT ADOPTED. No partial adoption; no threshold was
+tuned.**
+
+**The anatomy (recorded).** Above onset the array-wide fringe field is itself poisoned: the
+leave-one-out reference `u_R` is dragged by the same confident wrong fringes everywhere in the array,
+so `u_R` is displaced from zero in essentially every realisation, and a TRUE certification
+(`u_a` = 0) then fails concordance **with its own poisoned reference**. The veto measures *"this
+realisation's fringe field is discordant"* — true above onset for every realisation — rather than
+*"this pulsar disagrees with the others"*, which is what certification purity needs. **A per-pulsar
+veto built on a reference this contaminated cannot be selective at any threshold: the failure is
+structural, not a tuning artifact.** The layer fails hardest exactly where it was needed most (3 %
+survival at the wide-prior lit cell vs 67 % at the tight-prior vlbi cell).
+
+## D4 — THE REALISATION-LEVEL DISCORDANCE GATE: **DESIGNED, PRE-REGISTERED, TESTED, REJECTED**
+
+Full report `reports/D4_discordance_gate.md`; code `CW_transition/criterion_v2_1_d4.py` (which
+carries the pre-registration text machine-readably) + `CW_transition/run_d4_score.py`; scores banked
+to `reports/d4_score.npz`. CPU-only, banked npz only, no new realisations.
+
+D3 left exactly one live lead — its **(c) = 42/42**: the co-registration statistic rejects
+wrong-counterpart *detections* perfectly at the **realisation** level even where it destroys true
+certifications per pulsar. D4 promotes that lead to a gate.
+
+**THE STATISTIC** (chosen on the banked distributions *before* any condition was scored — the
+cheapest sufficient aggregate, one 2×2 solve per realisation, no leave-one-out loop):
+
+    S_det = J^T I^-1 J  over the DETECTED set D,   I = sum_D g_b g_b^T / s2_b,  J = sum_D g_b (2 pi dk_b)/s2_b
+          = chi2(u=0) - min_u chi2(u)   -- the GLRT for "the pulsars the data actually registered
+            co-register at a source OTHER than the assumed counterpart".  FLAG => veto the realisation.
+
+Selected because it is **the only aggregate whose true-signal distribution concentrates at the null
+value** (median **0.0** at both onset cells): the `max/mean/min/frac` of the per-candidate `R_all`
+inherit D3's poisoned reference in full (true-signal median `min_R` = 1.4e4 against a 9.21 bar), and
+`S_ref` over all 116 pulsars puts **pure noise ABOVE the wrong-counterpart population**. **This
+inverts D3's variant ranking** — there `R_all` carried the test and `R_det` was the control — because
+the detected set is the *clean* subset, and building the reference from it is what removes the
+poisoning. It is the formalisation of IGNITE-2 §1.4's sentence: *"the R_det control kills 6/6 — but
+for the degenerate reason that every detection is discordant with every other under a scrambled
+source, which is exactly the realisation-level (not per-pulsar) signal."*
+
+**VERDICT: (i) FAILS IN ALL EIGHT PRE-REGISTERED COMBINATIONS** (2 dk-conventions × 2 thresholds ×
+2 onset cells). Best catch at a ≤10 % false-flag rate: **90.3 %** against the **≥95 %** bar. The one
+setting that catches 97.5 % (ORACLE / χ²-bar, lit cell) flags **44 %** of true-signal realisations
+against the **≤10 %** bar. **Adoption required (i) AND (ii). NOT ADOPTED.**
+
+**THE ANATOMY — both failures are ONE statement: `S_det` is a `|Δk|` detector, and `|Δk|` is not the
+difference between a right and a wrong counterpart.**
+
+- **The misses.** Every wrong-counterpart realisation the gate misses is a noise-lock that landed
+  **within ±1 fringe of truth** (median max|Δk| among detections = **1**, against **137** (lit) /
+  **13** (vlbi) for the caught ones). The limit case is decisive: one missed realisation has
+  **Δk = 0** — a wrong counterpart whose surviving detection sits on the **true** fringe. The fringes
+  co-register *because they are right*; the **source** is wrong. **A co-registration statistic tests
+  the fringes, not the counterpart. NO co-registration statistic can close the D1 hole in general.**
+- **The false flags.** At the (−12.75, 30, lit) onset cell **13 of 36 (36 %)** detecting TRUE-signal
+  realisations have an **impure detected set** (≥1 detection on a wrong fringe). The gate's
+  in-sample false-flag rate there is **36.1 %**. **These are the same number** — the gate faithfully
+  measures the cell's own impurity and cannot beat it. At the vlbi cell, impurity 12 % → false-flag
+  rate **0 %**.
+
+> **THE SCISSORS. D3 failed because the REFERENCE was poisoned; D4 fails because the POPULATION IT
+> MUST PROTECT is itself poisoned. Same disease, one level up.** Above onset a true-signal
+> realisation and a wrong-counterpart realisation *contain the same kind of object* — a confident
+> noise-locked fringe — and a geometry test cannot tell which of them is the counterpart.
+
+**(iii) THE D1 HOLE'S CLOSURE TEST — the one genuine positive, and it is reported in full.** All
+**three** scrambled-loop keepers are flagged by the realisation-level form, **including the
+small-|Δk| J0437-4715 (Δk = −4) case that defeated the per-pulsar statistic** (`R_all` = 4.65 →
+MISSED; `S_det` = 55.9 → FLAG); B1937+21 (Δk = +21) → `S_det` = 1 728; J0711-6830 (Δk = +231) →
+3.2e5. **The hole is closable on every instance this campaign holds — and no gate that closes it
+survives condition (ii).** That is the hole's status, stated exactly: not "no statistic sees these
+events", but "the statistic that sees them cannot distinguish them from the impurity the true
+population already carries at the only cells where the count turns on."
+
+**STATUS OF THE D1 WRONG-COUNTERPART HOLE: OPEN, PERMANENTLY STATED, and now known to be structurally
+un-closable by co-registration.** The wrong-certification rate travels beside every above-onset count:
+**14/50 realisations at the lit onset cell under the fresh floors** (23/50 under the retired
+max-of-10 floors).
+
+## CONVENTION — a statistic evaluated against truth is an ORACLE until its implementable form is scored
+
+Adopted 2026-07-12, from D4. The fringe grid is indexed about the **EM-prior mean** (`k = 0`), so
+`dk = mapk − n_true_grid` is referenced to the **TRUE** fringe — which a real analysis does not know.
+D4 therefore scored **both** forms: **ORACLE** (`dk = mapk − n_true_grid`, D3's convention) and
+**IMPLEMENTABLE** (`dk = mapk`, referenced to the prior mean, with the `(1−q_max)` factor on the
+prior-variance term **dropped — forced by the change of reference, not tuned**, because the prior's
+distance error is present however confident the fringe posterior is).
+
+**Measured: the implementable form is 2–4× weaker** (catch 25–52 % vs 43–97.5 %), because
+`σ_EM/dL` is **O(150–800) fringes** in the lit tier — **the EM prior is wide enough to absorb almost
+any source displacement, so a wrong counterpart does not look displaced relative to a prior that was
+never going to localise the fringe anyway.**
+
+> **THIS CAVEAT TRAVELS BACKWARD ONTO D3.** Every D3 number — (a) = 100 %, (c) = 42/42 included —
+> was computed in the **oracle** convention. **No co-registration number in this repo may be quoted
+> as an achievable power without its implementable-form value beside it.**
+
+**The constructive corollary.** The oracle/implementable gap **closes with σ_d**: D4-OBS is 1.6×
+stronger in the VLBI tier (51.6 %) than in the lit tier (32.9 %). This is the *same* lever RING
+identified (only sub-3-pc σ_d matters) and the same lever the onset map rewards. **Sub-3-pc
+distances are doubly load-bearing: they buy detections AND they buy wrong-counterpart robustness.**
+
+## CONVENTION — every quoted onset carries its floor's N and its fit error
+
+Adopted 2026-07-12, from IGNITE-2 §2. Fresh D2-sized floors (N = 150, Gumbel α = 0.05) at the two
+pre-registered onset cells land **8 / 2 nat ABOVE** the max-of-10 floors IGNITE ran under, and under
+them **neither cell clears onset** (0.92 and 0.54 correct certifications/realisation, against the
+>1 bar). **IGNITE's h\* was partly an artifact of the retired floor estimator, and NO
+properly-calibrated onset exists anywhere in the modelled box.** An onset number quoted without its
+floor's `N` and fit error is not quoted. (The 10-null floors at the other 22 cells carry ±2–18 nat
+fit errors and cannot support an onset claim.)
+
+## CHORUS — PRE-REGISTRATION (the mixed-eccentricity population campaign; queued, no compute yet)
+
+**The open question IGNITE-2 flagged and nothing in this campaign has touched: every result above is
+for a SINGLE-POPULATION source model. Nature supplies a MIXTURE.** CHORUS measures whether an
+eccentric minority changes the certification arithmetic for the circular majority.
+
+**Axes:** (fraction eccentric) × (e-distribution) × (N_CW). **Deliverables:** (1) *certified count vs
+mix* — the onset surface re-cut as a function of the eccentric fraction, under criterion-v2.1 with
+the fresh-floor convention; (2) **THE CLOCK-SHARING TEST — the campaign's reason to exist:** does a
+single e ≈ 0.7 source, whose comb self-clocks (ATLAS's corner), lift the *circular* sources' pulsars
+over the floor? The mechanism under test is that the eccentric source's harmonic comb pins `f_gw`
+and `mc` for the array (SIREN's lag-diversity argument says short-lag pulsars pin frequency and
+thereby free the long lags to carry chirp mass), so the clock it supplies may be a **shared** array
+resource rather than a private one — i.e. certification may be a property of the POPULATION, not of
+the source. If it is, every single-source no-go in this repo is scoped to a premise nature does not
+satisfy. (3) **The capacity-vs-clock trade curve:** more sources raise the trials/confusion floor
+(the `ln K_counted` term and the noise-lock that sets `floor(h)`) while the eccentric member lowers
+the registration cost — CHORUS measures where the two cross.
+
+**Machinery (all banked, nothing new to build):** WEAVE chirp-tied harmonic stacks for the eccentric
+members + criterion-v2.1 scoring (fN operative, fALL blind-robust column, Gumbel α = 0.05 floors at
+N ≥ 150, refit per cell — the mixture changes the null, so **floors are refit per mix, never
+inherited**) + the soft loop (spec §3, `Q = Σ_p Σ_n q_p(n)·lnL`) as the reference implementation.
+**Gates to be specified in the launch prompt.** The pre-registered STOP conditions and the
+adoption/rejection conditions are to be fixed **before** any compute, per standing convention.
+
+**Standing caveats that CHORUS inherits and must restate:** the EOB-tier validity limit (ATLAS —
+the e ≳ 0.85 corner that would clear the absolute 0.003-dex floor is exactly the toy-invalid one);
+the D1 wrong-counterpart hole (OPEN, un-closable by co-registration); the oracle/implementable
+caveat on any co-registration statistic; and the 15-reals/cell sky-sampling error (GEO: the sky draw
+dominates yield variance).

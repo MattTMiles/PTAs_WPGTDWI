@@ -2293,9 +2293,11 @@ noise is **fringe correctness, not count excess**.
    confirmed — statically and dynamically).
 
 **Open.**
-1. ~~**The above-onset loop**~~ — **CLOSED BY IGNITE (§10.8.3), for the HARD-LOCKED loop only.**
-   It cascades into wrong certifications. The **soft** (spec-§3) loop remains untested above onset:
-   **IGNITE-2.**
+1. ~~**The above-onset loop**~~ — **CLOSED TWICE. CLOSED BY IGNITE (§10.8.3) for the HARD-LOCKED loop
+   only** (it cascades into wrong certifications), **and then CLOSED BY IGNITE-2 (§10.10c) for the
+   SOFT loop, which is the spec's actual M-step: no cascade in 40/40, wrong-cert count never grows,
+   3/6 scrambled false alarms self-clean.** The loop is **not** the problem; the **criterion** is.
+   B1.3's DAMPED and IGNITE's CASCADE are **hard-lock-only verdicts, superseded-with-trail.**
 2. ~~**The floor's registration-tolerance dependence**~~ — **CLOSED BY IGNITE (§10.8.2), and it
    INVERTED**: the null floor barely moves with tolerance; the *true-positive* channel is what dies.
    The `wrongpos` pathology was an artifact of applying a tol = 0 floor to a tol = 5 realisation.
@@ -2311,6 +2313,15 @@ noise is **fringe correctness, not count excess**.
    by construction has **no defence against a wrong counterpart** — IGNITE's scrambled loop detects
    2/5. The purity layer (D3) is the intended defence and is **on test, not adopted**. Until IGNITE-2
    reports, this hole is **open and stated**.
+
+   > ⚠️ **BOTH DEFENCES ARE NOW TESTED AND BOTH ARE REJECTED — the hole is OPEN and STRUCTURALLY
+   > UN-CLOSABLE BY CO-REGISTRATION.** D3 (per-pulsar) fails its pre-registration on true-cert
+   > preservation (§10.10a); D4 (realisation-level) fails on wrong-counterpart catch in all eight
+   > combinations (§10.11). The proof is a single measured realisation: a wrong counterpart whose
+   > surviving detection sits at **Δk = 0** — on the TRUE fringe — leaves **nothing discordant to
+   > detect**, at any threshold, in any form. **A co-registration statistic tests the fringes, not
+   > the counterpart.** The 14/50 wrong-certification rate (fresh floors, lit onset cell) travels
+   > beside every above-onset count, permanently.
 
 ### 10.7 CONVENTIONS ADDED THIS WEEK (full text in the spec)
 
@@ -2349,8 +2360,18 @@ almost as fast as it raises the signal (T = 20 vlbi: 0.72/real at −13.25 → *
 
 #### 10.8.2 THE ONSET MAP — baseline-driven, not loudness-driven
 
-Correct certifications/realisation, **counterpart-matched (`fN`) calibration** — with the
-**all-null (`fALL`) blind-robust column beside it, permanently, per D1**:
+> ⚠️ **THE ONSET IS RETRACTED (IGNITE-2 §2, see §10.10). `h\*` DOES NOT SURVIVE THE D2 ESTIMATOR.**
+> The floors below are **max-of-10** order statistics. Fresh D2-sized floors (N = 150, Gumbel
+> α = 0.05) at the two pre-registered onset cells land **8 / 2 nat ABOVE** them (38.86 ± 1.47 vs
+> 30.89; 7.59 ± 0.48 vs 5.46) — because `E[max_10] = μ + β·ln 10` sits at the ~91st percentile with
+> ±1.283β scatter, while α = 0.05 is an explicit ~95th. Re-cut under the honest floors, **neither
+> pre-registered onset cell clears onset**: **0.92** (−12.75, 30, lit) and **0.54** (−13.25, 30,
+> vlbi) correct certs/real, against the >1 bar. **`h\* = −12.75 / −13.25` were partly artifacts of
+> the retired floor estimator, and NO properly-calibrated onset exists anywhere in the modelled
+> box.** The relative structure below (baseline-driven, not loudness-driven; T^{5/2} beats the
+> h^1.66 floor race; VLBI converts trials mass into detections) **stands as measured** — what dies
+> is the absolute onset claim. **Every onset number is now quoted with its floor's N and fit
+> error, or it is not quoted** (convention, §10.10).
 
 | T | tier | corr certs/real over h = {−13.25, −13.0, −12.75, −12.5} | **h\* (>1)** | `fALL` |
 |---|---|---|---|---|
@@ -2427,6 +2448,14 @@ nonsense.**
 > ONLY. Neither is a verdict on Hogg's iterated phase-up per se.** The **soft loop is untested above
 > onset**, and that — not a repair of the hard lock — is **IGNITE-2's question.**
 
+> ✅ **ANSWERED BY IGNITE-2 (§10.10) — AND THE PREDICTION HELD.** The soft (spec-§3) loop was run
+> above onset: **no cascade in 40/40 trajectories.** The wrong-certification count **never grows**
+> (against the hard lock's 3 → 116, 356/359 wrong), W is flat to ±1, `src_mc_off` stays < 1e-4 dex.
+> **IGNITE's CASCADE and B1.3's DAMPED are hereby FORMALLY SUPERSEDED as HARD-LOCK-ONLY verdicts**,
+> exactly as this block predicted. The **soft loop is now spec §3's REFERENCE IMPLEMENTATION**; the
+> hard lock is retired. **What remains broken is the CRITERION, not the loop dynamics** — every
+> failure the soft loop shows is inherited from its seeds. See §10.10.
+
 #### 10.8.4 THE JOIN — the certification corner is the self-clocking corner, plus "near"
 
 Read with ATLAS: the first source had to be *eccentric (e ≳ 0.6), massive (Mc ≳ 10⁹), at the top of
@@ -2449,9 +2478,15 @@ Full text and derivations in the spec (`CW_transition/trackB_estimator_spec.md`,
 CRITERION (criterion-v2)"). Gates: `CW_transition/criterion_v2_gates.py` — **8/8 PASS + census
 triple bit-identical**, banked npz only, no GPU.
 
+> ⚠️ **D3 IS NOW TESTED AND REJECTED (IGNITE-2, §10.10), AND ITS REALISATION-LEVEL SALVAGE D4 IS
+> ALSO TESTED AND REJECTED (§10.11). criterion-v2.1 CARRIES NO PURITY LAYER AT EITHER LEVEL.**
+> The D1 wrong-counterpart hole is **OPEN**, and is now known to be **structurally un-closable by
+> co-registration**. Read D3 below as the pre-registration it was; read its verdict in §10.10–§10.11.
+
     DETECTION      dlnL_a > max( ln K_counted,a , floor(h, T, tol) )
     CERTIFICATION  q_max,a > 0.9  (strict 0.99)   within detections
     PURITY         co-registration statistic R_a  — PRE-REGISTERED TEST, NOT ADOPTED
+                   [v2.1: TESTED -> REJECTED, per-pulsar (D3) and realisation-level (D4) alike]
 
 **D1 — NULL FAMILY: counterpart-matched (`fN`) is operative; all-null (`fALL`) is the permanent
 blind-robust column.** *Rationale:* a **targeted** analysis faces exactly the counterpart-matched
@@ -2528,3 +2563,181 @@ measured**, quoted beside every above-onset count.
 scatter.* An order statistic is not a threshold: its stringency drifts with sample size and its
 scatter never shrinks. **"Bank more nulls" is a credibility purchase only if the estimator
 converges** — otherwise it is just a stricter, equally noisy bar.
+
+---
+
+### 10.10 IGNITE-2 — the SOFT loop above onset, the purity verdict, and the ONSET RETRACTION (ACCRE, 2026-07-12)
+
+Primary source `reports/IGNITE2_softloop.md`; empirical basis `reports/ig2_floors.npz`,
+`ig2_analysis.npz`, `ig2_purity.npz`, `ig2_levers.npz`, `ig2_dreplay.npz`, the 40
+`ig_sloop*`/`ig_sloopX*` soft-loop banks and the 540 `ig_fnull*` fresh nulls. **Four results, and
+they point in different directions — which is the point.**
+
+**(a) THE PURITY LAYER (D3) IS REJECTED BY ITS OWN PRE-REGISTRATION.** Scorecard: **(a) PASS** —
+23/23 (100 %) of wrong certs killed, with the `R_det` control landing at *exactly* its pre-recorded
+87 % ceiling (so the co-registration idea is what does the work); **(b) FAIL** — only **3 %** (lit)
+and **67 %** (vlbi) of TRUE certifications survive, against a **≥90 %** bar; **(c)** 42/42 = **100 %**
+rejection of wrong-counterpart detections at the realisation level; **(d) FAIL** — one scrambled-loop
+certification survives (J1909-3744, Δk = −4, `R_all` = 4.65 vs the 9.21 bar). **No threshold was
+tuned; no partial adoption was taken.** *The anatomy:* above onset the array-wide fringe field is
+itself poisoned — the leave-one-out reference `u_R` is dragged by confident wrong fringes everywhere,
+so a TRUE cert (`u_a` = 0) fails concordance **with its own poisoned reference**. The veto measures
+*"this realisation's fringe field is discordant"* (true of every realisation above onset) rather than
+*"this pulsar disagrees with the others"*. **Structural, not a tuning artifact** — and it fails
+hardest exactly where it was needed most (the wide-prior lit cell).
+
+**(b) THE ONSET IS RETRACTED — `h*` WAS PARTLY A FLOOR-ESTIMATOR ARTIFACT.** Fresh D2-sized floors
+(150 nulls/cell, Gumbel-MLE, α = 0.05): **38.86 ± 1.47** (lit) and **7.59 ± 0.48** nat (vlbi) — both
+**ABOVE** the max-of-10 floors IGNITE ran under (30.89 / 5.46), exactly as D2 predicts
+(`E[max_10] = μ + β·ln 10` is a ~91st percentile with ±1.283β scatter; α = 0.05 is an explicit ~95th).
+Re-cut under them, **neither pre-registered onset cell clears onset**: **0.92** and **0.54** correct
+certifications/realisation against the >1 bar. The wrong-cert rate falls with the same stroke
+(23 → 14 at the lit cell), as it must — purity and count move together. **NO properly-calibrated
+onset exists anywhere in the modelled box** (the other 22 cells rest on 10-null floors with ±2–18 nat
+fit errors, and were already below the bar). **CONVENTION NOW ENFORCED: every quoted onset carries
+its floor's N and its fit error, or it is not quoted.**
+
+**(c) THE SOFT LOOP WORKS — AND THE HARD-LOCK VERDICTS ARE FORMALLY SUPERSEDED.** 40 realisations
+(30 signal + 10 scrambled) through spec §3's `Q = Σ_p Σ_n q_p(n)·lnL` (`B1Marg`; **nothing ever
+hard-locked**, all 116 pulsars fringe-marginalised at every step). **No cascade in 40/40**: the
+wrong-cert count **never grows** (hard lock: 3 → 116, 356/359 wrong), W flat to ±1, `src_mc_off`
+< 1e-4 dex at truth. It **grows a genuine dk = 0 certification in 2/30** (real, but +1-class and
+non-compounding), **self-cleans 3 of 6 scrambled false alarms** (the M-step takes one large step and
+the re-scored E-step drops the false cert — the hard lock did the opposite, its first step *created*
+116 detections), and loses exactly one true cert as a **1.4-nat floor-margin wobble at dk = 0** (a
+margin event, not a wrong fix). `σ(log10 mc)` = **1e-5–1e-4 dex WITH dk = 0** — tight local width
+*and* correct global registration, the inverse of the hard lock's "confident nonsense".
+**B1.3's DAMPED and IGNITE's CASCADE are hereby superseded-with-trail as HARD-LOCK-ONLY verdicts
+(§10.5, §10.8.3); the soft loop is spec §3's REFERENCE IMPLEMENTATION.** The pre-registered STOPs
+still fire (6/10 scrambled realisations certify at some iteration; 4/15 lit signal realisations carry
+seed-static wrong certs) — so the verdict is **STOP** — but with this anatomy: **every failure is
+inherited from the criterion's seeds; none is generated by the loop.**
+
+**(d) THE FRONTIER STATEMENT, UPDATED.** *The loop works given seeds. The modelled box supplies
+none.* The levers that could supply them, in measured order: **T** (strongest — the T^{5/2}
+`fdot`/coherence leverage beats the h^1.66 floor race, and louder alone does **not**);
+**VLBI-tier distances** (binary, not graded — per RING, only sub-3-pc σ_d crosses the coherence
+threshold; and per §10.11 they now buy wrong-counterpart robustness too); **loudness** (a lottery on
+the loud-nearby tail — per SCOUT, N̄ ≲ 0.01–0.1, and the floor rises almost as fast as the signal);
+**eccentricity** (ATLAS's self-clocking corner — and M4's Earth-term siren needs no certified pulsar
+terms at all); **geometry** (GEO — the sky draw dominates yield variance). **The mixed-population
+question is OPEN and is the one premise every no-go in this repo silently assumes away → CHORUS
+(§10.12).**
+
+**Caveats that travel verbatim.** 15 realisations/cell (5 skies × 3 weathers) → ±0.2-class
+sky-sampling error on every per-cell rate (the *dynamical* statements — no cascade, flat W, no
+wrong-fix — are per-trajectory and do not share it); **the signal loops start at the true source**
+(behaviour from a mis-registered-but-unscrambled start is untested); `σ(log10 mc)` is the **profile
+width** of the M-step's own marginalised objective, **not a posterior credible width**; the fresh
+D2-sized floors exist at the **two onset cells only** (the other 22 cells' v2 floors are 10-null fits
+with their large errors stated).
+
+### 10.11 D4 — THE REALISATION-LEVEL DISCORDANCE GATE: designed, pre-registered, tested, **REJECTED** (cronus, 2026-07-12, tag `criterion-v2.1`)
+
+Primary source `reports/D4_discordance_gate.md`; code `CW_transition/criterion_v2_1_d4.py` (carrying
+the pre-registration text machine-readably) + `CW_transition/run_d4_score.py`; scores banked to
+`reports/d4_score.npz`. CPU-only, banked npz only, no new realisations. **Value gate passed before
+scoring:** the D4 machinery reproduces IGNITE-2's banked co-registration statistic for all **1 089**
+candidates (max |Δlog10 R| = 1.2e-10) — *"bank the statistic, not the verdict" paying for itself a
+second time: D3's verdict could not have been re-examined, but D3's statistic could.*
+
+**The design.** D3 left one live lead — its **(c) = 42/42**: co-registration rejects wrong-counterpart
+*detections* perfectly at the **realisation** level even where it destroys true certs per pulsar. D4
+promotes it to a gate: flag a realisation whose **detected set** co-registers at a source *other*
+than the assumed counterpart, and veto every certification in it. The statistic is `S_det`, the
+detected-set consensus-displacement significance (`= χ²(u=0) − min_u χ²(u)` on the detected set) —
+**chosen on the banked distributions before any condition was scored**, because it is the only
+aggregate whose true-signal distribution **concentrates at the null value** (median **0.0** at both
+onset cells), and the cheapest (one 2×2 solve, no leave-one-out loop). The `R_all` aggregates inherit
+D3's poisoned reference in full (true-signal median `min_R` = 1.4e4 against a 9.21 bar); the all-116
+`S_ref` puts **pure noise ABOVE the wrong-counterpart population**. **This inverts D3's variant
+ranking, and IGNITE-2 §1.4 says why** — the detected set is the *clean* subset.
+
+**VERDICT: (i) FAILS IN ALL EIGHT PRE-REGISTERED COMBINATIONS** (2 dk-conventions × 2 thresholds ×
+2 onset cells). Best catch at a ≤10 % false-flag rate: **90.3 %** against the **≥95 %** bar; the one
+setting catching 97.5 % flags **44 %** of true-signal realisations against the **≤10 %** bar.
+Adoption required (i) **and** (ii). **NOT ADOPTED. criterion-v2.1 = criterion-v2 + this rejection,
+recorded with anatomy. No purity layer at either level.**
+
+**THE ANATOMY — both failures are ONE statement: `S_det` is a `|Δk|` detector, and `|Δk|` is not the
+difference between a right and a wrong counterpart.**
+- **The misses**: every missed wrong-counterpart realisation is a noise-lock **within ±1 fringe of
+  truth** (median max|Δk| among detections = **1**, vs **137** (lit) / **13** (vlbi) for the caught).
+  The limit case is decisive — one missed realisation has **Δk = 0**: a wrong counterpart whose
+  surviving detection sits on the **TRUE fringe**. The fringes co-register *because they are right*;
+  the **source** is wrong. **A co-registration statistic tests the fringes, not the counterpart —
+  so NO co-registration statistic can close the D1 hole in general.**
+- **The false flags**: at the lit onset cell **13 of 36 (36 %)** detecting TRUE-signal realisations
+  have an **impure detected set** (≥1 detection on a wrong fringe); the gate's in-sample false-flag
+  rate there is **36.1 %**. **These are the same number** — the gate faithfully measures the cell's
+  own impurity and cannot beat it. (VLBI cell: 12 % impure → **0 %** false flags.)
+
+> **THE SCISSORS. D3 failed because the REFERENCE was poisoned; D4 fails because the POPULATION IT
+> MUST PROTECT is itself poisoned. Same disease, one level up.** Above onset a true-signal
+> realisation and a wrong-counterpart realisation *contain the same kind of object* — a confident
+> noise-locked fringe — and a geometry test cannot tell which of them is the counterpart.
+
+**(iii) THE D1 HOLE'S CLOSURE TEST — the one genuine positive, reported in full.** **All three**
+scrambled-loop keepers are flagged by the realisation-level form, **including the small-|Δk|
+J0437-4715 (Δk = −4) case that defeated the per-pulsar statistic** (`R_all` = 4.65 → MISSED;
+`S_det` = 55.9 → FLAG); B1937+21 (Δk = +21) → 1 728; J0711-6830 (Δk = +231) → 3.2e5. **The hole is
+closable on every instance this campaign holds — and no gate that closes it survives condition (ii).**
+That is the hole's status, exactly: not *"no statistic sees these events"* but *"the statistic that
+sees them cannot distinguish them from the impurity the true population already carries at the only
+cells where the count turns on."*
+
+**NEW STRUCTURAL CAVEAT — THE ORACLE/IMPLEMENTABLE GAP, AND IT TRAVELS BACKWARD ONTO D3.** The fringe
+grid is indexed about the **EM-prior mean**, so D3's `dk = mapk − n_true_grid` is referenced to the
+**TRUE** fringe — which a real analysis does not know. D4 therefore scored **both** the ORACLE form
+and the IMPLEMENTABLE form (`dk = mapk`, prior-referenced, with the `(1−q_max)` factor dropped —
+forced by the change of reference, not tuned). **The implementable form is 2–4× weaker** (catch
+25–52 % vs 43–97.5 %), because `σ_EM/dL` is **O(150–800) fringes** in the lit tier: **the EM prior is
+wide enough to absorb almost any source displacement.** *Every D3 number — (a) = 100 % and
+(c) = 42/42 included — was computed in the oracle convention.* **No co-registration number in this
+repo may be quoted as an achievable power without its implementable-form value beside it.**
+**The constructive corollary:** the gap **closes with σ_d** (D4-OBS is 1.6× stronger in the VLBI
+tier), which is the *same* lever RING identified — **sub-3-pc distances are now doubly load-bearing:
+they buy detections AND wrong-counterpart robustness.**
+
+**Caveats.** Condition (ii)'s out-of-sample denominators are small (9 and 4 detecting sloop
+realisations); the in-sample calibration rates (36/24 realisations) are quoted beside them and agree.
+The verdict does not rest on them — **(i) fails in all eight combinations**, and the lit cell's (ii)
+failure is corroborated by the 36 % detected-set impurity, measured independently of the gate. A
+*mis-positioned* (rather than scrambled) counterpart — the `tol > 0` axis — is **untested** here.
+
+### 10.12 WHAT THE CONSOLIDATION SETTLES, AND THE ONE PREMISE NOBODY HAS TESTED
+
+**Settled by IGNITE-2 + D4.**
+1. **The loop is not the problem.** Hogg's iterated phase-up, implemented **as the spec wrote it**
+   (soft, fringe-posterior-weighted), is **dynamically safe and mildly consolidating**. The hard lock
+   was the whole instability. B1.3/IGNITE loop verdicts are hard-lock-only, superseded-with-trail.
+2. **There is no properly-calibrated onset in the modelled box.** `h*` did not survive the D2
+   estimator. The certification road's requirement tightens from *"eccentric, massive, top-of-band,
+   near"* to **"louder or longer than anything in the modelled box"** — and SCOUT's population clock
+   (N̄ ≲ 0.01–0.1 at loudness 0.5–1 dex *below* even the nominal onsets) makes §10.8.4's
+   expectation-value verdict **stronger**, not weaker.
+3. **The criterion cannot be purified.** Both purity layers are tested and rejected — per-pulsar (D3)
+   and realisation-level (D4) — and the D1 wrong-counterpart hole is **structurally un-closable by
+   co-registration** (a noise-lock at Δk = 0 under a wrong source leaves nothing to detect).
+   **The certification bottleneck is the criterion's purity above onset, and it has no geometric fix.**
+4. **The expectation-value road remains ATLAS M4's eccentric Earth-term standard siren**, which needs
+   **no certified pulsar terms at all**. Certification remains a **variance play** on the loud-nearby
+   tail.
+
+**Open — and item 1 is now the queue head.**
+1. **THE MIXED POPULATION (CHORUS — pre-registered in the spec, queued, no compute yet).** *Every
+   result in this repo is for a single-population source model. Nature supplies a mixture.* The
+   campaign's reason to exist is the **CLOCK-SHARING TEST**: does one e ≈ 0.7 source, whose comb
+   self-clocks (ATLAS's corner), lift the **circular** sources' pulsars over the floor — i.e. is
+   certification a property of the **POPULATION** rather than of the source? SIREN's lag-diversity
+   mechanism (short lags pin `f_gw`, freeing long lags to carry `mc`) says the clock may be a
+   **shared array resource**. **If it is, every single-source no-go in this repo is scoped to a
+   premise nature does not satisfy.** Axes: (fraction eccentric) × (e-distribution) × (N_CW).
+   Deliverables: certified count vs mix; the clock-sharing test; the capacity-vs-clock trade curve
+   (more sources raise the trials/confusion floor while the eccentric member lowers the registration
+   cost — where do they cross?). Machinery: WEAVE chirp-tied stacks + criterion-v2.1 scoring (floors
+   **refit per mix, never inherited** — the mixture changes the null) + the soft loop. Gates and STOP
+   conditions to be fixed in the launch prompt, before compute.
+2. **The EOB tier** (ATLAS) — still open, still the corner the toy tier cannot see.
+3. **The soft loop from a mis-registered start** — the signal loops start at truth; the `tol > 0`
+   trajectory is untested, and so is D4 under a mis-positioned (rather than scrambled) counterpart.
