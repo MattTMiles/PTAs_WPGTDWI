@@ -23,10 +23,18 @@ scaffolding for the paper(s), not analysis.
 - **Every quoted onset carries its floor's `N` and fit error, or it is not quoted.**
 - **A calibrated threshold states its false-alarm rate α and its sampling scatter.** An order statistic
   is not a threshold.
+- **The D2 Gumbel floor is valid only where the null's zero-fraction is ≲ 20 %.** Above that, quote the
+  empirical (1−α) quantile with a **bootstrap** error. **The zero-fraction is a REQUIRED column, not a
+  caveat.** *(criterion-v2.2, adopted from ANCHOR §4 — a Gumbel fitted to a point mass at zero errs
+  PERMISSIVE.)*
 - **Confidence without a detection statistic is prior-pinning in disguise.**
 - **Count and correctness are quoted together.** An above-onset count without its purity number is
   meaningless.
 - **Bank the statistic, not the verdict.**
+- **Bank the ORIENTATION, not just the array.** An index column and a sentence stating what pairs with
+  what — the alternative is a silent transpose. *(RECUT §3/§4.)*
+- **A difference or ratio between two cells is RE-DERIVED, never carried forward**, when either cell's
+  floor has moved. *(RECUT §6 — two such claims were checked after the floor fix; both moved.)*
 - **A break-even is a response curve, never a point extrapolated through an assumed scaling.**
 - **A statistic evaluated against truth is an ORACLE until its implementable form is scored.**
 
@@ -339,10 +347,19 @@ certifying nothing); flat (`dlnL > ln K`) **1.38** (range 0–4). **The census's
 | **criterion-v1 three-layer** (+ absolute floor 9.01 nat) | **0.275/draw** | the null could still fire at the two-layer gate; the floor zeroes it. The Bayesian 4.5 was **~94 %** prior/trials-driven |
 | criterion-v2 (floor is a *function*) | *(not re-cut at zero noise)* | 9.01 is now known to be the census-loudness value of `floor ∝ h^1.66`; GEO's 0.275 stands **as a census-loudness number** with its floor's ±5-nat scatter attached |
 
-[MEASURED: GEO §2; FORGE §9.2; project_progress §10.0 THE FINAL TABLE; IGNITE §4.1]
-[DISPUTED: the GEO 0.275 has **never been re-cut under a properly-sized (N ≥ 100, Gumbel α = 0.05) floor** —
-zero-noise cells have no fresh null banks. It is quoted under a retired estimator. Its *sign* is safe (the
-surviving detections are J1909 `dlnL = 9.30` and two J0437/J1713 cells); its *value* is not. → S6.3]
+| **criterion-v2.1 ZERO-NOISE CEILING** (flat gate, layers 1 + 3, **no floor term**) | **1.350 ± 0.82/draw** | **the floor is RETIRED at zero noise, as a category error** — see below |
+
+[MEASURED: GEO §2; FORGE §9.2; project_progress §10.0 THE FINAL TABLE; IGNITE §4.1; SURFACE §8]
+[~~DISPUTED (D-3)~~ → **CLOSED by SURFACE §8.** At zero noise there are **no fluctuations for a
+noise-floor to gate**: GEO's data are Asimov-at-truth, and the 9.01-nat floor was fitted to *noisy*
+nulls. Applying it to a noiseless statistic is **not a mis-sized number — it is a CATEGORY ERROR.**
+The zero-noise ceiling is therefore quoted under the **flat gate alone** (layers 1 + 3) and is
+**1.350 ± 0.82/draw**, reproducing FORGE §9.2's independent two-layer number (1.35 ± 0.82) to three
+digits. ***`0.275` is RETIRED as a floor-concept category error, not as a wrong measurement. Its
+sign was always safe; its value was never meaningful.*** And the caveat is **closed, not
+inherited**: **0 of 4640** (draw, pulsar) cells have `dlnL < 0`, so at zero noise the MAP fringe
+**is** the true fringe and `q_max ≡ P_true` identically — **GEO's count is IMPLEMENTABLE, not an
+oracle.** The D4 oracle/implementable gap does **not** bite at zero noise.]
 
 **S3.2.3** **Surviving detectors under criterion-v1, per pulsar:** GEO zero-noise — J1909−3744 (0.225),
 J0437−4715 (0.025), J1713+0747 (0.025). FORGE Arm A — J1909−3744 (0.067). **FORGE Arm B — none.**
@@ -1021,12 +1038,25 @@ scatter, while α = 0.05 is an explicit ~95th):
 anywhere in the modelled box.**
 [MEASURED: IGNITE2 §2 — the wrong-cert rate falls with the same stroke, **as it must: purity and count move
 together**]
+[SUPERSEDED → **the FIRST sentence stands; the SECOND is REFUTED.** SURFACE paid the D2 sizing at all
+**108** cells of the extended box: IGNITE's two cells **remain below onset** (0.87 and 0.47 here, on
+independent seeds and independent N = 100 null banks — reproducing 0.92/0.54 within the sky error), but
+**59 other cells clear it.** *"No properly-calibrated onset exists anywhere in the modelled box"* was a
+statement about **two** cells, generalised to twenty-four. **It is superseded, and the generalisation is
+the part that was wrong.** → S6.3.2]
 
 **S6.1.3 What SURVIVES the retraction, as measured:** the **relative** structure — onset is
 **baseline-driven, not loudness-driven** (`T^{5/2}` fdot/coherence leverage beats the `h^{1.66}` floor race;
 **louder alone does not**); **VLBI converts trials mass into detections** (ΣK 88 454 → 470); **no cell
 reaches 3 correct certs/real anywhere**; and **under `fALL` the map never ignites at all.**
 [MEASURED: IGNITE §4.2/§4.4; project_progress §10.8.2 retraction block]
+[SUPERSEDED (in part) → **two of these four survive and two do not.** ✅ The baseline lever survives —
+**but it has a CEILING inside the box** (S7.1.1). ✅ VLBI's trials conversion survives — **and it now has a
+measured PRICE on the null side** (S7.2.8). ❌ *"No cell reaches 3 correct certs/real anywhere"* is
+**FALSE**: SURFACE's 5+11 structure posts **9 cells with corr_lo > 3**, best **7.93/real**. ❌ *"Under
+`fALL` the map never ignites at all"* is **FALSE**: **21 cells clear onset on `fALL`, best 2.57/real —
+all 21 in the 5+11 structure.** **Both failures are the same failure: IGNITE never varied the population's
+loudness STRUCTURE, and that is the axis that moves the count most.** → S6.3.2, S7.6.2]
 
 **S6.1.4 CONVENTION NOW ENFORCED: every quoted onset carries its floor's N and its fit error, or it is not
 quoted.** The other 22 cells rest on **10-null floors with ±2–18 nat fit errors** and **cannot support an
@@ -1039,9 +1069,19 @@ onset cell: 30.89 → 38.86 nat, 1.54 → 0.92 certs) says **those floors are bi
 own sigmas.** *"Nothing measured contradicts the expectation that paying the sizing everywhere would close
 the rest of the box."*
 [MEASURED: IGNITE2 §4]
-[DISPUTED: status. Those four cells are **not** retracted and **not** confirmed. They are **uncalibrated**.
-The honest statement is *"no properly-calibrated onset exists in the box"* — **not** *"there is no onset"*. →
-S6.3]
+[SUPERSEDED → ***REFUTED. Paying the sizing everywhere OPENS the box.*** SURFACE paid it at all 108 cells
+and **59 clear onset.** The expectation was not merely unmet — it pointed the wrong way.]
+[~~DISPUTED (D-4)~~ → **CLOSED by SURFACE §7.** N = 100 floors resolve all four: **two RETRACT**
+((−13.00, 30, lit) → **0.60** [0.47, 0.73]; (−12.75, 30, vlbi) → **0.73**), **one CONFIRMS**
+((−12.50, 30, lit) → **1.13** [1.10, 1.23], floor 106.04 ± 4.62 — **the programme's first confirmed onset
+cell**), **one stays MARGINAL** ((−12.50, 30, vlbi) → **1.17**, dies at floor + error). **All four
+verdicts survive the criterion-v2.2 floor fix**, though the first cell's numbers moved (its Gumbel was
+invalid: zero-fraction 0.27, floor restated 19.46 → 16.60 ± 1.60, count 0.37 → 0.60).
+**And the MECHANISM was not what IGNITE-2's single datum suggested.** It is **not** "10-null floors are
+biased low": at (−12.50, lit) the properly-sized floor came out **11 % LOWER** and the cell **SURVIVED**.
+***A max-of-N floor is not biased in a fixed direction — it is an order statistic with ±1.283β of scatter
+and no fixed false-alarm rate, so it lands wherever its ten draws put it.*** That is D2.2's argument, and
+this is its first four-cell test.]
 
 ### S6.2 The two calibrated cells
 
@@ -1060,6 +1100,15 @@ tol) box:**
 offender** — a point mass at zero the Gumbel does not model. The fitted floor lands within 0.5 nat of the
 empirical q95, so **the fit is serviceable, but the zero-fraction travels with the number.**
 [MEASURED: IGNITE2 §2]
+[SUPERSEDED → **this caveat was the edge of a DEFECT, and "serviceable" is not a property that
+extrapolates.** ANCHOR §4 measured the zero-fraction across the box and found it reaches **57 %, 80 % and
+93 %**. A Gumbel fitted to a point mass at zero is **dragged DOWN toward it**, understating the α = 0.05
+bar by up to **2.8×** — **24σ and 12σ against its own quoted fit error.** *The fit error is not merely
+wrong; it is confidently wrong: a Gumbel fitted to a 93 % point mass reports ±0.064 nat.* **And it errs in
+the DANGEROUS direction** — detection is `dlnL > max(ln K, floor)`, so a floor that is too low is **too
+PERMISSIVE.** **This cell's own floor is now RESTATED as the empirical q95 (7.06 ± 0.40, bootstrap), not
+the Gumbel (7.59 ± 0.48) — but its count (0.54) and its verdict (BELOW onset) do not move.** → the
+zero-fraction convention in the header; S6.5.]
 
 **S6.2.3** Every per-cell rate carries a **±0.2-class sky-sampling error** (15 realisations/cell = 5 skies ×
 3 weathers, and GEO says the sky draw dominates yield variance). The **dynamical** statements (S8) are
@@ -1070,13 +1119,39 @@ per-trajectory and do **not** share it.
 
 **S6.3.1** The onset surface is currently **two calibrated points and 22 uncalibrated ones**. The
 `(h, T, tier, tol)` box has never been swept under a converging floor estimator.
-[PENDING: SURFACE — bank **N ≥ 150** counterpart-matched nulls at **every** cell (~2 GPU-hours for
-150 × 24 per D2's own sizing arithmetic), refit `floor(h, T, tol)` per cell, and re-cut the entire onset
-map. **Deliverables:** (i) the onset surface with a fit error on every cell; (ii) whether any cell in the box
-survives proper sizing, or whether the box closes entirely; (iii) the `h^1.66` law refit against converging
-floors rather than max-of-N floors; (iv) the purity number at every cell that posts a count; (v) the zero-noise
-GEO count re-cut under a properly-sized floor (S3.2.2's open trail); (vi) the **tolerance axis** swept jointly
-with h and T, since the floor's tol-dependence has only ever been measured at one (h, T, tier) cell.]
+[~~PENDING: SURFACE~~ → **DELIVERED.** 108 cells × (30 signal + 200 nulls) = **24 840 realisations**,
+≈ 11 GPU-hours, every floor refit per cell at N = 100, α = 0.05. **Deliverables (i)–(v) supplied;
+(vi) — the tolerance axis — was NOT run and remains open.** → S6.3.2]
+
+**S6.3.2 THE ONSET EXISTS. `N_onset = 59` of 108 cells.** (MARGINAL 3, below 46 — a MARGINAL cell clears
+the bar at its floor and dies at floor + its own error, and is not an onset.) The census-structure onset
+sits at **h\* = −12.50** (**1.13** [1.10, 1.23] correct certs/real, floor **106.04 ± 4.62 nat**, N = 100,
+α = 0.05, **zero-fraction 0.00**) — **one grid step LOUDER than IGNITE's retracted claim, not absent.**
+***IGNITE's max-of-10 floors were drawn low enough to move the onset into the WRONG CELL — a subtler and
+more instructive failure than "there is no onset".***
+[MEASURED: SURFACE §3/§4, re-cut against the criterion-v2.2 floors; `recut_surface.npz`]
+
+**S6.3.3 THE 59 IS A RE-CUT NUMBER, AND ITS STABILITY IS A COINCIDENCE.** The floor fix (S6.5) touched
+**15 of the 108 cells**; **93 — including 57 of the 59 onsets — are bit-identical to the published
+surface.** Of the touched cells, **two onsets DIED and two were BORN.** The pre-fix banked count was also
+59. ***That the totals agree is a coincidence, not a confirmation. The number is stable; the map is not.***
+[MEASURED: RECUT §1; gates A and B both 0.000e+00 — gate B proves the re-cut scorer IS the scorer that
+produced the published surface]
+
+**S6.3.4 `h*` IS NOT BOUNDED BELOW in 7 of the 18 frontier columns.** For those, SURFACE locates an onset
+but **cannot locate its faint boundary** — the faint edge of the surface is **outside this grid**, and the
+next grid is **fainter, not louder.** **Re-cut: still 7 of 18 — and NOT the same seven** (lost: lit 3+13
+T = 40, lit 2+14 T = 50; gained: lit 3+13 T = 50, vlbi 2+14 T = 50; five unchanged). ***Quote the number;
+never the same seven columns.*** *This is the number-not-names lesson (S3.3.1) arriving a second time, for
+the same reason.*
+[MEASURED: SURFACE §4 / RECUT §1.3]
+
+**S6.3.5 A caveat on the frontier, stated because it is load-bearing for KINDLE.** Two of the faint-edge
+onsets are **ISOLATED**: the cell certifies at h = −13.25 while **every louder h in the same column sits
+below the bar.** This is **not** a re-cut artifact — the floor grows as ≈ `h^1.5–2`, so **a faint cell can
+out-certify a loud one**, and the *published* surface already showed the pattern. **Whether an isolated
+faint-edge onset is a frontier or a fluctuation is UNMEASURED.**
+[MEASURED: RECUT §1.3 caveat] [PENDING: KINDLE item (ii)]
 
 ### S6.4 The real-data anchor
 
@@ -1092,13 +1167,106 @@ basis timing-design extrapolation, zero-extended binary columns, span-scaled GP 
 git-tracked), plus two hand-injected published composites (J0437 Reardon+2016, J1909 Reardon+2021).
 [MEASURED: Anchor Census A0]
 
-[PENDING: ANCHOR — the real-data anchor campaign. **Deliverables:** (i) run the criterion-v2.1 detection
-statistic on **real PTA data** for the best-anchored pulsar(s) — J0437 above all — and report `dlnL`,
-`ln K_counted`, `q_max` with the floor calibrated **at that data's own noise, loudness hypothesis, and
-registration tolerance**; (ii) establish whether the simulated null banks bear any relation to a real one
-(real data has DM events, solar wind, band noise, and non-stationarity that no `nullN` draw contains);
-(iii) close the loop on the `σ_d` lever by pricing what a **real** sub-3-pc VLBI campaign on the readable
-sub-array (S2.3.1) would buy, in the units the onset map uses.]
+[~~PENDING: ANCHOR~~ → **RAN, AND ITS PREMISE WAS REFUTED AT TASK 1.** **The repo has no real residuals.**
+The 116-pulsar feather set is a **MOCK** — telescope `AXIS`, a single 1440 MHz channel — and **its
+`residuals` column IS the injected CW + CURN realisation `b20_cw_curn_r0`**, bit-identical (max|diff| = 0.0,
+all 116). **The certification chain never reads it** (`data = inject_delay(θ_true) + NoiseDrawer.draw(seed)`),
+so **no banked result depends on it** — ***but any future task that treats those residuals as "the data" is
+measuring an injected CW.*** ANCHOR's brief was therefore amended in flight: **the anchor is REALISM, not
+provenance** → S6.4.3. **The real-data question it was built to answer is NOT answered, and is re-tagged
+[PENDING: REAL-ARRAY]** below.]
+[MEASURED: ANCHOR §0, `anchor_data_forensics.npz`]
+
+**S6.4.3 THE REALISM LADDER: CONSISTENT AT EVERY RUNG. THE ONSET SURFACE DOES NOT SHIFT.** Regenerate
+noise-only nulls on the *same* array with noise the frozen analysis does **not** model — **R1** RN/GWB
+spectral mis-specification, **R2** an unmodelled DM power-law GP, **R3** non-Gaussian tails — and the
+realised noise rms rises **1.993 → 2.634 µs (×1.32)**. `NoiseDrawer.draw` is the **only** object replaced;
+every other frozen object is untouched. ***The mismatch IS the experiment.*** Pooled over all 40
+(rung × cell) comparisons: **18/40 cells "inflated" — a coin flip**; median Δq95 = **−0.18 nat**; **1/40**
+significant under Mann-Whitney against **2 expected by chance.** **Verdict: CONSISTENT at every rung.**
+[MEASURED: ANCHOR §3 — 7 200 realisations, T = 15 (the native, unextended array), N = 150 nullN per cell]
+
+**S6.4.4 AND THE MECHANISM, WHICH IS A STRONGER STATEMENT THAN THE NULL RESULT.** Exactly 1 of 40 cells is
+significant — and its **floor barely moves** (Δq95 = +0.36 ± 0.29) while **the rate at which the null
+produces a candidate AT ALL more than doubles** (P(offender > 0): 0.200 → 0.453). ***Unmodelled noise makes
+the null throw up MORE candidates, but not LOUDER ones.*** The floor is an **upper-tail** quantile, and the
+upper tail is set by the **TEMPLATE, not the data**: the E-step's matched-filter cross term is linear in the
+*model* amplitude, so the loudest fringe fluctuations scale with the hypothesis `h` — the `floor ∝ h^1.66`
+mechanism (S5.3.1), which ANCHOR reproduces **from scratch at 1.67**, at a baseline where it was never
+fitted.
+
+> ***The criterion's floor is robust to noise mis-specification BECAUSE it is loudness-relative.*** The
+> property S5.3.2 recorded as a **COST** — the bar rises almost as fast as the signal, so louder alone buys
+> nothing — is **the same property that makes the floor immune to getting the noise model wrong.**
+> **The tail is template-dominated; the body is noise-dominated.**
+
+[MEASURED: ANCHOR §5]
+
+**S6.4.5 THE OFFENDER ANATOMY IS SET BY THE TRIALS FACTOR, NOT THE NOISE BUDGET.** The same five pulsars
+carry ~75 % of offenders in **every** rung, including the control; total offenders move **+6 %** from R0 to
+R3 against a **+32 %** rise in noise rms. **The suspects did not show up:** J1824−2452A — the array's
+reddest pulsar by far (feather χ²/N = 3243) — contributes 6 offenders in R0 and 13 in R3; B1937+21 never
+appears. **Unmodelled DM and unmodelled red power do NOT route false alarms through the chromatically-dirty
+pulsars.** What *does* move is **J0437−4715 (+31 under R3 — the largest single shift in the table)**, and
+J0437 is **the array's smallest trials factor** (`ln K` = 1.39, the array minimum). ***The pulsar whose bar
+is lowest is the one most exposed when you add noise the model does not know about.*** *That is the J0437
+double edge (S5.2.4) — robustness to source error and vulnerability to noise are THE SAME PROPERTY —
+showing up in a third independent place.*
+[MEASURED: ANCHOR §6]
+
+**S6.4.6 THE LADDER'S CEILING, stated because it BOUNDS S6.4.3.** **The array is single-frequency** — all
+30 225 TOAs sit at 1440.0 MHz, so the chromatic factor `(f_ref/f_obs)²` is a **constant** (0.9450–0.9454)
+and **chromaticity is UNIDENTIFIABLE BY CONSTRUCTION**: a DM GP enters the data as an extra *red* process,
+and no analysis could separate it from an achromatic one. ***R2 tests UNMODELLED CHROMATIC-BAND POWER, NOT
+CHROMATICITY.*** (ECORR is likewise degenerate with EQUAD here — one TOA per epoch.) **This is the ladder's
+binding limitation, and only a real multi-frequency array lifts it.**
+[MEASURED: ANCHOR §2.1]
+
+[PENDING: **REAL-ARRAY** — port the criterion stack to a real PTA. ***Why it is a campaign, not a task:***
+every prior in the criterion is keyed to the 116-pulsar mock — `best_distances.txt`, the per-pulsar
+`ln K_counted`, ΣK, the lit/vlbi tiers, the geometry ensembles, the census, and the `NoiseDrawer`'s
+hyperparameters. ***A real-array anchor is a RE-DERIVATION OF THE PRIOR STACK on a different array, not a
+substitution of a residual vector.*** **On disk and verified (ANCHOR 2026-07-12):** NG 15 yr (66 psr,
+615 294 TOAs, 16.03 yr, 1705 radio frequencies — loads in `discovery` unmodified); NG 20 yr (77 psr,
+1 131 412 TOAs, 20.62 yr); MPTA DR3 (83 psr, par/tim only). **Deliverables:** (i) the prior stack
+re-derived on the target array; (ii) the floor re-fit against that array's own noise; (iii) the programme's
+first certification numbers that touch a real TOA; (iv) **it LIFTS ANCHOR's ceiling** — a multi-frequency
+array makes chromaticity *identifiable*, so the DM channel can be tested as chromaticity rather than as
+unmodelled red power (S6.4.6).]
+
+### S6.5 The floor estimator has a validity domain — and outside it, it errs PERMISSIVE
+
+**S6.5.1 THE DEFECT.** The offender statistic is **0.0 whenever a realisation has no cell passing layer 1 ⊕
+layer 3.** At faint `h` that is *most* realisations — measured zero-fractions reach **57 %, 80 % and 93 %**.
+**A Gumbel fitted to a point mass at zero is dragged DOWN toward it**, understating the α = 0.05 bar by up to
+**2.8×** (0.845 fitted vs **2.395** empirical at h = −13.25 lit) — **24σ and 12σ against its own quoted fit
+error.** ***And it errs in the DANGEROUS direction:*** detection is `dlnL > max(ln K, floor)`, so **a floor
+that is too low is TOO PERMISSIVE — it lets pure-noise offenders through.** *Every faint-`h` cell in the
+onset map was calibrated by this estimator.*
+[MEASURED: ANCHOR §4 — found in the CONTROL arm of a campaign built to test something else]
+
+**S6.5.2 THE CONVENTION (criterion-v2.2, binding).** ***The D2 Gumbel floor is valid ONLY where the nullN
+zero-fraction is ≲ 20 %. Above that, quote the empirical (1−α) quantile with a BOOTSTRAP error, and bank the
+zero-fraction beside it. The zero-fraction is a REQUIRED column, not a caveat.*** The onset **test** is
+unchanged — `ONSET` iff the count at **floor + its own error** exceeds 1 — only the floor and the error
+change.
+[MEASURED: RECUT §0; adopted verbatim from ANCHOR §4]
+
+**S6.5.3 WHAT IT COST, AND WHAT IT DID NOT.** **SURFACE: 15 of 108 cells touched, N_onset = 59 unchanged in
+total and changed in membership** (S6.3.3). **CHORUS: ALL 26 of 26 cells fail the gate; 23 of 26 floors
+rise; and the campaign's loudest headline dies** (S7.6.4). **ANCHOR: nothing retracted.** **IGNITE-2: both
+calibrated cells keep their verdicts; the vlbi floor is restated** (S6.2.2). ***The fix bit exactly where the
+provisional analysis predicted the exposure was — faint `h`, high zero-fraction — and nowhere else. 57 of the
+59 onsets, the entire loud-cell result, both purity rejections, and the clock-sharing verdict never depended
+on the estimator at all.***
+[MEASURED: RECUT §6]
+
+**S6.5.4 THE RULE THIS ESTABLISHES, and it is the durable part.** ***Anything of the form "cell A versus cell
+B" — a difference, a ratio, an inversion, a peak location — must be RE-DERIVED from the corrected banks
+before it is quoted. The counts moved, so the differences moved.*** **Two such claims were checked rather
+than assumed after the fix, and BOTH moved**: SURFACE's `h*`-column membership (S6.3.4) and CHORUS's
+trade-curve inversion (S7.6.5). *Neither was on anyone's list.*
+[MEASURED: RECUT §6]
 
 ---
 
@@ -1115,6 +1283,21 @@ lever statement in the programme.
 [MEASURED: IGNITE §4.1/§4.2; project_progress §10.10(d)]
 *(Note the honest asymmetry: T = 30 is where the retracted onset lived. Under fresh floors those cells read
 0.92/0.54 — **the T-lever's DIRECTION survives the retraction; its sufficiency does not.**)*
+
+**S7.1.1a THE STRONGEST LEVER HAS A CEILING, AND THE CEILING IS INSIDE THE BOX.** Over the 36
+(h, tier, structure) columns of the extended grid: **T = 30 yr is optimal in 0 of 36.** T = 40 wins 19,
+T = 50 wins 17 — **and the split is h-dependent, not random.** ***Loud cells PEAK at 40 yr and LOSE at 50***
+(12 of 12 loud columns of the 3+13 and 5+11 structures), while faint cells keep gaining to 50 (6 of 6 loud
+2+14 columns rise). **The mechanism is visible in the floors:** the counterpart-matched floor grows with
+**data volume** as well as with loudness — the matched-filter cross term integrates more data — and between
+40 and 50 yr **that growth OVERTAKES the `T^{5/2}` leverage** at loud `h`, while at faint `h` the floor is
+still small enough that the leverage wins. **IGNITE's *"onset is baseline-driven; `T^{5/2}` beats the floor
+race"* is TRUE UP TO A CEILING, and the ceiling is ~40 yr: past it, the floor race resumes and WINS.**
+[MEASURED: SURFACE §9.2, re-cut — the 0/36, 12/12 and 6/6 counts are all re-derived on the corrected floors]
+*(Convention caveat, load-bearing: the T = 50 cells extrapolate the timing model **35 yr** past the last real
+TOA under a stated convention — median-cadence TOAs, smooth-basis design extrapolation, zero-extended binary
+columns, span-scaled GP components. **The SIGN of the 40 → 50 fall is robust; the MAGNITUDE is a property of
+the convention and must never be quoted as a forecast.**)*
 
 **S7.1.2** The T-lever has an independent expression on the blind side: the float ceiling reaches the F2
 loosest rung only at **T ~ 11 kyr** (S4.1.13). **The same lever, four orders of magnitude out of reach for
@@ -1177,6 +1360,18 @@ prior arm** and the single highest-value follow-up RING points to.
 mean is ALWAYS exactly the true distance.** A "bad prior" there is **wide**, never **mis-centred**. Since the
 width axis *alone* already produces a 3–6° SNR-independent bias, **a mis-centred prior can only be worse.**
 [MEASURED: RING §2(a)/§2.1]
+
+**S7.2.8 ROLE 3 — AND IT IS A COST. VLBI IS NOT FREE IN ONSET-MAP UNITS.** `floor(vlbi) − floor(lit)` at the
+same `h`: **+2.9 ± 1.0 nat at h = −13.25, and nothing measurable anywhere else in the box** (the loud cells'
+floor errors are 3–6 nat and cannot resolve a price of this size, so **none is quoted**). **It is a TIER
+effect, not a realism effect** — the control arm already carries +2.59 ± 1.41, statistically
+indistinguishable from the worst realistic rung's +2.76. **Realism does not change the price of VLBI.**
+**The mechanism, and the sign is not a paradox:** VLBI shrinks `σ_d` → fewer fringes in the prior window →
+smaller `K_counted` → **a LOWER trials bar** → **a pure-noise fluctuation clears layer 1 more easily** →
+more and louder offenders → **a HIGHER absolute floor.** ***This is the J0437 double edge again, measured as
+a TIER-level quantity: VLBI buys detections on the SIGNAL side (ΣK 88 454 → 470) and pays for them on the
+NULL side.*** **This is the first number for what a VLBI campaign costs.**
+[MEASURED: ANCHOR §7 — empirical q95, bootstrap errors, across all rungs]
 
 ### S7.3 Loudness — the SCOUT clock
 
@@ -1295,20 +1490,98 @@ is a **variance** to be planned around — sky-conditional seed sets (S3.3.4) �
 
 **S7.6.1** ***Every result in this repo is for a SINGLE-POPULATION source model. Nature supplies a MIXTURE.***
 [MEASURED: project_progress §10.12 — flagged by IGNITE-2 as the queue head]
+[~~PENDING: CHORUS~~ → **DELIVERED.** 26 mixture cells × 30 realisations + 4 000 nulls + 40 exact pairs +
+30 soft loops. All three deliverables supplied. → S7.6.2–S7.6.6]
 
-[PENDING: CHORUS — the mixed-eccentricity population campaign (pre-registered in the spec; **queued, no
-compute yet**). **Axes:** (fraction eccentric) × (e-distribution) × (N_CW). **Deliverables:** (1) *certified
-count vs mix* — the onset surface re-cut as a function of eccentric fraction, under criterion-v2.1, **floors
-refit per mix, NEVER inherited** (the mixture changes the null); (2) **THE CLOCK-SHARING TEST — the campaign's
-reason to exist:** does a single e ≈ 0.7 source, whose comb self-clocks (S7.4.1), lift the **circular**
-sources' pulsars over the floor? SIREN's lag-diversity mechanism (short lags pin `f_gw`, freeing long lags to
-carry `mc` — S9.2) says **the clock may be a SHARED ARRAY RESOURCE rather than a private one — i.e.
-certification may be a property of the POPULATION, not of the source. If it is, every single-source no-go in
-this repo is scoped to a premise nature does not satisfy.** (3) the **capacity-vs-clock trade curve**: more
-sources raise the trials/confusion floor (the `ln K` term and the noise-lock that sets `floor(h)`) while the
-eccentric member lowers the registration cost — **where do they cross?** **Machinery: all banked** (WEAVE
-chirp-tied stacks + criterion-v2.1 scoring + the soft loop). **Gates and STOP conditions fixed in the launch
-prompt, before compute.**]
+**S7.6.2 CERTIFICATION IS A PROPERTY OF THE POPULATION — measured, on TWO independent axes.**
+- **LOUDNESS structure (SURFACE).** Promoting two of sixteen sources faint → loud (3+13 → 5+11) at fixed
+  (h, T, tier) raises the count **up to 6.1×** (median **2.5×** across the 36 columns) — *super-linearly,
+  and against a floor that itself rises 2–3× because the recovery model carries more amplitude.* Demoting
+  one all but extinguishes certification. **Two loud sources is a dead population; five is a factory.**
+  **The frontier moves by ≥ 0.75 dex.**
+- **WAVEFORM structure (CHORUS).** Replacing ONE of the three loud members with an eccentric source at fixed
+  census loudness moves the count **14.8× (lit) / 12.4× (vlbi)** at e = 0.7. ***Eccentric structure is the
+  strongest single lever yet measured in the box.***
+
+> ***Every single-source no-go in this repo is scoped to a population structure nature does not have to
+> supply.*** *(Both levers are re-derived on the criterion-v2.2 floors, not inherited — S6.5.4. The two were
+> measured on different floors, as they must be: each mix refits its own null.)*
+
+[MEASURED: SURFACE §9.1 / CHORUS §1, re-cut]
+
+**S7.6.3 BUT THE CLOCK IS NOT SHARED — and that was the campaign's reason to exist.** In **20 exact
+seed-paired** realisations (e = 0 vs e = 0.7, sharing the noise seed AND the physical truth distances, each
+banking the member0-inert-template rescore `dlnL_ct`), the certified count jumps in **every** pair (lit
+0–3 → 1–15; vlbi 0–1 → 1–15). **But under the pre-registered attribution rule — ecc-attributed iff
+`dlnL − dlnL_ct > 1` nat — ZERO of the ~120 lifted certifications across all 20 pairs are
+circular-attributed.** Every pulsar the eccentric arm certifies is certified **through the eccentric
+member's OWN comb template** — its harmonic pulsar terms — not through a lifted circular-member
+registration. **Pre-registered verdict: MARGINAL (lit, 1/10 pairs above floor-refit noise) / ABSENT (vlbi,
+0/10).** **And the joint-fit channel — where SIREN's lag-diversity mechanism (S9.2) would have to operate —
+adds NOTHING:** all 20 signal soft-loop trajectories are **FLAT**; the eccentric-seeded loops hold their
+large seed sets (18/6/2/2/6) exactly as the circular-seeded loops hold their sparse ones (0/0/0/0/1).
+***The eccentric-seeded loop does not consolidate further than the circular one. Its entire advantage is in
+its SEEDS.***
+
+> ***Certification in a mixed population is a property of the SOURCE, not a shared array resource.***
+> **The single-source no-gos are rescoped anyway — but through the comb's OWN pulsar terms, not through a
+> shared clock.** *One moderately eccentric loud member certifies up to ~18 pulsars single-handedly where
+> the entire circular population certifies none.*
+
+[MEASURED: CHORUS §2 — **structural, and independent of the floor: the re-cut does not touch it**]
+
+**S7.6.4 THE SWITCH-ON THRESHOLD IN e IS A MIXTURE PROPERTY — and CHORUS's published threshold is REFUTED.**
+[SUPERSEDED → *"every eccentric mix clears the >1 bar; **a single e = 0.3 member suffices at either tier**"*
+(counts 1.57 lit / 1.13 vlbi) — **FALSE.** Under the criterion-v2.2 floors the lit cell collapses to **0.70
+— below the bar, REFUTED** — and the vlbi cell reads **1.03: MARGINAL, not confirmed** (it clears the bar at
+the floor and **fails at floor + bootstrap error**, 0.60). The lit floor rose **7.39 → 11.30 nat: +53 %, a
+6.2σ move against its own quoted fit error** — a Gumbel fitted to a **73 %-zero point mass.** ***This is the
+single most expensive consequence of the floor defect in the whole repo.***]
+
+> ### THE CORRECTED, BINDING EXTERNAL STATEMENT
+> ### **With ONE eccentric member, the switch-on is at `e = 0.5`. With TWO OR MORE, it is at `e = 0.3` (CONFIRMED, both tiers).**
+> ***The threshold is NOT a property of eccentricity alone — it depends on how many members carry it.***
+
+| n_ecc | tier | e = 0.3 | e = 0.5 | e = 0.7 | switch-on |
+|---|---|---|---|---|---|
+| **1** | lit | 0.70 [0.43] **below** | 3.13 [2.70] CONFIRMED | 5.43 [4.90] CONFIRMED | **e = 0.5** |
+| **1** | vlbi | 1.03 [0.60] MARGINAL | 2.27 [1.73] CONFIRMED | 5.77 [5.13] CONFIRMED | **e = 0.5** |
+| 2 | lit / vlbi | 2.77 / 1.77 **CONFIRMED** | 4.90 / 3.97 | 5.47 / 4.10 | **e = 0.3** |
+| 3 | lit / vlbi | 2.50 / 2.20 **CONFIRMED** | 5.83 / 4.50 | 4.07 / 5.07 | **e = 0.3** |
+
+*(count at the adopted floor, [count at floor + bootstrap error]. CONFIRMED = clears the >1 bar at floor +
+error; MARGINAL = clears it only at the floor.)*
+
+**Note the direction this moves the programme:** the corrected single-member threshold (e ≳ 0.5) **pulls the
+count criterion's requirement BACK TOWARD ATLAS's own self-clocking corner (e ≳ 0.58–0.6, S7.4.1)** — two
+thresholds measured on **entirely different statistics**, which now nearly agree. *That is a harder
+requirement than published CHORUS claimed, and a more coherent one.*
+[MEASURED: CHORUS §1 / RECUT §2.1, `recut_chorus.npz`]
+
+**S7.6.5 THE CAPACITY-VS-CLOCK TRADE CURVE — the deliverable exists; the CROSSING does not.**
+[SUPERSEDED → *"the trade inverts between n_ecc = 2 and 3 at high e; the surface peaks at n_ecc = 2
+(8.7/7.4); the capacity crossing sits at ~8–12 % band occupancy"* — **DEMOTED TO NOT-CLEAN.** Under the
+corrected floors the inversion **flips status in 3 of the 8 (e, tier) combinations, and not in the same
+direction**: published 5 of 8 inverted, re-cut **4 of 8 — but not the same four.** The surface no longer
+peaks in the same place either: **vlbi peaks at n_ecc = 2, lit now peaks at n_ecc = 3.** **DO NOT QUOTE "the
+trade inverts at n_ecc = 3" without re-deriving it from `recut_chorus.npz`. It is not refuted; it is no
+longer a clean claim.** *This is a difference between two counts that BOTH moved — exactly the class S6.5.4
+names.*]
+**What SURVIVES is the mechanism, and it is floor-independent:** the binding cost at high occupancy is the
+**`K_counted` trials term** (K_sum grows ~11× from m0 to m3e07) and the finer joint fringe grid — **not the
+floor**, which *falls* at the n_ecc = 3 high-e cells while the count falls with it. ***The capacity ceiling
+is real. WHERE it bites is now an open number.***
+[MEASURED: CHORUS §3(3) / RECUT §2.3]
+
+**S7.6.6 THE PRE-REGISTERED STOP FIRES — with the IGNITE-2 anatomy intact.** 2 of 10 scrambled-source
+realisations certify at some iteration; **1 keeps** its certification to the fixed point (J1640+2224,
+dlnL = 12.14 vs an 8.51 floor, qmax = 1.000, **Δk_oracle = −266** — a confident noise-lock under a scrambled
+comb, **present at iteration 0 and never touched by the loop**). The other **SELF-CLEANS** — the M-step and
+re-scored E-step DROP it, reproducing IGNITE-2's behaviour on the mixed problem. **No scrambled trajectory
+grows; wrong-cert counts are flat in all 30/30 loop trajectories.** ***Every STOP event is inherited from the
+criterion's seeds; none is generated by the loop.*** **The D1 hole travels unchanged, in its mixed-model
+flavour.**
+[MEASURED: CHORUS §2(c)]
 
 ### S7.7 The handoff that is not ours
 
@@ -1712,6 +1985,33 @@ properly-calibrated onset in the box, the requirement tightens from *"eccentric,
 ~8–53 Mpc"* to ***"louder or longer than anything in the modelled box."*** **The table is kept because its
 STRUCTURE (the corner is the corner, plus a distance cut) survives; its NUMBERS are upper bounds on a bar that
 moved up.**]
+[SUPERSEDED AGAIN → **the onset EXISTS (S6.3.2), so the ceilings are recomputed — and they move in BOTH
+directions at once.** This is the join as SURFACE re-measured it, against the census-structure onset
+(h\* = −12.50) and against the 5+11 onset (h\* ≤ −13.25):]
+
+| f_orb (Hz) | log₁₀Mc | ATLAS min-e | `D_L ≤` at **h\* = −12.50** (census 3+13, 30 yr, lit) | `D_L ≤` at **h\* = −13.25** (5+11, T ≥ 40) |
+|---|---|---|---|---|
+| 10⁻⁸ | 9.5 | 0.59 | **9.4 Mpc** | **53.1 Mpc** |
+| 10⁻⁸ | 9.0 | 0.58 | 1.4 Mpc | 7.8 Mpc |
+| 10⁻⁸ | 8.5 | 0.70 | 0.2 Mpc | 1.1 Mpc |
+| 10⁻⁸·⁵ | 9.5 | 0.66 | 4.4 Mpc | 24.6 Mpc |
+| 10⁻⁸·⁵ | 9.0 | 0.77 | 0.6 Mpc | 3.6 Mpc |
+| 10⁻⁸·⁵ | 8.5 | 0.84 | 0.1 Mpc | 0.5 Mpc |
+
+- **AGAINST the programme:** in the census structure the onset is **LOUDER** than IGNITE's retracted `h*`
+  (−12.50 vs −12.75), so the reference `(10⁹·⁵, 10⁻⁸)` corner must sit inside **9.4 Mpc** — ***INSIDE the
+  Virgo distance, not at 16.8 Mpc.*** SCOUT's population clock prices a source **1.25 dex quieter** than
+  that. **On the census population, certification remains a variance play on the loud-nearby tail — and
+  S7.1.1a caps the baseline lever at ~40 yr.**
+- **FOR the programme, and this is the new thing:** ***the frontier is not a property of the SOURCE alone.***
+  At 5+11 the onset reaches **h\* ≤ −13.25 (unbounded below by this grid)**, putting the same corner at
+  **53 Mpc** — *outside Virgo, a **~180× larger volume**.* ***The single most valuable unknown in the
+  forecast is therefore no longer "how loud is the loudest source" but "HOW MANY LOUD SOURCES ARE THERE" —
+  and nobody has measured that number.***
+
+[MEASURED: SURFACE §10 — strain convention verified against SIREN's banked DL table (Mc = 10⁹,
+f_gw = 2×10⁻⁸ Hz at 7.77 Mpc → log₁₀h = −13.25). The h\* cells are both untouched by the floor fix
+(zero-fraction 0.00), so these ceilings are re-cut-stable.]
 
 **S11.1.3 THE POPULATION VERDICT.** Against SCOUT's clock (**N̄_detectable ≲ 0.01–0.1 current, O(0.1–1) SKA —
 at −13.75-class loudness**), while IGNITE's onset is **0.5–1.0 dex LOUDER STILL** (and criterion-v2 moved that
@@ -1747,40 +2047,61 @@ that **no single row buys the certification programme by itself.**
 
 | capability | what it buys | measured price / status | claim |
 |---|---|---|---|
-| **T → 30 yr** | the strongest lever; `T^{5/2}` beats the `h^{1.66}` floor race | onset appears only at T = 30 — **and even there, 0.92/0.54 under honest floors** | S7.1, S6.2 |
+| **T → 40 yr** | the strongest lever — **and it CEILINGS here** | `T^{5/2}` beats the floor race up to ~40 yr; **T = 30 is optimal in 0 of 36 columns; loud cells LOSE at 50 (12/12)** | S7.1.1a, S6.3.2 |
 | **T → 11 kyr** | the blind wall closes | **not an observational horizon** | S4.1.13 |
-| **VLBI σ_d < 3 pc** | detections (ΣK 88 454 → 470) **AND** wrong-counterpart robustness (D4-OBS ×1.6) | a real VLBI campaign on the readable sub-array; **binary, not graded — Gaia is a NO-OP** | S7.2 |
-| **louder source (h)** | *almost nothing* — the floor rises as `h^1.66` | **the count is NON-MONOTONE in h**; and SCOUT says nature does not supply one | S5.3.2, S7.3 |
+| **VLBI σ_d < 3 pc** | detections (ΣK 88 454 → 470) **AND** wrong-counterpart robustness (D4-OBS ×1.6) | a real VLBI campaign on the readable sub-array; **binary, not graded — Gaia is a NO-OP**; **and it COSTS +2.9 ± 1.0 nat of null floor at h = −13.25** | S7.2, S7.2.8 |
+| **louder source (h)** | *almost nothing* — the floor rises as `h^1.72` | **the count is NON-MONOTONE in h**; and SCOUT says nature does not supply one | S5.3.2, S7.3 |
 | **an EM counterpart (sky)** | removes the sky axis; **the break-even is 0.188°/source and a host supplies it** | free (**EM astrometry beats the tolerance by ≥10⁴×**) — **but it does NOT supply the clock** | S4.1.11, S4.2.7, S7.3.4 |
 | **an EM period** | **NOTHING** (a 7× tighter `f` moves the best rung 3 %) | free, and worthless | S4.2.7 |
 | **a host distance (1 %)** | σ(log10_mc) → 0.0205–0.0364 dex | still **>20× short**; the σ_h → 0 floor is 0.00301 dex | S4.2.11 |
 | **eccentricity (e ≳ 0.6, Mc ≳ 10⁹, top-of-band)** | the **only** thing that moves the targeted evidence: **likelihood structure a prior box cannot supply**; and **σ(D_L)/D_L ≈ 12–14 % with ZERO seeds** | clears the *relative* >20× bound; **2.5× short of the absolute 0.003-dex floor**, and the corner that would clear it is **toy-invalid** | S4.2.12, S7.4, S9.4 |
-| **the EOB tier** | the e ≳ 0.85 corner the toy cannot see | **QUEUE HEAD** — *not a refinement, the load-bearing next step* | S7.4.6 |
-| **a mixed population** | possibly **everything**: if the eccentric member's clock is a **SHARED** array resource, every single-source no-go here is scoped to a premise nature does not satisfy | **untested** | S7.6 |
-| **3–5 certified pulsar terms** | **σ(D_L)/D_L = 6–12 %** — the dark-siren-useful class | the noisy pipeline currently delivers **0.000** of them | S9.1, S9.3.5 |
+| **the EOB tier** | the e ≳ 0.85 corner the toy cannot see | **still open** — *not a refinement, the load-bearing next step for the ABSOLUTE floor* | S7.4.6 |
+| **ONE eccentric loud member (e ≳ 0.5)** | **the count switches ON at census loudness: 3.13 lit / 2.27 vlbi — the 3-pulsar siren threshold, exactly** | **MEASURED.** At e = 0.7 it reaches 5.4/5.8 — **14.8× / 12.4×** over circular. **But the clock is NOT shared: the gain is the comb's OWN pulsar terms** | S7.6.3, S7.6.4 |
+| **TWO+ eccentric members (e ≳ 0.3)** | the same switch-on, at **one third the eccentricity** | **MEASURED, CONFIRMED both tiers** — *the threshold is a MIXTURE property, not a property of `e`* | S7.6.4 |
+| **two more LOUD sources (3+13 → 5+11)** | **up to 6.1× the count (2.5× median), and the frontier moves ≥ 0.75 dex** — `h*` reaches the faint edge of the grid, putting the reference corner at **53 Mpc instead of 9.4** | **MEASURED.** Nobody has measured how many loud sources exist. ***This is now the single most valuable unknown in the forecast*** | S7.6.2, S11.1.2 |
+| **3–5 certified pulsar terms** | **σ(D_L)/D_L = 6–12 %** — the dark-siren-useful class | the noisy pipeline currently delivers **0.000** of them; **the loop above onset has never been run on a low-impurity seed set** | S9.1, S9.3.5, PENDING: KINDLE |
 
-**S11.3.2 The one-sentence forecast.** ***Certification is a variance play on a loud, near, eccentric,
-top-of-band source that nature is not expected to supply; the eccentric Earth-term siren is the
-expectation-value road and needs no certification at all; and the one premise that could overturn either
-statement — that certification is a property of the POPULATION rather than of the source — has never been
-tested.***
-[MEASURED: project_progress §10.12; PENDING: CHORUS]
+**S11.3.2 The one-sentence forecast.**
+[SUPERSEDED → *"…and the one premise that could overturn either statement — that certification is a property
+of the POPULATION rather than of the source — has never been tested."* **It has now been tested, and the
+answer is HALF YES AND HALF NO — and the half that is "no" is the half everyone expected to be "yes."**]
+
+> ***Certification is a variance play on a loud, near, eccentric, top-of-band source that nature is not
+> expected to supply; the eccentric Earth-term siren remains the expectation-value road and needs no
+> certification at all; and the premise that could have overturned both — that certification is a property
+> of the POPULATION rather than of the source — is TRUE, but not for the reason it was posed. The
+> POPULATION's structure (how many loud members, how many eccentric ones) moves the count by 6× to 15× and
+> moves the frontier by a factor of 180 in volume. The CLOCK, however, is NOT shared: an eccentric member
+> certifies its own pulsar terms and drags the array's count up single-handedly. So the no-gos ARE rescoped
+> — but by a population parameter nobody has measured, not by a mechanism anybody can exploit.***
+
+[MEASURED: SURFACE §9.1/§10; CHORUS §1/§2 — both re-cut on the criterion-v2.2 floors]
 
 ---
 
 ## APPENDIX A — THE PENDING INVENTORY
 
+**DELIVERED since criterion-v2.1** — struck here, kept for the trail:
+
+| ~~tag~~ | delivered | where it now lives | what it did NOT supply |
+|---|---|---|---|
+| ~~**SURFACE**~~ | 108 cells, 24 840 realisations, ≈ 11 GPU-h | **S6.3.2–S6.3.5**, S7.1.1a, S7.6.2, S11.1.2 | **the `tol` axis was NOT swept** — it remains measured at one (h, T, tier) cell only → folded into **ROBUST** |
+| ~~**CHORUS**~~ | 26 mixture cells, 4 000 nulls, 40 exact pairs, 30 loops | **S7.6.2–S7.6.6** | the trade-curve **crossing** (demoted, S7.6.5); mis-registered starts → **ROBUST** |
+| ~~**ANCHOR**~~ | 7 200 realisations; realism ladder + the floor-estimator defect | **S6.4.3–S6.4.6**, **S6.5**, S7.2.8 | ***the REAL-DATA question — its premise was refuted at Task 1 (the repo has no real residuals). Re-tagged REAL-ARRAY.*** |
+
+**OPEN:**
+
 | tag | scope | first appears | what it must supply |
 |---|---|---|---|
-| **QUILL** | first-principles criterion | S4.3.1, S5.6.5, S5.7 | derive `floor(h,T,tol)`; unify `ln K` ⊕ floor as one statistic; adjudicate D1 decision-theoretically; price the wrong-counterpart hole as an FDR term; explain or demolish the one-wall coincidence; state the criterion's ROC |
-| **SURFACE** | the general onset surface | S6.3, S8.4.4 | N ≥ 150 nulls at **every** cell (~2 GPU-h); onset surface with a fit error on every cell; refit `h^1.66` against converging floors; purity at every counting cell; GEO re-cut; the tol axis swept jointly with (h, T) |
-| **ANCHOR** | the real-data anchor | S6.4 | run criterion-v2.1 on **real PTA data** (J0437 first) with a floor calibrated at that data's own noise/loudness/tolerance; test whether simulated nulls resemble a real one; price a real VLBI campaign in onset-map units |
-| **CHORUS** | mixed populations | S7.6 | certified count vs mix (floors refit per mix); **the clock-sharing test**; the capacity-vs-clock trade curve |
-| **ROBUST** | the realism ladder | S8.4.1, S10.2 | soft loop from a mis-registered start; the tol grid through the soft loop; **D4 under a mis-positioned counterpart**; the mis-centred-prior arm (1.40σ on J0437); un-frozen GP γ + RN; the `fgw ≲ −9` recalibration |
+| **KINDLE** | the loop above onset, on the CORRECTED cells | S6.3.5, S9.3.5, S11.3.1 | **the gain contour on the corrected above-onset cells** — SURFACE reserved Pair B ((−12.75, 40, vlbi, 5+11) at 4.07/real and (−13.00, 40, vlbi, 5+11) at 3.57, **wrong-cert 0.07–0.13** — the first genuinely above-onset, low-impurity seed set the programme has ever had, and **both untouched by the floor fix**) and the soft loop was **never run on it**. **Two named questions must be answered BEFORE the contour is drawn, not after:** **(i) THE EXACTLY-1.000 MARGINALITY** — two cells ((−13.25, 40, vlbi, 3+13) and (−13.00, 40, vlbi, 3+13)) post a count of **precisely 1.000**: 30 correct certs in 30 realisations. **The count is quantised at 1/30, and the strict `> 1` bar lands exactly on a lattice point.** Both currently read *below onset* **on the strictness of an inequality.** ***Is that a measurement or a convention? It is a convention, it is undeclared, and it is doing work — a bar that can be decided by `>` versus `≥` is not yet a bar.*** **(ii) THE ISOLATED FAINT-EDGE ONSETS** (S6.3.5) — frontier, or fluctuation? |
+| **REAL-ARRAY** | the real-data anchor *(re-tagged from ANCHOR)* | S6.4.2 | **a RE-DERIVATION OF THE PRIOR STACK on a real array, not a substitution of a residual vector.** On disk and verified: NG 15 yr (66 psr, 1705 frequencies), NG 20 yr (77 psr), MPTA DR3 (83 psr). Supplies: the prior stack re-derived; the floor re-fit against that array's own noise; **the programme's first certification numbers that touch a real TOA**; and **it lifts ANCHOR's single-frequency ceiling** (S6.4.6) |
+| **QUILL** | first-principles criterion | S4.3.1, S5.6.5, S5.7 | derive `floor(h,T,tol)`; unify `ln K` ⊕ floor as one statistic; adjudicate D1 decision-theoretically; price the wrong-counterpart hole as an FDR term; explain or demolish the one-wall coincidence; state the criterion's ROC. **NEW: derive the floor's VALIDITY DOMAIN from first principles** — S6.5 bounds the D2 estimator empirically, at a zero-fraction of 20 %, and nothing explains why that is the number |
+| **ROBUST** | the realism ladder | S8.4.1, S10.2 | soft loop from a mis-registered start; **the `tol` grid through the soft loop — SURFACE did not sweep it**; **D4 under a mis-positioned counterpart**; the mis-centred-prior arm (1.40σ on J0437); un-frozen GP γ + RN; the `fgw ≲ −9` recalibration |
 | **SAMPLER** | honest posteriors + SBC | S1.3.3, S10.1 | joint (source × integer × distance) sampler with no conditioning on truth; **SBC on the fringe-integer posterior**; credible-interval coverage (closes RING S-4); global CW proposal + tempering |
 | **PIPELINE** | end-to-end | S10.3 | one driver, one conventions file, provenance per number, cost of the full chain |
 | **EOB tier** | the e ≳ 0.85 corner | S7.4.6, S11.3.1 | σ(log10_mc) where the toy comb coalesces — **the only place the absolute 0.003-dex floor could be cleared** |
 | **IMAGING** *(unnamed)* | the PTA as an imaging telescope | S9.5 | the real-array capacity law; the deconfusion bound joined to the fringe-ID layer; paper-section vs separate-paper decision |
+| *(ACCRE, CPU — a task, not a campaign)* | **the last piece of the floor fix** | S6.5.3 | **bank SURFACE's `fALL` offenders** and re-cut the 21-cell `fALL` ignition against the validity gate. The `fALL` zero-fractions were **never banked**, so the claim *"21 cells ignite under fALL"* **stands on the pre-fix estimator and cannot be checked from disk.** Proxy evidence says it is safe. **Proxy evidence is not a re-cut.** |
 | *(handoff, not ours)* | environmental `df/f` | S2.2.6, S7.7 | whether real SMBHB environments produce stochastic `df/f` ≳ 1e-6–1e-5 over kyr lags — **Taylor/Farr** |
 
 ## APPENDIX B — THE DISPUTED INVENTORY
@@ -1789,6 +2110,8 @@ tested.***
 |---|---|---|---|
 | D-1 | **ATLAS M4's `e` column**: npz holds the κ ≥ 20 min-e (0.516/0.526/0.501); the markdown labels it `e* (>20×)` (0.59/0.58/0.66); **σ_mc was evaluated at the npz values.** *Do not silently reconcile.* | S9.4 | decide which threshold the M4 payoff is quoted at; re-derive if it is the other one |
 | D-2 | **Tier-C `f`**: frozen 4-seed protocol gives **0.0323 ± 0.0134**; the table's auto-ingest of the completed 5-seed npz gives **0.0431 ± 0.0185**. **Both FAIL identically.** | S4.2.8 | re-run the frozen protocol at a stated seed count and adopt one; the verdict does not depend on it |
-| D-3 | **GEO's 0.275/draw** has never been re-cut under a properly-sized floor (zero-noise cells have no fresh null banks). It is quoted under a **retired estimator**. Its *sign* is safe; its *value* is not. | S3.2.2 | [PENDING: SURFACE] item (v) |
-| D-4 | **The four cells still posting > 1** under criterion-v2 (best 1.32) rest on **under-sized 10-null floors** (±2–18 nat). They are **neither retracted nor confirmed — they are UNCALIBRATED.** The honest statement is *"no properly-calibrated onset exists in the box"*, **not** *"there is no onset"*. | S6.1.5 | [PENDING: SURFACE] |
+| ~~D-3~~ | ~~**GEO's 0.275/draw** has never been re-cut under a properly-sized floor.~~ **CLOSED by SURFACE §8.** Applying a noisy-null floor to a noiseless statistic is a **CATEGORY ERROR**, not a mis-sizing. Zero-noise ceiling = **1.350 ± 0.82/draw** under the flat gate; **`0.275` RETIRED** (its sign was always safe; its value was never meaningful). And **GEO's count is IMPLEMENTABLE, not an oracle** (0 of 4640 cells have `dlnL < 0`, so `q_max ≡ P_true` at zero noise). | S3.2.2 | **RESOLVED 2026-07-12** |
+| ~~D-4~~ | ~~**The four cells still posting > 1** are UNCALIBRATED.~~ **CLOSED by SURFACE §7.** N = 100 floors: **2 RETRACT, 1 CONFIRMS** ((−12.50, 30, lit) — the programme's first confirmed onset cell), **1 stays MARGINAL.** **All four verdicts survive the criterion-v2.2 floor fix.** And the mechanism is **not** "10-null floors are biased low" — at (−12.50, lit) the properly-sized floor came out **11 % LOWER** and the cell survived. *A max-of-N floor is an order statistic with no fixed false-alarm rate; it lands wherever its ten draws put it.* | S6.1.5 | **RESOLVED 2026-07-12/13** |
 | D-5 | **The one-wall coincidence** (27× blind / >20× targeted / >20× ATLAS relative / κ ≥ 20 WEAVE): four *different objects* landing within ~1.5× of each other, with **no banked explanation**. ATLAS explicitly warns the last three are three distinct "20"s that earlier work conflated. | S4.3.1 | [PENDING: QUILL] item 4 |
+| **D-6** | **The ONSET BAR IS AN UNDECLARED CONVENTION at the lattice point.** Two cells post a count of **exactly 1.000** (30 correct certs in 30 realisations). The count is **quantised at 1/30**; the test is **strict** (`> 1`); so both read *below onset* **on the strictness of an inequality that nobody ever declared.** `>` versus `≥` moves N_onset from 59 to 61. **Flagged, not resolved.** | S6.3.2, KINDLE(i) | [PENDING: KINDLE] item (i) — **declare the convention before the contour is drawn, not after** |
+| **D-7** | **The `fALL` column was never re-cut** and its zero-fractions were never banked, so *"21 cells ignite under `fALL`"* (S6.1.3's refutation) **stands on the estimator that criterion-v2.2 bounds.** Proxy evidence (the matched `fN` zero-fractions of the 21 cells are 0.00–0.03) says it is **very probably safe.** ***Probably is not a re-cut.*** | S6.1.3, S6.5.3 | ACCRE CPU job — bank the `fALL` offenders; the banks already exist |

@@ -2741,3 +2741,459 @@ failure is corroborated by the 36 % detected-set impurity, measured independentl
 2. **The EOB tier** (ATLAS) — still open, still the corner the toy tier cannot see.
 3. **The soft loop from a mis-registered start** — the signal loops start at truth; the `tol > 0`
    trajectory is untested, and so is D4 under a mis-positioned (rather than scrambled) counterpart.
+
+---
+
+### 10.13 SURFACE — the GENERAL onset surface, calibrated everywhere (ACCRE, 2026-07-12; **counts re-cut 2026-07-13**)
+
+Primary source `reports/SURFACE_onset.md`; banks `reports/surface_analysis_recut.npz`,
+`surface_floors_recut.npz`, `recut_surface.npz`, `surface_nullN_offenders.npz` (the pre-fix
+`surface_analysis.npz` / `surface_floors.npz` are kept and are the trail). **108 cells** =
+h {−13.25…−12.00} × T {30, 40, 50} × tier {lit, vlbi} × structure {3+13, 5+11, 2+14}; **24 840
+realisations** (30 signal + 200 nulls per cell); ≈ 11 GPU-hours. **Every count below is the RE-CUT
+count** (§10.16); 93 of the 108 cells are bit-identical to the published surface.
+
+**(a) THE ONSET EXISTS — AND IGNITE-2'S GENERALISATION IS SUPERSEDED.** IGNITE-2's *"no
+properly-calibrated onset exists anywhere in the modelled box"* was inferred from **two** calibrated
+cells. Paying the D2 sizing at all 108: **N_onset = 59** (MARGINAL 3, below 46). **The specific
+retraction SURVIVES** — IGNITE's `h* = −12.75` lit and `−13.25` vlbi remain below onset (0.87 and
+0.47, reproducing IGNITE-2's 0.92/0.54 within the sky error, on independent seeds and independent
+null banks). **What does not survive is the generalisation.** STORY S6.1.5's *"nothing measured
+contradicts the expectation that paying the sizing everywhere would close the rest of the box"* is
+**REFUTED — paying it OPENS the box.** In the census structure the onset sits at **h\* = −12.50**
+(1.13 [1.10, 1.23], floor 106.04 ± 4.62 nat, N = 100, zero-fraction 0.00) — **one grid step LOUDER
+than IGNITE's retracted claim, not absent.** *IGNITE's max-of-10 floors were drawn low enough to
+move the onset into the wrong cell — a subtler and more instructive failure than "there is no
+onset".*
+
+**(b) CERTIFICATION IS A PROPERTY OF THE POPULATION — the axis IGNITE never had, and the biggest
+one.** Promoting two of the sixteen sources faint → loud (3+13 → 5+11) at fixed (h, T, tier) raises
+the count **up to 6.14×** (median **2.49×** over the 36 columns) — *super-linearly, and against a
+floor that itself rises 2–3× because the recovery model carries more amplitude.* Demoting one
+(3+13 → 2+14) all but extinguishes certification. **The frontier moves by ≥ 0.75 dex.** Two loud
+sources is a dead population; five is a factory. **This is CHORUS's central premise, and it is now
+measured rather than assumed** — and it means **every single-source no-go in this repo is scoped to
+a population structure nature does not have to supply.**
+
+**(c) T IS NOT MONOTONE — the strongest lever has a CEILING, and it is inside the box.**
+**T = 30 yr is optimal in 0 of 36 columns.** T = 40 wins 19, T = 50 wins 17. The split is
+h-dependent: **loud cells peak at 40 yr and LOSE at 50** (12 of 12 loud columns of 3+13/5+11), while
+faint cells keep gaining to 50 (6 of 6 loud 2+14 columns rise). Mechanism, visible in the floors:
+the counterpart-matched floor grows with **data volume** as well as with loudness, and between 40
+and 50 yr that growth **overtakes the `T^{5/2}` leverage** at loud h. IGNITE's *"onset is
+baseline-driven; `T^{5/2}` beats the `h^{1.66}` floor race"* is **true up to a ceiling, and the
+ceiling is ~40 yr.** *(Caveat, load-bearing: T = 50 extrapolates the timing model 35 yr past the
+last real TOA under a stated convention. The SIGN is robust; the MAGNITUDE is a property of the
+convention and is not a forecast.)*
+
+**(d) J1909-FIRST IS DEAD.** The prior-pinned anchor **J0437−4715** — smallest `K_counted`, so the
+smallest trials bar — leads at **19 of 22** near-onset cells in the census structure. It arrives
+first wherever the floor is the binding constraint, *which is exactly what onset means.* And the
+census's "J1909 first" was **itself a floor artifact**: in the zero-noise re-cut, removing the floor
+flips the lead to J0437 (25/40 vs 21/40), where the retired floor had given J1909 9/40 and J0437
+1/40. **The floor was manufacturing J1909-first.**
+
+**(e) BOTH DISPUTES CLOSED.**
+- **D-3 CLOSED.** At zero noise there are no fluctuations for a noise-floor to gate; GEO's data are
+  Asimov-at-truth and the 9.01-nat floor was fitted to *noisy* nulls. Applying it is a **category
+  error**, not a mis-sized number. The zero-noise ceiling under the flat gate (criterion-v2.1
+  layers 1+3) is **1.350 ± 0.82/draw** — the 1.35/draw class exactly, reproducing FORGE §9.2's
+  independent two-layer number (1.35 ± 0.82) to three digits. **`0.275` is RETIRED as a
+  floor-concept category error, not as a wrong measurement. Its sign was always safe; its value was
+  never meaningful.** And a caveat is **closed rather than inherited**: 0 of 4640 (draw, pulsar)
+  cells have `dlnL < 0`, so at zero noise the MAP fringe **is** the true fringe and `q_max ≡ P_true`
+  identically — **GEO's count is IMPLEMENTABLE, not an oracle.**
+- **D-4 CLOSED.** The four uncalibrated cells, under N = 100 floors: **two RETRACT** ((−13.00, 30,
+  lit) → 0.60; (−12.75, 30, vlbi) → 0.73), **one CONFIRMS** ((−12.50, 30, lit) → 1.13 — **the
+  programme's first confirmed onset cell**), **one stays MARGINAL** ((−12.50, 30, vlbi) → 1.17,
+  dies at floor + error). **All four verdicts survive the floor fix.** And the mechanism is **not**
+  uniformly "10-null floors are biased low", which IGNITE-2's single datum suggested: at (−12.50,
+  lit) the properly-sized floor came out **11 % LOWER** and the cell **survived**. **A max-of-N
+  floor is not biased in a fixed direction — it is an order statistic with ±1.283β of scatter and
+  no fixed false-alarm rate.** That is D2.2's argument, and this is its first four-cell test.
+
+**(f) THE `fALL` COLUMN IGNITES — for the first time in the programme.** IGNITE: *"the map never
+ignites under fALL, best 0.24"*; IGNITE-2: *"never exceeds 0.36"*. SURFACE: **21 cells clear onset
+on fALL, best 2.57/real — and all 21 are 5+11** (3+13: 0. 2+14: 0). **D1's price is real at the
+census structure and VANISHES at 5+11.** This does *not* close the D1 hole (D4 proved no
+co-registration statistic can), but it removes the criterion's most uncomfortable dependence on a
+design decision. **⚠ CAVEAT, AND IT IS NOT SMALL: the `fALL` floors were NEVER re-cut and cannot be
+from disk** — `surface_floors.npz` banks no `fALL_zerofrac`, and RECUT banked the nullN offenders
+only. Using the matched cell's `fN` zero-fraction as a proxy, all 21 igniting cells sit at
+z = 0.00–0.03, so the claim is **very probably safe — but probably is not a re-cut.** *Banking the
+`fALL` offenders is a cheap CPU job against banks that already exist, and it is the one piece of
+the floor fix that was not finished.*
+
+**(g) THE LOUDNESS LAW SURVIVES THE ESTIMATOR CHANGE.** `floor_fN ∝ h^1.72` (span 1.53–1.91) and
+`floor_fALL ∝ h^1.80` (1.63–1.93), refit on 18 independent Gumbel fits, against IGNITE's max-of-N
+`h^1.66` / `h^1.88`. **It was never an artifact of max-of-N — only its NORMALISATION was, and that
+is what moved the onset cell.**
+
+**(h) THE LOOP CELLS, reserved and not run.** Pair A (max margin): (−12.00, 40, vlbi, 5+11) at 7.93
+and its lit twin at 7.80 — but **0.37–0.50 wrong certs/real.** Pair B (purity-preferred):
+(−12.75, 40, vlbi, 5+11) at 4.07 and (−13.00, 40, vlbi, 5+11) at 3.57 — **0.07–0.13 wrong.**
+**Recommendation recorded, not executed: run the soft loop on Pair B** — IGNITE-2 §3.2 showed every
+soft-loop failure was inherited from impure seeds, and Pair B is the first genuinely above-onset,
+low-impurity seed set the programme has ever had. **Both Pair-B cells have zero-fraction 0.00 and
+are untouched by the floor fix, so the reservation stands exactly as written.**
+
+**Caveats that travel.** The **D1 wrong-counterpart hole is untouched and OPEN** — wrong
+certifications travel beside every count (up to 1.13/real at (−12.25, 40, lit, 3+13)). **30
+realisations/cell** (5 skies × 6 weathers), so every per-cell rate carries the ±0.2-class
+sky-sampling error; the *ordering* results (structure lever, T non-monotonicity, J0437-first) are
+consistent across all 36/18/22 columns and rest on no single cell. **The structures are nested on
+ONE frozen population** (seed 3000) — the 5+11 result is a statement about promoting *these two*
+sources. **Nothing here touches a real TOA.**
+
+### 10.14 CHORUS — the MIXED-ECCENTRICITY POPULATION: the clock is NOT shared (ACCRE, 2026-07-13; **counts re-cut 2026-07-13**)
+
+Primary source `reports/CHORUS_mixed_pop.md`; banks `reports/recut_chorus.npz`,
+`ch_analysis_recut.npz`, `ch_floors_recut.npz` (pre-fix `ch_analysis.npz` / `ch_floors.npz` kept as
+the trail). 26 mixture cells × 30 realisations + 4 000 nulls + 40 exact pairs + 30 soft loops.
+**All 26 cells fail the Gumbel validity gate (zero-fraction 0.33–0.81), so every floor here is the
+empirical q95 with a bootstrap error and 23 of 26 rose** — CHORUS is the campaign the floor fix cost
+the most (§10.16).
+
+**(a) THE CAMPAIGN'S NAMESAKE QUESTION RESOLVES NEGATIVE. THE CLOCK IS NOT SHARED.** In **20 exact
+seed-paired** (e = 0 vs e = 0.7) realisations — sharing the noise seed AND the physical truth
+distances, each banking the member0-inert-template rescore `dlnL_ct` — the certified count jumps in
+**every** pair (lit 0–3 → 1–15; vlbi 0–1 → 1–15). **But under the pre-registered attribution rule
+(ecc-attributed iff `dlnL − dlnL_ct > 1` nat), ZERO of the ~120 lifted certifications across all 20
+pairs are circular-attributed.** Every pulsar the eccentric arm certifies is certified **through
+member 0's own comb template** — its harmonic pulsar terms — not through a lifted circular-member
+registration. **Pre-registered verdict: MARGINAL (lit, 1/10 pairs above floor-refit noise) / ABSENT
+(vlbi, 0/10).** SIREN's lag-diversity mechanism does **not** operate at the joint-fit level either:
+all 20 signal soft-loop trajectories are **FLAT** — the eccentric-seeded loops hold their large seed
+sets (lit 18/6/2/2/6) exactly as the circular-seeded loops hold their sparse ones (0/0/0/0/1). **The
+eccentric-seeded loop does not consolidate further than the circular one; its entire advantage is in
+its SEEDS.** *This result is STRUCTURAL and is independent of the floor — the re-cut does not touch
+it.*
+
+> **Certification in a mixed population is a property of the SOURCE, not a shared array resource.**
+> **But the single-source no-gos are rescoped anyway** — because one moderately eccentric loud
+> member certifies up to ~18 pulsars single-handedly where the whole circular population certifies
+> none.
+
+**(b) THE SWITCH-ON THRESHOLD IN e — and the published one is REFUTED.** [SUPERSEDED → *"every
+eccentric mix clears the >1 bar; a single e = 0.3 member suffices at either tier"* (counts 1.57 /
+1.13) — **FALSE.** Under the corrected floors the lit cell collapses to **0.70 (below the bar,
+REFUTED)** and the vlbi cell reads **1.03 — MARGINAL, not confirmed** (it clears the bar at the
+floor and fails at floor + bootstrap error, 0.60). The lit floor rose **7.39 → 11.30 nat, +53 %, a
+6.2σ move against its own quoted fit error** — a Gumbel fitted to a 73 %-zero point mass.]
+
+> ### THE CORRECTED, BINDING EXTERNAL STATEMENT
+> ### **ONE eccentric member → the switch-on is at e = 0.5. TWO OR MORE → it is at e = 0.3 (CONFIRMED, both tiers).**
+> **The threshold is NOT a property of eccentricity alone — it depends on how many members carry
+> it.** The interim binding to e = 0.5 imposed by the provisional floor fix **STANDS, and it was the
+> right call.**
+
+| n_ecc | tier | e = 0.3 | e = 0.5 | e = 0.7 | switch-on |
+|---|---|---|---|---|---|
+| **1** | lit | 0.70 [0.43] **below** | 3.13 [2.70] CONFIRMED | 5.43 [4.90] CONFIRMED | **e = 0.5** |
+| **1** | vlbi | 1.03 [0.60] MARGINAL | 2.27 [1.73] CONFIRMED | 5.77 [5.13] CONFIRMED | **e = 0.5** |
+| 2 | lit / vlbi | 2.77 / 1.77 CONFIRMED | 4.90 / 3.97 | 5.47 / 4.10 | **e = 0.3** |
+| 3 | lit / vlbi | 2.50 / 2.20 CONFIRMED | 5.83 / 4.50 | 4.07 / 5.07 | **e = 0.3** |
+
+*(count at the adopted floor, [count at floor + bootstrap error]; CONFIRMED = clears >1 at floor +
+error, MARGINAL = clears it only at the floor.)*
+
+**(c) ECCENTRIC STRUCTURE IS THE STRONGEST SINGLE LEVER YET MEASURED IN THE BOX.** m0 (all circular,
+below onset at **0.37 / 0.47**) → m1 e = 0.7 is **14.8× (lit) / 12.4× (vlbi)** — *re-derived on the
+corrected counts, not inherited* (published: 11.2× / 14.2×; the ratio moved because **both** counts
+moved). Against SURFACE's loudness-structure lever (2.5× median, 6.1× best), **waveform structure
+beats loudness structure** — with the caveat that the two were measured on different floors, as they
+must be (each mix refits its own null).
+
+**(d) THE COMB RAISES ITS OWN BAR — and it is not enough to stop it.** The operative floor grows with
+the mix (lit: m0 7.00 → m1e07 11.65 → m2e07 13.73 nat) — the confusion cost of harmonic occupancy,
+measured in the null family itself — **and the certification gain beats it across the whole measured
+box.** At n_ecc = 3 and high e the floor *falls* again while `K_counted` explodes (K_sum ~11M vs
+m0's ~1M): **the trials term takes over from the floor.**
+
+**(e) THE TRADE INVERSION IS DEMOTED TO NOT-CLEAN.** [SUPERSEDED → *"the trade inverts between
+n_ecc = 2 and 3 at high e; the surface peaks at n_ecc = 2 (8.7/7.4) and the capacity crossing sits
+at ~8–12 % band occupancy"* — **under the corrected floors it flips status in 3 of the 8 (e, tier)
+combinations, and not in the same direction.** Published: 5 of 8 inverted. Re-cut: **4 of 8 — but
+not the same four.** The surface no longer peaks in the same place either (vlbi peaks at n_ecc = 2,
+**lit now peaks at n_ecc = 3**). **DO NOT QUOTE "the trade inverts at n_ecc = 3" without re-deriving
+it from `recut_chorus.npz`. It is not refuted; it is no longer a clean claim.**] **The MECHANISM
+survives intact and is floor-independent** — the binding cost at high occupancy is the `K_counted`
+trials term and the finer joint fringe grid, **not** the floor. **What is no longer supportable is
+where the trade CROSSES.**
+
+**(f) THE PRE-REGISTERED SCRAMBLED-LOOP STOP FIRES — with the IGNITE-2 anatomy intact.** 2 of 10
+scrambled realisations certify at some iteration; **1 keeps** its certification to the fixed point
+(J1640+2224, dlnL = 12.14, qmax = 1.000, **Δk_oracle = −266** — a confident noise-lock under a
+scrambled comb, **present at iteration 0 and never touched by the loop**). The other **self-cleans**
+(the M-step + re-score DROPS it — IGNITE-2's behaviour, reproduced in the mixed pipeline). **No
+scrambled trajectory grows; wrong-cert counts are flat in all 30/30 loop trajectories.** Verdict:
+**STOP** — and **every STOP event is inherited from the criterion's seeds; none is generated by the
+loop.** *The D1 hole travels unchanged in its mixed-model flavour.*
+
+**(g) THE FINDING THAT TRAVELS BEYOND THE CAMPAIGN — a repo-wide reproducibility hazard.** CHORUS's
+first g1 attempt FAILED with a distinctive anatomy (dlnL shifted O(0.1–1) nat on nearly every pulsar;
+lnK and the certified sets untouched). Diagnosis: **`NoiseDrawer` builds the GWB noise square root by
+CPU `np.linalg.eigh` of a near-degenerate HD-correlated Φ, and the LAPACK eigenvector basis inside
+degenerate subspaces DEPENDS ON THE BLAS THREAD COUNT.** A job at `--cpus-per-task=16` draws a
+*rotated* — different but equal-distribution — GWB realisation at the same seed. **Banked noisy
+realisations reproduce bit-identically only at `cpus-per-task = 8`.** *Until it was fixed,
+`cpus-per-task` was part of the seed.* **CLOSED by the canonical `b1_L_gwb` bank (§10.16(d)).**
+
+**Caveats that travel.** 30 realisations/cell (the per-realisation cert count at m1e07 spans 2–18
+across skies — GEO's sky-dominance, showing directly). **The loops start at the true source.**
+N_HARM = 32 (exact through e = 0.7; the eU draws top out at 0.68). **Every banked `mapk` is
+prior-referenced (implementable); every "correct" label used `n_true_grid` and is ORACLE-labelled.**
+**The `fALL` inversion under the comb** (fALL sits BELOW fN in every eccentric lit cell — the
+opposite of the circular cells) **is measured, not explained, and was NOT re-cut.**
+
+### 10.15 ANCHOR — the REALISM ladder, and the defect it found in our own floor estimator (ACCRE, 2026-07-12/13)
+
+Primary source `reports/ANCHOR_realdata_null.md`; banks `reports/anchor_ladder.npz` (**re-banked**,
+§10.16(c)), `anchor_g1.npz`, `anchor_data_forensics.npz`. **7 200 realisations**, T = 15 (the native,
+unextended array), 8 cells × 6 rungs, N = 150 nullN each. **Two verdicts, different in kind.**
+
+**(a) THE BRIEF WAS REFUTED AT TASK 1, AND THE PREMISE AMENDED.** The repo **has no real residuals**:
+the 116-pulsar feather set is a **mock** (telescope `AXIS`, a single 1440 MHz channel), and **its
+`residuals` column IS the injected CW+CURN realisation `b20_cw_curn_r0`** — bit-identical, max|diff|
+= 0.0, all 116. **The certification chain never reads it** (`data = inject_delay(θ_true) +
+NoiseDrawer.draw(seed)`), so **no banked result depends on it** — *but any future task that treats
+those residuals as "the data" is measuring an injected CW.* The amended premise: **the anchor is
+REALISM, not provenance.** `NoiseDrawer.draw` is the **only** object the ladder replaces; every
+other frozen object (B1Split, FringeTables, `ln K_counted`, the EM priors, the tiers, the geometry
+ensembles) is untouched. **The mismatch IS the experiment.**
+
+**(b) THE LADDER: CONSISTENT AT EVERY RUNG. THE ONSET SURFACE DOES NOT SHIFT.** Rungs: **R1**
+per-pulsar RN (log10 A, γ) mis-specification + GWB amplitude × U(0.5, 1.5); **R2** unmodelled DM
+power-law GP; **R3** non-Gaussian tails (excess white + 2 % shot outliers at 6σ). Realised noise rms
+rises **1.993 → 2.634 µs (×1.32)**. Pooled over all 40 (rung × cell) comparisons: **18/40 cells
+"inflated" — a coin flip**; median Δq95 = **−0.18 nat**; **1/40** significant under Mann-Whitney
+(2 expected by chance). **Verdict: R1 CONSISTENT, R2 CONSISTENT, R3 CONSISTENT.** *The per-cell
+INFLATED/DEFLATED entries change sign between neighbouring cells of the same rung and sit at 1–2σ
+against 3–5-nat fit errors. They are calibration noise.*
+
+**(c) AND THE MECHANISM, which is stronger than the null result.** Exactly 1 of 40 cells is
+significant — R3 at (−13.25, vlbi), p = 0.0000 — and **its floor barely moves (Δq95 = +0.36 ± 0.29)
+while the rate at which the null produces a candidate AT ALL more than doubles (P(offender > 0):
+0.200 → 0.453).** **Unmodelled noise makes the null throw up MORE candidates, but not LOUDER ones.**
+The floor is an *upper-tail* quantile, and the upper tail is set by the **template**, not the data:
+the E-step's matched-filter cross term is linear in the *model* amplitude, so the loudest fringe
+fluctuations scale with the hypothesis `h` — the `floor ∝ h^1.66` mechanism, which ANCHOR
+independently reproduces at **1.67** from scratch, at a baseline where it was never fitted.
+
+> **The criterion's floor is robust to noise mis-specification BECAUSE it is loudness-relative.**
+> The property recorded as a **cost** (the bar rises almost as fast as the signal, so louder alone
+> buys nothing) is the same property that makes the floor **immune to getting the noise model
+> wrong.** *The tail is template-dominated; the body is noise-dominated.*
+
+**(d) THE OFFENDER ANATOMY IS SET BY THE TRIALS FACTOR, NOT THE NOISE BUDGET.** The same five pulsars
+carry ~75 % of offenders in **every** rung including the control; total offenders move **+6 %** from
+R0 to R3 against a **+32 %** rise in noise rms. **The suspects did not show up:** J1824−2452A, the
+array's reddest pulsar by far (feather χ²/N = 3243), contributes 6 offenders in R0 and 13 in R3;
+B1937+21 never appears. What *does* move is **J0437−4715 (+31 under R3, the largest single shift)** —
+**the array's smallest trials factor** (`ln K` = 1.39). **The pulsar whose bar is lowest is the one
+most exposed when you add noise the model does not know about.** *That is the J0437 double edge —
+robustness to source error and vulnerability to noise are THE SAME PROPERTY — showing up in a third
+independent place.*
+
+**(e) THE VLBI PRICE, on the null side, for the first time.** `floor(vlbi) − floor(lit)` at the same
+h: **+2.9 ± 1.0 nat at h = −13.25, and nothing measurable anywhere else in the box** (the loud cells'
+errors are 3–6 nat and cannot resolve a price of this size — so none is quoted). **It is a TIER
+effect, not a realism effect** — the control already carries +2.59 ± 1.41, indistinguishable from
+R2's +2.88 and R3's +2.76. **Realism does not change the price of VLBI.** Mechanism: VLBI shrinks
+`σ_d` → fewer fringes → smaller `K_counted` → a **lower trials bar** → a noise fluctuation clears
+layer 1 more easily → **a higher absolute floor.** **VLBI buys detections on the signal side (ΣK
+88 454 → 470) and PAYS for them on the null side. A VLBI campaign is not free in onset-map units,
+and this is the first number for what it costs.**
+
+**(f) THE SECOND VERDICT — A DEFECT IN THE CRITERION'S OWN FLOOR ESTIMATOR.** *It was not in the
+brief. It fell out of the control arm, and it matters more than the ladder does.* → **§10.16.**
+
+**THE LADDER'S STATED CEILING (binding).** **The array is single-frequency** — all 30 225 TOAs sit at
+1440.0 MHz, so the chromatic factor `(f_ref/f_obs)²` is a constant (0.9450–0.9454) and chromaticity
+is **unidentifiable by construction**. **R2 tests UNMODELLED CHROMATIC-BAND POWER, not
+chromaticity.** (ECORR is likewise degenerate with EQUAD here: one TOA per epoch.) **A real
+multi-frequency array would lift this ceiling — and that is the REAL-ARRAY campaign, not this one.**
+
+### 10.16 THE FLOOR FIX — and **criterion-v2.2** (cronus + ACCRE/RECUT, 2026-07-13, tag `criterion-v2.2`)
+
+Primary source `reports/RECUT_floors.md` (supersedes `FLOOR_FIX_provisional.md`, which is kept as
+the trail). Scripts `CW_transition/recut_surface.py`, `recut_chorus.py`, `bank_surface_offenders.py`,
+`rebank_anchor_ladder.py`, `make_lgwb_bank.py`, `stage_recut_banks.py`. **CPU only. No GPU. No new
+realisations. Every count re-cut from the per-realisation signal banks.**
+
+**(a) THE DEFECT.** The offender statistic is **0.0 whenever a realisation has no cell passing layer
+1 ⊕ layer 3.** At faint `h` that is *most* realisations. **A Gumbel fitted to a point mass at zero is
+dragged DOWN toward it**, understating the α = 0.05 bar by up to **2.8×** (0.845 fitted vs 2.395
+empirical at h = −13.25 lit, where **93 % of nulls have no offender at all**) — gaps of **24σ and
+12σ against its own quoted fit error.** *The fit error is not merely wrong; it is confidently
+wrong: a Gumbel fitted to a 93 % point mass reports ±0.064 nat.* **And it errs in the DANGEROUS
+direction:** detection is `dlnL > max(ln K, floor)`, so a floor that is too low is **too permissive**
+— it lets pure-noise offenders through. **S6.2.2 saw the edge of this at 45 % and called the fit
+"serviceable". At 57 %, 80 % and 93 % it is not, and "serviceable" is not a property that
+extrapolates.**
+
+> ### **CONVENTION ADOPTED (criterion-v2.2), BINDING:**
+> ### **The D2 Gumbel floor is valid ONLY where the nullN zero-fraction is ≲ 20 %. Above that, quote the empirical (1−α) quantile with a BOOTSTRAP error, and bank the zero-fraction beside it. THE ZERO-FRACTION IS A REQUIRED COLUMN, NOT A CAVEAT.**
+>
+> The onset test itself is **unchanged** — `ONSET` iff the count at **floor + its own error** exceeds
+> 1. Only the floor and the error change; above the gate the error is the bootstrap sd of the
+> empirical quantile, so the onset test is made against a bootstrap error exactly as required.
+
+**(b) THE GATES THAT LICENSE THE CORRECTED NUMBERS.** **No corrected number was emitted until an
+uncorrected one was reproduced from the same raw columns.**
+
+| gate | what it proves | SURFACE | CHORUS |
+|---|---|---|---|
+| **A — floors** | recomputed offenders reproduce the *banked* Gumbel floor, sd, emp-q95 and zero-fraction | **0.000e+00** | **0.000e+00** |
+| **B — counts** | this scorer, at the *old* floors, reproduces the *banked* counts and verdicts | **0.000e+00** (108/108 verdicts) | **0.000e+00** |
+
+**Gate B is the load-bearing one: it proves the scorer used for the re-cut IS the one that produced
+the published surface. Without it, a corrected count is just a different number.**
+
+**(c) WHAT THE RE-CUT SETTLED.**
+1. **SURFACE: N_onset = 59** (bounded 57–67 by the provisional analysis). **15 of 108 cells touched;
+   93 untouched — including 57 of the 59 onsets.** **Two onsets died and two were born, and the
+   coincidence of totals is a COINCIDENCE, not a confirmation. The number is stable; the map is
+   not.** Both cells the provisional analysis named AT RISK are **RETRACTED** (0.77 and 0.90 —
+   neither of its bounds, ≤ 1.20 and ≤ 1.37, was reached). Of the 8 cells that *might* have ignited,
+   **2 did.**
+2. **`h*` unbounded below: REINSTATED at 7 of 18 columns — and NOT the same seven** (lost: lit 3+13
+   T=40, lit 2+14 T=50. gained: lit 3+13 T=50, vlbi 2+14 T=50). **Quote the number; never the same
+   seven columns.** *This is the number-not-names convention (§10.1) arriving for the second time in
+   the programme, for the same reason.*
+3. **CHORUS: the e = 0.3 single-member switch-on is REFUTED** (§10.14(b)). **All 26 CHORUS floors are
+   restated; 23 of 26 rise.**
+4. **The 2+14 "no onset anywhere in the vlbi half" statement is FALSE** under the corrected floors —
+   the surviving faint-edge onset **moves across the tier boundary** (lit T=50 retracts; vlbi T=50
+   ignites).
+5. **ANCHOR's published §3 ladder table reproduces from the re-banked file EXACTLY** (all 48 rows,
+   0.0e+00). **ANCHOR's verdicts stand; nothing is retracted.**
+
+**(d) TWO THINGS WERE CHECKED RATHER THAN ASSUMED, AND BOTH MOVED. This is the part worth keeping.**
+
+- **THE ANCHOR BANK DEFECT WAS HALF-CORRECT — and the half that was wrong was ours.**
+  `FLOOR_FIX_provisional.md` §5 reported that `anchor_ladder.npz` stores `offenders` rung-major while
+  its metadata is cell-major, and concluded: *"The array is the TRANSPOSE of its own metadata, and
+  **nothing in the file says so**."* **The first half is right. The second is not — the file DID say
+  so.** `anchor_ladder.npz` already banked **`offender_index`**, a 48-element string column whose
+  entry *j* labels `offenders[j]`; re-cutting by that key reproduces the banked `emp_q95` **and**
+  `zero_frac` to **exactly 0.000e+00**, and the permutation §5 reverse-engineered
+  (`perm[j] = (j%6)·8 + (j//6)`) is **identically** the mapping `offender_index` already encoded.
+  **§5's recommended fix — *"or add an explicit index key"* — asked for a key the file already had.**
+  **The trap is real but NARROWER than stated:** it is sprung only by a re-cut that *ignores* the
+  key, and such a re-cut is wrong by up to **79.9 nat**, silently. **FIXED — the ARRAY, not the
+  metadata:** `offenders` is now permuted into metadata-row order (so the naive `offenders[j]` ↔ row
+  *j* re-cut is the **correct** one), `offender_index` is reordered to match, and
+  `offender_index_orientation` states the convention **in words**. The metadata order was left alone
+  because it is the order of the published §3 table and of every downstream reader. Original
+  preserved as `anchor_ladder.npz.preRECUT.bak`.
+  **Learning applied immediately:** `surface_nullN_offenders.npz` (108 × 100, readback-gated to
+  0.000e+00) ships an `index` column **and** an `orientation` string that states in words that
+  `off_i` ↔ `index[i]` ↔ meta row *i*, **with no transpose and no implied permutation.**
+- **THE TRADE-CURVE INVERSION IS DEMOTED.** CHORUS's *"the trade inverts at n_ecc = 3"* flips status
+  in **3 of 8** (e, tier) combinations under the corrected floors (§10.14(e)). *It was not on
+  anyone's list. It was found by re-deriving a claim instead of carrying it forward.*
+
+> **THE GENERAL RULE THIS ESTABLISHES (binding):** **anything of the form "cell A versus cell B" — a
+> difference, a ratio, an inversion, a peak location — must be RE-DERIVED from the corrected banks
+> before it is quoted. The counts moved, so the differences moved.** Two such claims were checked;
+> **both** moved. The SURFACE structure lever (6× → "up to 6.1×, 2.5× median") and the T-optimum
+> (18/18 → 19/17) were re-derived here for the same reason.
+
+**(e) THE CANONICAL `b1_L_gwb` BANK — the thread-count hazard, closed.** Generated on **ACCRE** with
+BLAS threads pinned to **8 before numpy import** (`make_lgwb_bank.py`); **3248 × 3248**, fingerprint
+**`71677a810cbc7187`**, cpus = 8, 81 MB. Φ's spectrum has **1624 near-degenerate adjacent eigenvalue
+pairs — exactly half the spectrum: the hazard's cause, made visible.** Reconstruction
+‖L Lᵀ − Φ‖ = 6.5e−27. **THE GATE PASSES:** ANCHOR's 80 banked `ig_nullN_*` T=15 realisations replayed
+**through the bank** reproduce all six columns and the offender statistic at **0.000e+00**,
+**80/80 bit-identical**, with **zero fallback warnings in the gate log** — so the replay genuinely
+ran through the bank rather than silently recomputing. **The bank is CANONICAL: it reproduces the
+repo's existing banked realisations bit-for-bit.** *A regenerated bank is not canonical until that
+gate passes; the generator refuses to overwrite an existing bank and STOPs if two `eigh` calls
+disagree at the same thread count.*
+
+> **DECISION (Matt, this session): the 84.4 MB bank is NOT committed.** It lives on ACCRE scratch at
+> `CW_transition/b1_L_gwb.npz` — exactly where `trackB_b1_core.L_GWB_BANK` looks for it — and is
+> **gitignored** so it cannot be added by accident. What **is** committed is
+> `reports/b1_L_gwb_manifest.npz` (36 kB): the fingerprint, the file SHA-256, the shape, `cpus = 8`,
+> and the full g1 gate evidence. **Any machine can VERIFY it holds the canonical bank by comparing
+> fingerprints. No machine can REGENERATE one off-ACCRE — that is the entire point of banking it.**
+>
+> ### **CONSEQUENCE, STATED AND INTENDED: a machine without this file — cronus — CANNOT reproduce any banked NOISY number in the repo.** It will hit the **`RECOMPUTED-UNSAFE`** warning path and draw a *rotated* GWB realisation. **That is not a bug and it is not a regression: it is the accepted cost of keeping 84 MB out of git history, and `RECOMPUTED-UNSAFE` firing on cronus is the INTENDED behaviour.** Reproduction of noisy banked numbers is **ACCRE-only, by design.** *A cronus session that sees that warning and proceeds anyway is fabricating a number; a cronus session that sees it and stops is working correctly.*
+
+**(f) WHAT IT COST, STATED PLAINLY.** **CHORUS's loudest headline — *a single e = 0.3 member
+suffices* — is gone.** It was an artifact of a Gumbel fitted to a 73 %-zero point mass, which
+understated the bar by 53 %. **The floor fix was worth doing, and that is what it bought.** Its
+counterweight: **57 of the 59 SURFACE onsets, the entire loud-cell result, both purity rejections,
+the clock-sharing verdict, the structure lever, the T-ceiling and every ANCHOR verdict are
+UNTOUCHED** — because they never depended on the faint-`h` estimator. *The fix bit exactly where the
+provisional analysis predicted the exposure was, and nowhere else.*
+
+**(g) THE ONE PIECE NOT FINISHED.** **SURFACE's `fALL` offenders were never banked**, so the `fALL`
+floors cannot be tested against the validity gate, let alone corrected — and the "21 cells ignite
+under fALL" claim stands on the pre-fix estimator (§10.13(f)). The proxy evidence says it is safe.
+**Proxy evidence is not a re-cut.** *This is a cheap CPU job on ACCRE against banks that already
+exist, and it is the last open item of the floor fix.*
+
+### 10.17 WHAT CRITERION-V2.2 SETTLES, AND WHAT IS NOW OPEN
+
+**criterion-v2.2 = criterion-v2.1 + the zero-fraction floor-validity gate + the corrected banks.**
+The three-layer criterion is **unchanged**; the *estimator* of layer 2 is now bounded, and its
+validity domain is stated. **No purity layer exists** (D3 and D4 both rejected, and the D1 hole is
+structurally un-closable by co-registration).
+
+**Settled.**
+1. **The onset EXISTS** — 59 calibrated cells, one of them inside IGNITE's own box. The *specific*
+   `h*` retractions stand; the *generalisation* ("no onset anywhere") is superseded. **h\* = −12.50
+   in the census structure.**
+2. **Certification is a property of the POPULATION, not of the source** — measured on two
+   independent axes: loudness structure (SURFACE, up to 6.1×) and waveform structure (CHORUS, 14.8×).
+   **Every single-source no-go in this repo is scoped to a premise nature does not have to satisfy.**
+3. **But the clock is NOT SHARED** (CHORUS, 0 of ~120 lifted certs circular-attributed). The
+   mixture rescopes the no-gos **through the eccentric member's own comb**, not through a shared
+   array resource. *The premise IGNITE-2 named as the queue head is now tested, and the answer is
+   half yes, half no — and the half that is "no" is the half everyone expected to be "yes".*
+4. **The switch-on threshold in e is a MIXTURE property**: e = 0.5 for one eccentric member,
+   e = 0.3 for two or more.
+5. **T has a ceiling (~40 yr) and T = 30 is optimal nowhere.**
+6. **The floor is loudness-relative, and that is why it is robust to noise mis-specification**
+   (ANCHOR) — *the same property that makes "louder alone buys nothing" a cost.*
+7. **The D2 estimator has a validity domain, and outside it, it errs PERMISSIVE.** The zero-fraction
+   is now a required column.
+8. **`cpus-per-task` is no longer part of the seed** — the canonical `b1_L_gwb` bank is generated,
+   fingerprinted and gated.
+9. **D-3 and D-4 are CLOSED.**
+
+**Open — and the queue head has changed.**
+1. **[PENDING: KINDLE] — the gain contour on the CORRECTED above-onset cells.** SURFACE reserved
+   Pair B as the first genuinely above-onset, low-impurity seed set the programme has ever had, and
+   the soft loop was never run on it. **Two named questions the re-cut created, and both must be
+   answered before the contour is drawn, not after:**
+   - **(i) THE EXACTLY-1.000 MARGINALITY.** Two cells — (−13.25, 40, vlbi, 3+13) and (−13.00, 40,
+     vlbi, 3+13) — post a count of **precisely 1.000**: 30 correct certifications in 30
+     realisations. **The count statistic is quantised at 1/30, and the strict `> 1` bar lands
+     exactly on a lattice point.** Both currently read *below onset* on the strictness of an
+     inequality. **Is that a measurement or a convention?** It is a convention, it is currently
+     undeclared, and it is doing work. *A bar that can be decided by `>` versus `≥` is not yet a
+     bar.*
+   - **(ii) THE ISOLATED FAINT-EDGE ONSETS.** The newly-gained `vlbi 2+14 T=50` column certifies at
+     h = −13.25 (1.17) while **every louder h in that column sits below the bar** (0.33–0.90). It is
+     a frontier column by the letter of the definition with no contiguous frontier running down to
+     it. This is **not** a re-cut artifact — the floor grows as ≈ h^1.5–2, so a faint cell can
+     out-certify a loud one, and the *published* surface already showed the pattern — but **whether
+     it is a frontier or a fluctuation is unmeasured.**
+2. **[ACCRE, CPU] Bank SURFACE's `fALL` offenders** and re-cut the 21-cell `fALL` ignition against
+   the validity gate. **The last unfinished piece of the floor fix** (§10.16(g)).
+3. **The faint frontier.** `h*` is unbounded below in 7 of 18 columns. **The next grid is fainter,
+   not louder** — and it is the same grid that would settle (1)(ii).
+4. **REAL-ARRAY.** Every prior in the criterion is keyed to the 116-pulsar mock:
+   `best_distances.txt`, the per-pulsar `ln K_counted`, ΣK, the tiers, the geometry ensembles, the
+   census, the `NoiseDrawer` hyperparameters. **A real-array anchor is a RE-DERIVATION OF THE PRIOR
+   STACK on a different array, not a substitution of a residual vector.** On disk and verified:
+   NG 15 yr (66 psr, 615 294 TOAs, 1705 frequencies, loads in `discovery` unmodified), NG 20 yr
+   (77 psr), MPTA DR3 (83 psr). **It also lifts ANCHOR's ceiling** — a multi-frequency array makes
+   chromaticity *identifiable*, so DM can be tested as chromaticity rather than as unmodelled red
+   power.
+5. **The EOB tier** — still the corner the toy tier cannot see.
+6. **The purity hole travels unchanged.** Every count above onset carries wrong certifications, and
+   there is **no layer left to remove them.**

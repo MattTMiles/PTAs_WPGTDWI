@@ -5,6 +5,24 @@
 number below is read out of a banked `.npz`, or re-cut from banked raw statistics using the
 campaign's own definitions. Script: `EXPLAINER_results/explainer_figures.py`.
 
+> ## ⚠ FOUR FIGURES ARE STALE — THE FLOOR FIX (RECUT, 2026-07-13) MOVED THEIR NUMBERS.
+>
+> **`F3_the_honest_criterion.png`, `F4_the_switch.png`, `F5_the_map.png`, `F9_the_growth_path.png`
+> must be REGENERATED from the `_recut` banks before they are shown to anyone.** The captions below
+> have been corrected in place and now disagree with the PNGs they describe. **The other ten
+> figures are unaffected.**
+>
+> **The one that must not be shown as it stands is F4/F9.** They teach *"a slightly oval orbit
+> (e = 0.3) crosses the bar"* — **that is refuted.** The single-member switch-on is **e = 0.5**.
+>
+> **And F3 carries an irony worth stating:** the figure that teaches *"fit the bar properly"*
+> illustrates it with the one cell whose properly-fitted Gumbel is **invalid** (its null is 27 %
+> silent). Its lesson survives — the detection is still retracted — but its bar and its count both
+> moved, and *the figure argues for an estimator the programme has since had to bound.*
+>
+> Regenerate with `reports/explainer_figures.py` against `recut_surface.npz` / `recut_chorus.npz`.
+> [FLAGGED FOR MATT — figure regeneration is compute + design, not a doc edit, and is not done here.]
+
 ## The one-paragraph story
 
 A pulsar timing array watches ~116 millisecond pulsars and looks for a single supermassive
@@ -63,25 +81,43 @@ pulsar data is analysed anywhere in this repository.
 > take the best of ~116 pulsars × thousands of teeth. The earlier bar (red dashed) was set by the
 > loudest of just *ten* noise trials, landed at 13.5, and yielded 1.03 "certifications" per
 > dataset — it looked like a detection. Fitting the bar properly, so that pure noise clears it
-> only 5% of the time (green, 19.5 ± 1.4 from 100 trials), the same signal data yields **0.37 —
-> and the detection is retracted.** *Confidence never lied; the comparison did.*
+> only 5% of the time (**16.6 ± 1.6** from 100 trials), the same signal data yields **0.60 — and
+> the detection is retracted.** *Confidence never lied; the comparison did.*
+>
+> **⚠ FIGURE STALE — and instructively so.** The PNG draws the green bar at **19.5 ± 1.4** (a
+> Gumbel fit) and the count at **0.37**. Under the floor convention adopted after this figure was
+> made, **that Gumbel is INVALID at this very cell**: 27 % of its noise trials produce no candidate
+> at all, so the fit is describing a point mass at zero rather than a tail. The honest bar is the
+> **empirical 95th percentile, 16.60 ± 1.60**, and the count is **0.60**. **The retraction — the
+> entire point of the figure — stands, and stands more firmly** (0.60 is still far below 1). But
+> the figure teaches the reader to trust an estimator that the programme has since had to bound,
+> and it must be redrawn on the empirical bar.
 >
 > Source: re-cut from `SURFACE_results/sf_{nullN,sig}_h1300_T30_lit_k3_*.npz` (100 noise-only +
-> 30 signal realisations) at cell h = 10⁻¹³, T = 30 yr. The refit reproduces SURFACE's banked
-> floor (19.46 ± 1.40) and its retraction count (0.37) exactly.
+> 30 signal realisations) at cell h = 10⁻¹³, T = 30 yr; corrected numbers from
+> `reports/recut_surface.npz` (zero-fraction 0.27 → empirical q95 adopted).
 
 ### F4 — THE SWITCH · `F4_the_switch.png`
 
-> The census population is three loud sources on circular orbits, and it does not work: 0.70
+> The census population is three loud sources on circular orbits, and it does not work: **0.37**
 > certified pulsars per dataset, below the bar of 1 (a, leftmost). Now make **one** of those three
-> orbits oval — same loudness, same array, same observing time. A slightly oval orbit (e = 0.3)
-> crosses the bar; a strongly oval one (e = 0.7) delivers 7.83, eleven times the circular count.
+> orbits oval — same loudness, same array, same observing time. **A slightly oval orbit (e = 0.3)
+> does NOT cross the bar** (0.70 — it fails). **A moderately oval one (e = 0.5) does: 3.13.** A
+> strongly oval one (e = 0.7) delivers **5.43, roughly fifteen times the circular count.**
 > An eccentric orbit emits on many harmonics instead of one, and that harmonic comb is a clock
 > the analysis can lock onto. Panel (b) is the honesty check: the noise bar *rises* at the same
-> time (4.3 → 8.5 nats), so the gain is a real gain and not a lowered standard.
+> time (**7.0 → 11.7 nats**), so the gain is a real gain and not a lowered standard.
 >
-> Source: `CHORUS_results/ch_analysis.npz` (counts) and `ch_floors.npz` (floors), 26 mixture cells
-> × 30 realisations, floors refit per mixture. Caveat: the extra certifications are attributable
+> **⚠ FIGURE STALE — AND ITS HEADLINE IS REFUTED.** The PNG shows the e = 0.3 bin clearing the bar
+> at 1.57. **Under the corrected floors it reads 0.70 and fails.** *"One slightly-oval orbit is
+> enough"* is **not true**; **"one moderately-oval orbit (e ≳ 0.5) is enough, OR two mildly-oval
+> ones (e ≳ 0.3)"** is. **Do not present this figure until it is redrawn.** The honesty check in
+> panel (b) is the reason: the noise bar rose *more* than the figure knew — the e = 0.3 cell's
+> bar was understated by 53 %, and it was the bar, not the signal, that was wrong.
+>
+> Source: `recut_chorus.npz` (counts + adopted floors), 26 mixture cells × 30 realisations, floors
+> refit per mixture **and re-cut against the empirical q95** (all 26 cells fail the Gumbel validity
+> gate). Caveat: the extra certifications are attributable
 > to the eccentric member's *own* template — the clock is not shared with its circular neighbours.
 
 ### F5 — THE MAP · `F5_the_map.png`
@@ -95,8 +131,15 @@ pulsar data is analysed anywhere in this repository.
 > loud (b) and the boundary sweeps to the faint edge of the map. **How many loud sources exist
 > matters more than how loud the loudest one is** — and nobody has measured that number.
 >
-> Source: `SURFACE_results/surface_analysis.npz`, 108 cells × 30 signal realisations, each with
-> its own 200-null floor. Panels show the "today's distance knowledge" (lit) tier.
+> **⚠ FIGURE STALE (mildly).** The re-cut moves **4 of the 108 cells** across the boundary — two
+> onsets died at the faint edge and two were born — so **the red on/off contour is drawn in the
+> wrong place at h = 10⁻¹³·²⁵**, though the total (59 cells on) is unchanged. Both headline
+> readings survive exactly: 40 yr still beats 50 in the loud columns (12 of 12), and 30 yr is still
+> optimal nowhere (0 of 36). **The lesson holds; the contour must be redrawn.**
+>
+> Source: `reports/surface_analysis_recut.npz`, 108 cells × 30 signal realisations, each with
+> its own floor (Gumbel where the null's zero-fraction ≤ 20 %, empirical 95th percentile with a
+> bootstrap error above it). Panels show the "today's distance knowledge" (lit) tier.
 
 ### F6 — THE PAYOFF · `F6_the_payoff.png`
 
@@ -153,12 +196,21 @@ Script: `EXPLAINER_results/explainer_figures2.py`.
 
 > The whole array is 116 pulsars, but **the science does not need the array — it needs the first
 > handful.** Three certified pulsars make the source a useful standard siren *and* pin it to a
-> single galaxy; five saturates (more buy nothing). Today's all-circular population delivers 0.70
-> per dataset — below even one. Making a single loud orbit slightly oval (e = 0.3) reaches 1.57;
-> making it strongly oval (e = 0.7) reaches 7.83, which is past saturation. **One eccentric source
-> supplies the entire handful the science needs**, and it does so at unchanged loudness.
+> single galaxy; five saturates (more buy nothing). Today's all-circular population delivers
+> **0.37** per dataset — below even one. Making a single loud orbit **slightly** oval (e = 0.3)
+> **is not enough — it reaches 0.70 and still fails.** Making it **moderately** oval (e = 0.5)
+> reaches **3.13 — the three-pulsar siren threshold, exactly**; making it strongly oval (e = 0.7)
+> reaches **5.43, at saturation.** **One eccentric source still supplies the entire handful the
+> science needs — but it must be moderately eccentric, not slightly**, and it does so at unchanged
+> loudness.
 >
-> Source: CHORUS mixture cells (census loudness, 30 yr, lit tier); SURFACE's best cell over the
+> **⚠ FIGURE STALE — its e = 0.3 rung is refuted** (see F4). The growth path is real; **its first
+> rung is one step further up the eccentricity axis than the figure draws it.** The corrected
+> reading is arguably the *cleaner* story: e = 0.5 lands the count at **3.13**, which is precisely
+> the three-pulsar threshold the figure is built around — *the switch-on and the science threshold
+> coincide.*
+>
+> Source: `recut_chorus.npz`, CHORUS mixture cells (census loudness, 30 yr, lit tier); SURFACE's best cell over the
 > 108-cell box (7.93); GEO's 40 sky draws (18 pulsars certify in ≥1 sky — the same 18 as SIREN's
 > geometry union); SURFACE's `percert` (70 distinct pulsars certify *somewhere* in the box, so 46
 > never certify at any modelled loudness).

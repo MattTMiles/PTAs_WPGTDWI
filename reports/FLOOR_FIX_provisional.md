@@ -1,7 +1,28 @@
 # THE FLOOR FIX — PROVISIONAL, PENDING RE-SCORE
 
-**Session:** cronus doc/machinery session, 2026-07-13. **Status: PROVISIONAL.** The floors below
-are final. **No count below is corrected, and none may be quoted as one.**
+> ## ⛔ SUPERSEDED — 2026-07-13, BY `reports/RECUT_floors.md`.
+>
+> **The re-score landed. Every bound in this file is now resolved to an exact number, and this file
+> is kept only for its trail.** Read `RECUT_floors.md` instead. Where the two disagree, RECUT wins.
+>
+> **How the provisional analysis scored, judged against the re-cut it demanded:**
+>
+> | this file said | the re-cut found | verdict |
+> |---|---|---|
+> | 57 ≤ N_onset ≤ 67; **do not quote 59** | **N_onset = 59** (2 died, 2 born) | **correct as a bound, loose as a forecast** — and the caution was right for the right reason: the *map* moved even though the *total* did not |
+> | 2 onset cells AT RISK, bounds ≤ 1.20 / ≤ 1.37, **INDETERMINATE** | both **RETRACTED** — 0.77 and 0.90 | **correct, and conservative** — neither bound was reached |
+> | 8 cells MAY IGNITE | **2 ignited**; the other 6 rose and stayed under | correct as a bound |
+> | `h*` unbounded below (7/18): **SUSPENDED** | **REINSTATED at 7/18 — different seven** | suspension was right; the number survived, the names did not |
+> | e = 0.3 switch-on: **INDETERMINATE, do not quote** | **REFUTED** (lit 0.70) / MARGINAL (vlbi 1.03) | **the embargo was correct and load-bearing** — the claim did not survive |
+> | e = 0.5 is the defensible binding | **CONFIRMED, both tiers** | correct |
+> | §5: `anchor_ladder.npz` offenders are transposed and **"nothing in the file says so"** | **half wrong — the file DID say so** (`offender_index`, a 48-element key, already encoded the exact permutation §5 reverse-engineered). The trap is real but narrower: it is sprung only by a re-cut that *ignores* the key | **the diagnosis was half wrong, and RECUT found it by checking rather than assuming.** The array is now permuted into metadata-row order and the naive re-cut is the correct one |
+>
+> **The one thing it got wrong, kept visible on purpose:** §5's recommended fix — *"or add an
+> explicit index key"* — **asked for a key the file already had.**
+
+**Session:** cronus doc/machinery session, 2026-07-13. **Status: SUPERSEDED (was PROVISIONAL).**
+The floors below are final. **No count below is corrected, and none may be quoted as one** — the
+corrected counts are in `RECUT_floors.md`.
 Script: `CW_transition/floorfix_provisional.py` (CPU, seconds, no GPU).
 Bank: `reports/floorfix_provisional.npz`. Every number here is read back off that bank.
 

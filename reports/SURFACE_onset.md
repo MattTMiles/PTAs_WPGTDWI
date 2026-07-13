@@ -1,8 +1,29 @@
 # SURFACE — the GENERAL onset surface, calibrated everywhere
 
+> ## ⚠ AMENDED 2026-07-13 BY THE FLOOR FIX (RECUT). READ THIS FIRST.
+>
+> Every count and floor in this report was re-cut against the **adopted** floor convention
+> (ANCHOR §4: the D2 Gumbel is valid only where the nullN zero-fraction ≤ 20 %; above that the
+> floor is the empirical q95 with a **bootstrap** error). **15 of 108 cells were touched; 93 stand
+> bit-identical.** Primary source: `reports/RECUT_floors.md`; banks `reports/recut_surface.npz`,
+> `surface_analysis_recut.npz`, `surface_floors_recut.npz`, `surface_nullN_offenders.npz`.
+>
+> **What changed, and what did not:**
+> - **N_onset = 59 — the same number, a different map.** Two onsets died, two were born. *The
+>   coincidence of totals is a coincidence, not a confirmation.*
+> - **`h*` unbounded below: still 7 of 18 columns — but not the same seven.**
+> - **The structure lever and the T-ceiling survive; their headline RATIOS moved** (§9.1, §9.2).
+> - **The `fALL` column was NOT re-cut** and cannot be, from disk (§9.3).
+> - IGNITE's two retracted cells, the D-4 verdicts, the loop cells (§5), and the `h`-law are
+>   **unmoved**.
+>
+> Every table below carries the corrected numbers. **The pre-fix values are kept beside them where
+> they moved** — the trail is the result.
+
 **Agent:** SURFACE · ACCRE · tag `criterion-v2.1` (`git rev-parse HEAD` → `6bec3d6` ✓;
 discovery `136b270f`, ee `f73b8e0`) · **Date:** 2026-07-12 · **PURE EXECUTION** (no commits,
-no tracked-file edits).
+no tracked-file edits). **Amended 2026-07-13 (RECUT + cronus doc session); adopted at
+`criterion-v2.2`.**
 
 **Scratch paths (host):** code `hpc_harbor/surface/` (`surface.py`, `surface_analysis.py`,
 `surface_addendum.py`, `surface_figures.py`, 3 sbatch), results `SURFACE_results/` (24 840 lean
@@ -16,7 +37,9 @@ oracle columns beside and labelled**), logs `hpc_harbor/logs/sf_*`. Lane
 
 **The onset exists. IGNITE-2's "no properly-calibrated onset exists anywhere in the modelled box"
 was a statement about two cells, generalised to twenty-four — and when the D2 sizing is actually
-paid at all 108 cells of the extended box, 59 of them clear onset.** The specific retraction
+paid at all 108 cells of the extended box, 59 of them clear onset** (re-cut against the adopted
+floor; two of the originally-banked 59 died and two were born — see the banner and §3.1). The
+specific retraction
 survives (IGNITE's `h*` = −12.75 lit / −13.25 vlbi remain **below** onset under honest floors:
 0.87 and 0.47 correct certs/realisation here, reproducing IGNITE-2's 0.92 / 0.54 within the sky
 error). What does **not** survive is the generalisation: STORY S6.1.5's *"nothing measured
@@ -26,11 +49,15 @@ sits at **h\* = −12.50** (1.13 [1.10, 1.23] correct certs/real, floor 106.04 �
 one grid step **louder** than IGNITE's retracted claim, not absent. And the axis IGNITE never
 had is the one that matters most: **the population's loudness STRUCTURE is a stronger lever than
 loudness itself.** Promoting two of the sixteen sources from faint to loud (3+13 → 5+11) raises
-the count **6×** at fixed (h, T, tier) — *super-linearly*, and against a floor that itself nearly
-doubles — while demoting one (3+13 → 2+14) all but extinguishes certification. In the 5+11
+the count **up to 6.1×** at fixed (h, T, tier) — *super-linearly*, and against a floor that itself
+nearly doubles — while demoting one (3+13 → 2+14) all but extinguishes certification. (**Re-cut:**
+the published "6×" was read off two cells; one holds at **6.14×**, the other falls to **3.56×**
+because its 3+13 denominator carried an invalid floor. The *median* lever across all 36 columns is
+**2.49×**, unmoved from the published 2.51× — §9.1.) In the 5+11
 structure the map **ignites under `fALL` for the first time in the programme** (21 cells above
 onset on the wrong-counterpart-robust column, best 2.57/real, against IGNITE's *"the map never
-ignites under fALL, best 0.24"*). **Certification is a property of the POPULATION, not of the
+ignites under fALL, best 0.24"*) — **but the `fALL` floors were never re-cut, and cannot be from
+disk; the claim is qualified, not withdrawn, in §9.3.** **Certification is a property of the POPULATION, not of the
 source** — which is CHORUS's central premise, and it is now measured, not assumed. Two further
 structural results: the certified count is **non-monotone in T**, with an h-dependent optimum
 (T = 30 yr is optimal in **0 of 36** columns; loud cells peak at **40 yr** and *lose* at 50 as the
@@ -115,94 +142,164 @@ the census structure (gate S4).
 
 ---
 
-## 3. DELIVERABLE 1 — THE SURFACE
+## 3. DELIVERABLE 1 — THE SURFACE **(RE-CUT)**
 
-Correct certifications per realisation. **Bold** = count at the fitted floor; `[lo, hi]` = count at
-floor ± its fit error; `w` = wrong certs/real (**reported, never hidden**); `fA` = count on the
-`fALL` blind-robust column. Floors below each block, `± 2.80·β̂/√N`, N = 100. Figure:
-`SURFACE_results/surface_onset.png` (green box = onset surviving the floor's own calibration
-error; green contour = count ≥ 1; blue contour = count ≥ 3).
+Correct certifications per realisation, **re-cut against the adopted floor**. **Bold** = ONSET
+(count > 1 at floor + its own error). `[lo, hi]` = count at floor ± error; `w` = wrong certs/real
+(**reported, never hidden**); **`z` = the nullN zero-fraction — a REQUIRED column, not a caveat**
+(ANCHOR §4). Floors below each block: **`*` marks a cell where z > 0.20, the Gumbel is invalid, and
+the floor is the empirical q95 with a BOOTSTRAP error**; unmarked floors are the banked Gumbel
+(`± 2.80·β̂/√N`, N = 100) and are bit-identical to the published ones. Figure:
+`SURFACE_results/surface_onset.png` (**stale — regenerate from `recut_surface.npz`**; green box =
+onset surviving the floor's own calibration error; green contour = count ≥ 1; blue = count ≥ 3).
 
 ### structure 3+13 (the census structure) — tier lit
 
 | T | −13.25 | −13.00 | −12.75 | −12.50 | −12.25 | −12.00 |
 |---|---|---|---|---|---|---|
-| **30** | 0.67 [0.67,0.70] w0.03 | 0.37 [0.23,0.47] w0.03 | 0.87 [0.80,1.00] w0.23 | **1.13** [1.10,1.23] w0.23 | **1.20** [1.17,1.23] w0.40 | **1.13** [1.03,1.30] w0.27 |
-| **40** | **1.37** [1.20,1.57] w0.10 | 0.47 [0.43,0.50] w0.03 | **1.20** [1.07,1.37] w0.33 | **2.33** [2.27,2.47] w0.50 | **2.47** [2.20,2.80] w1.13 | **2.73** [2.63,2.93] w0.70 |
-| **50** | 1.10 [0.87,1.47] w0.00 | **1.13** [1.07,1.40] w0.00 | **1.33** [1.23,1.50] w0.17 | **1.57** [1.47,1.77] w0.33 | **1.83** [1.57,2.03] w0.20 | **1.83** [1.53,1.87] w0.43 |
-| floor T=30 | 4.76±0.40 | 19.46±1.40 | 37.68±1.63 | 106.04±4.62 | 334.40±14.24 | 1064.59±45.07 |
-| floor T=40 | 6.81±0.56 | 24.86±1.43 | 46.91±2.03 | 119.97±4.78 | 344.17±13.62 | 1088.04±48.94 |
-| floor T=50 | 12.06±0.93 | 27.63±1.43 | 68.12±3.53 | 203.96±11.47 | 640.79±37.22 | 1977.69±110.44 |
+| **30** | 0.57 [0.50,0.57] w0.03 z0.67 | 0.60 [0.47,0.73] w0.10 z0.27 | 0.87 [0.80,1.00] w0.23 z0.00 | **1.13** [1.10,1.23] w0.23 z0.00 | **1.20** [1.17,1.23] w0.40 z0.00 | **1.13** [1.03,1.30] w0.27 z0.00 |
+| **40** | 0.77 [0.67,0.90] w0.03 z0.60 ✗ | 0.47 [0.43,0.50] w0.03 z0.04 | **1.20** [1.07,1.37] w0.33 z0.00 | **2.33** [2.27,2.47] w0.50 z0.00 | **2.47** [2.20,2.80] w1.13 z0.00 | **2.73** [2.63,2.93] w0.70 z0.00 |
+| **50** | **1.37** [1.10,1.50] w0.00 z0.41 ✓ | **1.13** [1.07,1.40] w0.00 z0.01 | **1.33** [1.23,1.50] w0.17 z0.00 | **1.57** [1.47,1.77] w0.33 z0.00 | **1.83** [1.57,2.03] w0.20 z0.00 | **1.83** [1.53,1.87] w0.43 z0.00 |
+| floor T=30 | 6.48±0.67* | 16.60±1.60* | 37.68±1.63 | 106.04±4.62 | 334.40±14.24 | 1064.59±45.07 |
+| floor T=40 | 9.39±0.79* | 24.86±1.43 | 46.91±2.03 | 119.97±4.78 | 344.17±13.62 | 1088.04±48.94 |
+| floor T=50 | 11.46±0.51* | 27.63±1.43 | 68.12±3.53 | 203.96±11.47 | 640.79±37.22 | 1977.69±110.44 |
 
 ### structure 3+13 — tier vlbi
 
 | T | −13.25 | −13.00 | −12.75 | −12.50 | −12.25 | −12.00 |
 |---|---|---|---|---|---|---|
-| **30** | 0.47 [0.43,0.50] w0.03 | 0.47 [0.43,0.53] w0.03 | 0.73 [0.63,0.80] w0.03 | 1.17 [1.00,1.30] w0.27 † | **1.20** [1.17,1.43] w0.27 | 1.03 [0.97,1.27] w0.20 † |
-| **40** | 0.63 [0.60,0.87] w0.03 | 1.00 [0.73,1.13] w0.00 | **1.63** [1.53,1.83] w0.27 | **2.50** [2.23,2.77] w0.57 | **2.70** [2.47,2.87] w0.70 | **2.70** [2.40,2.87] w0.80 |
-| **50** | 0.83 [0.57,1.00] w0.00 | 0.97 [0.83,1.17] w0.00 | **1.70** [1.53,1.87] w0.30 | **1.30** [1.13,1.37] w0.37 | **1.43** [1.30,1.60] w0.27 | **1.37** [1.17,1.40] w0.47 |
-| floor T=30 | 8.16±0.63 | 17.40±1.01 | 38.29±1.70 | 103.99±4.46 | 331.66±13.71 | 1074.03±45.49 |
-| floor T=40 | 10.24±0.73 | 20.14±1.06 | 46.21±1.88 | 118.84±4.64 | 347.34±14.59 | 1064.78±44.94 |
+| **30** | 0.47 [0.43,0.53] w0.03 z0.41 | 0.47 [0.43,0.53] w0.03 z0.04 | 0.73 [0.63,0.80] w0.03 z0.00 | 1.17 [1.00,1.30] w0.27 z0.00 † | **1.20** [1.17,1.43] w0.27 z0.00 | 1.03 [0.97,1.27] w0.20 z0.00 † |
+| **40** | 1.00 [0.87,1.23] w0.03 z0.27 ‖ | 1.00 [0.73,1.13] w0.00 z0.01 ‖ | **1.63** [1.53,1.83] w0.27 z0.00 | **2.50** [2.23,2.77] w0.57 z0.00 | **2.70** [2.47,2.87] w0.70 z0.00 | **2.70** [2.40,2.87] w0.80 z0.00 |
+| **50** | 0.83 [0.57,1.00] w0.00 z0.19 | 0.97 [0.83,1.17] w0.00 z0.00 | **1.70** [1.53,1.87] w0.30 z0.00 | **1.30** [1.13,1.37] w0.37 z0.00 | **1.43** [1.30,1.60] w0.27 z0.00 | **1.37** [1.17,1.40] w0.47 z0.00 |
+| floor T=30 | 7.98±0.54* | 17.40±1.01 | 38.29±1.70 | 103.99±4.46 | 331.66±13.71 | 1074.03±45.49 |
+| floor T=40 | 8.92±0.64* | 20.14±1.06 | 46.21±1.88 | 118.84±4.64 | 347.34±14.59 | 1064.78±44.94 |
 | floor T=50 | 13.23±0.91 | 26.87±1.31 | 60.41±2.98 | 204.96±11.50 | 620.29±34.65 | 2006.73±113.36 |
 
-† MARGINAL: count > 1 at the fitted floor but **not** at floor + sd. Not an onset.
+† MARGINAL: count > 1 at the fitted floor but **not** at floor + its error. Not an onset.
+✗ = an ONSET the re-cut RETRACTED. ✓ = an onset the re-cut IGNITED (§3.1).
+**‖ = the count is EXACTLY 1.000** — 30 correct certifications in 30 realisations, so the statistic
+lands exactly on the bar. The test is strict (`> 1`), so both cells read *below*. **The count is
+quantised at 1/30; the bar sits on a lattice point.** This is a live convention question, not a
+measurement — see the KINDLE PENDING (§13).
 
 ### structure 5+11 — tier lit / tier vlbi
 
 | T | −13.25 | −13.00 | −12.75 | −12.50 | −12.25 | −12.00 |
 |---|---|---|---|---|---|---|
-| **lit 30** | 0.60 [0.47,0.67] | **2.13** [1.93,2.50] | **2.47** [2.30,2.83] | **2.63** [2.33,2.90] | **3.03** [2.73,3.40] | **3.03** [2.53,3.53] |
-| **lit 40** | **1.17** [1.03,1.47] | **2.87** [2.53,3.33] | **4.07** [3.63,4.30] | **6.53** [6.10,7.13] | **7.37** [7.07,7.87] | **7.80** [7.50,8.03] |
-| **lit 50** | **1.30** [1.03,1.50] | **1.83** [1.63,2.03] | **2.50** [2.27,2.93] | **2.03** [1.83,2.57] | **2.60** [2.33,2.90] | **2.43** [2.17,2.60] |
-| **vlbi 30** | **1.27** [1.03,1.47] | **2.33** [1.97,2.63] | **1.90** [1.70,2.27] | **2.70** [2.47,2.93] | **3.20** [2.90,3.60] | **2.77** [2.63,3.23] |
-| **vlbi 40** | **1.63** [1.57,1.80] | **3.57** [3.33,3.87] | **4.07** [3.77,4.67] | **5.83** [5.50,6.23] | **7.07** [6.70,7.57] | **7.93** [7.73,8.47] |
-| **vlbi 50** | **1.90** [1.57,2.10] | **2.40** [2.10,3.07] | **2.20** [1.97,2.63] | **2.50** [2.27,2.63] | **2.97** [2.60,3.40] | **2.30** [2.17,2.63] |
+| **lit 30** | 0.87 [0.67,1.33] z0.21 | **2.13** [1.93,2.50] | **2.47** [2.30,2.83] | **2.63** [2.33,2.90] | **3.03** [2.73,3.40] | **3.03** [2.53,3.53] |
+| **lit 40** | **1.17** [1.03,1.47] z0.10 | **2.87** [2.53,3.33] | **4.07** [3.63,4.30] | **6.53** [6.10,7.13] | **7.37** [7.07,7.87] | **7.80** [7.50,8.03] |
+| **lit 50** | **1.30** [1.03,1.50] z0.03 | **1.83** [1.63,2.03] | **2.50** [2.27,2.93] | **2.03** [1.83,2.57] | **2.60** [2.33,2.90] | **2.43** [2.17,2.60] |
+| **vlbi 30** | **1.27** [1.03,1.47] z0.03 | **2.33** [1.97,2.63] | **1.90** [1.70,2.27] | **2.70** [2.47,2.93] | **3.20** [2.90,3.60] | **2.77** [2.63,3.23] |
+| **vlbi 40** | **1.63** [1.57,1.80] z0.00 | **3.57** [3.33,3.87] | **4.07** [3.77,4.67] | **5.83** [5.50,6.23] | **7.07** [6.70,7.57] | **7.93** [7.73,8.47] |
+| **vlbi 50** | **1.90** [1.57,2.10] z0.01 | **2.40** [2.10,3.07] | **2.20** [1.97,2.63] | **2.50** [2.27,2.63] | **2.97** [2.60,3.40] | **2.30** [2.17,2.63] |
 
-Floors, 5+11 lit: T=30 {20.17±1.41, 36.19±1.65, 105.80±5.08, 327.40±16.52, 962.30±46.41,
+**Exactly one 5+11 cell is touched** — (−13.25, 30, lit), z = 0.21, whose floor FALLS
+20.17 → **16.69 ± 1.98\*** and whose count RISES 0.60 → **0.87**. It stays below the bar. Every
+other 5+11 count and floor is bit-identical to the published one, so **the structure result is
+untouched by the floor fix**, as pre-registered.
+
+Floors, 5+11 lit: T=30 {**16.69±1.98\***, 36.19±1.65, 105.80±5.08, 327.40±16.52, 962.30±46.41,
 2985.07±136.63}; T=40 {23.41±1.49, 47.23±2.11, 129.07±5.29, 321.81±11.17, 965.94±31.65,
 2829.50±80.24}; T=50 {29.38±1.70, 72.78±3.91, 218.26±11.96, 694.79±38.83, 2095.57±109.81,
-6690.86±343.25}. (vlbi within ~10 % of these; full table in `surface_floors.npz`.)
+6690.86±343.25}. (vlbi within ~10 % of these; full table in `surface_floors_recut.npz`.)
 
 ### structure 2+14 — the axis in the other direction
 
 | T | −13.25 | −13.00 | −12.75 | −12.50 | −12.25 | −12.00 |
 |---|---|---|---|---|---|---|
-| **lit 30** | 0.40 | 0.13 | 0.13 | 0.20 | 0.17 | 0.30 |
-| **lit 40** | 0.63 | 0.20 | 0.23 | 0.40 | 0.33 | 0.43 |
-| **lit 50** | **1.43** [1.37,1.57] | 0.23 | 0.47 | 0.73 | **1.03** [1.03,1.07] w0.63 | 1.03 [0.93,1.10] † |
-| **vlbi (all T)** | ≤ 0.90 | ≤ 0.33 | ≤ 0.63 | ≤ 0.63 | ≤ 0.60 | ≤ 0.90 |
+| **lit 30** | 0.23 z0.78 | 0.13 z0.46 | 0.13 | 0.20 | 0.17 | 0.30 |
+| **lit 40** | 0.37 z0.72 | 0.30 z0.28 | 0.23 | 0.40 | 0.33 | 0.43 |
+| **lit 50** | 0.90 [0.67,1.10] z0.73 ✗ | 0.23 z0.18 | 0.47 | 0.73 | **1.03** [1.03,1.07] w0.63 | 1.03 [0.93,1.10] † |
+| **vlbi 30/40** | ≤ 0.53 | ≤ 0.27 | ≤ 0.33 | ≤ 0.47 | ≤ 0.37 | ≤ 0.43 |
+| **vlbi 50** | **1.17** [1.10,1.37] w0.07 z0.33 ✓ | 0.33 | 0.63 | 0.63 | 0.60 | 0.90 |
 
-**Removing ONE loud source from the census population closes the box almost completely** — the
-entire vlbi half of 2+14 posts **no onset at any (h, T) in the grid**.
+Floors, 2+14 lit: T=30 {**6.36±1.23\***, **12.73±1.06\***, 32.63±1.83, 70.36±3.01, 222.33±10.33,
+696.90±34.64}; T=40 {**7.26±1.13\***, **15.41±1.60\***, 30.00±1.29, 77.86±3.69, 226.88±11.87,
+729.82±40.60}; T=50 {**8.89±1.17\***, 23.71±1.63, 40.02±1.86, 91.31±3.74, 260.54±8.87,
+749.77±20.32}. 2+14 vlbi faint edge: {**5.72±0.80\***, **7.11±0.42\***, **8.05±0.56\***} at
+T = 30/40/50.
+
+**Removing ONE loud source from the census population closes the box almost completely** — and the
+re-cut *moves the one surviving hole across the tier boundary*: the published `lit 50, h = −13.25`
+onset is **RETRACTED** (1.43 → **0.90**, floor 5.33 → 8.89), while `vlbi 50, h = −13.25` **IGNITES**
+(0.90 → **1.17**, floor 9.30 → 8.05). The statement *"the entire vlbi half of 2+14 posts no onset
+at any (h, T)"* is **FALSE under the corrected floors** and is retracted here. 2+14 now posts
+**exactly two onsets** — one per tier, both at T = 50 — where it posted two before, in different
+places.
 
 ### The tally
 
-| | count |
-|---|---|
-| cells with corr > 1 at the fitted floor | **63 / 108** |
-| **ONSET** (corr > 1 surviving floor + sd) | **59** |
-| MARGINAL (corr > 1, dies at floor + sd) | 4 |
-| **count ≥ 3 contour** (corr_lo > 3) | **9** (all 5+11, T = 40, h ≥ −13.0) |
-| cells above onset on the **`fALL`** column | **21** (all 5+11) |
+| | count | (pre-fix) |
+|---|---|---|
+| cells with corr > 1 at the adopted floor | **62 / 108** | 63 |
+| **ONSET** (corr > 1 surviving floor + its error) | **59** | 59 |
+| MARGINAL (corr > 1, dies at floor + error) | **3** | 4 |
+| below | **46** | 45 |
+| **count ≥ 3 contour** (corr_lo > 3) | **9** (all 5+11, T = 40, h ≥ −13.0) | 9 |
+| cells above onset on the **`fALL`** column | 21 (all 5+11) — **NOT re-cut, §9.3** | 21 |
+| cells whose floor is the empirical q95 (z > 0.20) | **15 / 108** | — |
+
+### 3.1 THE FOUR CELLS THAT FLIPPED — and why 59 = 59 is a coincidence
+
+> **N_onset = 59, and the pre-fix banked count was also 59. Two onsets died and two were born.
+> The number is stable; the map is not. Do not read the coincidence as a confirmation.**
+
+| cell | z | floor (Gumbel → **adopted**) | count (old → **re-cut**) | @floor+err | was → **now** |
+|---|---|---|---|---|---|
+| h=−13.25, T=40, **lit**, 3+13 | 0.60 | 6.81 → **9.39 ± 0.79** (1.38×) | 1.37 → **0.77** | 0.67 | ONSET → **below** |
+| h=−13.25, T=50, **lit**, 2+14 | 0.73 | 5.33 → **8.89 ± 1.17** (1.67×) | 1.43 → **0.90** | 0.67 | ONSET → **below** |
+| h=−13.25, T=50, **lit**, 3+13 | 0.41 | 12.06 → **11.46 ± 0.51** (0.95×) | 1.10 → **1.37** | 1.10 | MARGINAL → **ONSET** |
+| h=−13.25, T=50, **vlbi**, 2+14 | 0.33 | 9.30 → **8.05 ± 0.56** (0.87×) | 0.90 → **1.17** | 1.10 | below → **ONSET** |
+
+**Both cells the provisional analysis named as AT RISK are RETRACTED**, and neither of its bounds
+(≤ 1.20, ≤ 1.37) was reached — the true re-cut counts are **0.77** and **0.90**, comfortably below.
+Of the 8 below-onset cells whose floors fell, **only 2 actually ignited**; the other 6 rose but
+stayed under the bar. **The provisional bound 57 ≤ N ≤ 67 was correct as a bound and loose as a
+forecast.** Every flip is at the faintest strain on the grid, h = −13.25 — exactly where the
+provisional analysis said the exposure was.
+[MEASURED: RECUT §1, `recut_surface.npz`; gates A/B both 0.000e+00]
 
 ---
 
 ## 4. DELIVERABLE 2 — WHERE ONSET EXISTS: THE FRONTIER
 
-The **faintest** h clearing onset (corr_lo > 1), per (structure, tier, T):
+The **faintest** h clearing onset, per (structure, tier, T). **Re-cut**; the published value is in
+brackets where it moved.
 
 | structure | tier | T = 30 | T = 40 | T = 50 |
 |---|---|---|---|---|
-| 3+13 | lit | **−12.50** | **−13.25** ‡ | −13.00 |
+| 3+13 | lit | **−12.50** | −12.75 *(was −13.25 ‡)* | **−13.25** ‡ *(was −13.00)* |
 | 3+13 | vlbi | −12.25 | −12.75 | −12.75 |
 | 5+11 | lit | −13.00 | **−13.25** ‡ | **−13.25** ‡ |
 | 5+11 | vlbi | **−13.25** ‡ | **−13.25** ‡ | **−13.25** ‡ |
-| 2+14 | lit | none | none | **−13.25** ‡ |
-| 2+14 | vlbi | **none — the extended box contains no calibrated onset** | none | none |
+| 2+14 | lit | none | none | −12.25 *(was −13.25 ‡)* |
+| 2+14 | vlbi | none | none | **−13.25** ‡ *(was none)* |
 
 ‡ **The frontier sits ON the faint edge of the grid in 7 of the 18 columns.** For those, `h*` is
 **not bounded below by this box**: SURFACE locates an onset but cannot locate its faint boundary.
 This is the honest limit of the result and the obvious next grid.
+
+> ### **RE-CUT: still 7 of 18 — and NOT the same seven.**
+>
+> | | columns |
+> |---|---|
+> | **lost** the faint edge | lit 3+13 T=40 · lit 2+14 T=50 |
+> | **gained** the faint edge | lit 3+13 T=50 · vlbi 2+14 T=50 |
+> | unchanged (5) | lit 5+11 T=40, T=50 · vlbi 5+11 T=30, T=40, T=50 |
+>
+> **The suspension imposed by the provisional floor fix is LIFTED and the claim is reinstated at its
+> published strength (7/18).** The count is coincidentally identical; the *membership* is not.
+> **Quote the number, never the same seven columns** — any per-column text or figure must be
+> regenerated from `recut_surface.npz`. This is the number-not-names convention (S3.3.1), arriving
+> for the second time in the programme and for the same reason.
+
+**One caveat, stated.** The newly-gained `vlbi 2+14 T=50` column is an **isolated** faint-edge
+onset: h = −13.25 certifies (1.17) while every louder h in that column sits below the bar
+(0.33–0.90). It is a frontier column by the letter of the definition, but there is no contiguous
+frontier running down to it. **This is not a re-cut artifact** — the floor grows as ≈ h^1.5–2, so a
+faint cell can out-certify a loud one, and the *published* surface already showed exactly this
+pattern in `lit 2+14 T=50`. It is worth a sentence, not a retraction.
+[MEASURED: RECUT §1.3]
 
 **The headline comparison, stated exactly.**
 
@@ -278,14 +375,17 @@ which is a pleasing consistency, not an exception.
 Each rested on an under-sized 10-null floor (±2–18 nat) and was, per STORY, *"neither retracted nor
 confirmed — UNCALIBRATED"*. N = 100 Gumbel refits resolve all four:
 
-| cell | 10-null floor → corr | **N = 100 floor** | **→ corr [lo, hi]** | **verdict** |
-|---|---|---|---|---|
-| (−13.00, 30, lit) | 13.48 ± 3.21 → 1.10 | **19.46 ± 1.40** | **0.37** [0.23, 0.47] | **RETRACTED** |
-| (−12.75, 30, vlbi) | 35.38 ± 5.03 → 1.24 | **38.29 ± 1.70** | **0.73** [0.63, 0.80] | **RETRACTED** |
-| (−12.50, 30, lit) | 119.27 ± 18.30 → 1.06 | **106.04 ± 4.62** | **1.13** [1.10, 1.23] | **CONFIRMED** |
-| (−12.50, 30, vlbi) | 104.93 ± 12.53 → 1.32 | **103.99 ± 4.46** | **1.17** [1.00, 1.30] | **MARGINAL** — dies at floor + sd |
+| cell | 10-null floor → corr | z | **adopted floor** | **→ corr [lo, hi]** | **verdict** |
+|---|---|---|---|---|---|
+| (−13.00, 30, lit) | 13.48 ± 3.21 → 1.10 | **0.27** | **16.60 ± 1.60** *(emp q95; Gumbel 19.46 INVALID)* | **0.60** [0.47, 0.73] | **RETRACTED** |
+| (−12.75, 30, vlbi) | 35.38 ± 5.03 → 1.24 | 0.00 | **38.29 ± 1.70** | **0.73** [0.63, 0.80] | **RETRACTED** |
+| (−12.50, 30, lit) | 119.27 ± 18.30 → 1.06 | 0.00 | **106.04 ± 4.62** | **1.13** [1.10, 1.23] | **CONFIRMED** |
+| (−12.50, 30, vlbi) | 104.93 ± 12.53 → 1.32 | 0.00 | **103.99 ± 4.46** | **1.17** [1.00, 1.30] | **MARGINAL** — dies at floor + error |
 
-**Two retract, one confirms, one stays marginal.** Note the mechanism is *not* uniformly "10-null
+**Two retract, one confirms, one stays marginal — and the re-cut does not change a single one of
+the four verdicts.** It *does* change the first cell's numbers: its Gumbel floor was invalid
+(z = 0.27), so the floor falls 19.46 → 16.60 and the count rises 0.37 → **0.60**. It is still
+retracted, by a wide margin. **The verdict was checked, not assumed.** Note the mechanism is *not* uniformly "10-null
 floors are biased low", which is what IGNITE-2's single datum suggested: at (−12.50, lit) the
 properly-sized floor came out **11 % lower** than the 10-null value and the cell **survived**. A
 max-of-N floor is not biased in a fixed direction — it is an order statistic with ±1.283β of
@@ -333,13 +433,22 @@ oracle/implementable gap does not bite at zero noise. Per-pulsar at the adopted 
 
 ### 9.1 The structure lever — certification is a property of the POPULATION
 
-Correct certs/real vs `k_loud` at fixed (h, T, tier), with per-loud-source yield in brackets:
+Correct certs/real vs `k_loud` at fixed (h, T, tier), **re-cut**, with per-loud-source yield in
+brackets and the published value beside it where it moved:
 
-| cell | k = 2 | k = 3 | k = 5 |
-|---|---|---|---|
-| h = −13.00, T = 30, lit | 0.13 [0.07/src] | 0.37 [0.12/src] | **2.13 [0.43/src]** |
-| h = −13.00, T = 40, lit | 0.20 [0.10/src] | 0.47 [0.16/src] | **2.87 [0.57/src]** |
-| h = −12.50, T = 40, lit | 0.40 [0.20/src] | 2.33 [0.78/src] | **6.53 [1.31/src]** |
+| cell | k = 2 | k = 3 | k = 5 | **k=3 → 5 lever** |
+|---|---|---|---|---|
+| h = −13.00, T = 30, lit | 0.13 [0.07/src] | **0.60** *(was 0.37)* [0.20/src] | **2.13 [0.43/src]** | **3.56×** *(was 5.82×)* |
+| h = −13.00, T = 40, lit | **0.30** *(was 0.20)* [0.15/src] | 0.47 [0.16/src] | **2.87 [0.57/src]** | **6.14×** *(unchanged)* |
+| h = −12.50, T = 40, lit | 0.40 [0.20/src] | 2.33 [0.78/src] | **6.53 [1.31/src]** | **2.80×** *(unchanged)* |
+
+> **RE-DERIVED, as RECUT §6 requires of every ratio between two cells.** The published headline
+> "**6×**" was read off the first two rows, whose 3+13 denominators both sat at faint `h` with
+> invalid floors. One row holds at **6.14×**; the other falls to **3.56×**. **The honest statement
+> is "up to 6.1×, and 2.5× in the median."** Across all **36** (h, T, tier) columns the 3+13 → 5+11
+> lever has median **2.49×** (range 0.95–6.14×) against the published median **2.51×**
+> (0.85–6.14×) — **the distribution is unmoved; only the cherry-picked cell moved.** *The result is
+> the lever, not the number 6.*
 
 **The gain is super-linear in the number of loud sources, and it is measured against a floor that
 rises with them** (the 5+11 floors are 2–3× the 3+13 floors at the same h, because the recovery
@@ -354,13 +463,17 @@ no-go in this repo is scoped to a population structure nature does not have to s
 
 ### 9.2 T is not monotone — the strongest lever has a ceiling
 
-Which T maximises the count, over all 36 (h, tier, structure) columns:
+Which T maximises the count, over all 36 (h, tier, structure) columns — **re-cut**:
 
-| T | columns won |
-|---|---|
-| 30 yr | **0 / 36** |
-| 40 yr | 18 / 36 |
-| 50 yr | 18 / 36 |
+| T | columns won | (pre-fix) |
+|---|---|---|
+| 30 yr | **0 / 36** | 0 / 36 |
+| 40 yr | **19 / 36** | 18 / 36 |
+| 50 yr | **17 / 36** | 18 / 36 |
+
+**The load-bearing statement is unmoved: T = 30 yr is optimal NOWHERE.** Three of the 36 columns
+swap their winner between 40 and 50 (all three at faint `h`, all three touched by the floor fix);
+the 18/18 tie becomes 19/17, which is a coin-flip's worth of difference and is not a result.
 
 And the split is **h-dependent**, not random:
 
@@ -368,7 +481,7 @@ And the split is **h-dependent**, not random:
 |---|---|---|---|
 | 5+11, lit, h = −12.00 | 3.03 (floor 2985) | **7.80** (floor 2830) | 2.43 (floor **6691**) |
 | 5+11, lit, h = −12.50 | 2.63 (floor 327) | **6.53** (floor 322) | 2.03 (floor **695**) |
-| 3+13, lit, h = −13.00 | 0.37 (floor 19) | 0.47 (floor 25) | **1.13** (floor 28) |
+| 3+13, lit, h = −13.00 | 0.60 (floor 17\*) | 0.47 (floor 25) | **1.13** (floor 28) |
 
 **Loud cells peak at T = 40 yr and LOSE at 50; faint cells keep gaining out to 50.** The mechanism
 is visible in the floors: the counterpart-matched floor grows with data volume as well as with
@@ -380,16 +493,32 @@ box**: past ~40 yr the floor race resumes and wins. **T = 30 yr is optimal nowhe
 
 *Convention caveat, load-bearing:* the T = 50 cells extrapolate the timing model **35 yr** past the
 last real TOA under the §2 convention. The *sign* of the T = 40 → 50 fall is robust where the floor race
-bites — it appears in **12 of 12** loud columns (h ≥ −12.5) of the 3+13 and 5+11 structures, and
-the floors' fit errors there are ~5 % — but in the 2+14 structure the count is small enough that
-the leverage still wins and the count **rises** to 50 yr in all 6 loud columns. The *magnitude* is
+bites — **re-cut, it still appears in 12 of 12** loud columns (h ≥ −12.5) of the 3+13 and 5+11
+structures, and the floors' fit errors there are ~5 % — but in the 2+14 structure the count is
+small enough that the leverage still wins and the count **rises** to 50 yr in **all 6** loud columns
+(also unmoved). **Both 12/12 and 6/6 are re-cut counts, not inherited ones.** The *magnitude* is
 a property of the extension convention and must not be quoted as a forecast.
 
 ### 9.3 The `fALL` column ignites — for the first time
 
+> ### ⚠ THE `fALL` COLUMN WAS NOT RE-CUT, AND CANNOT BE FROM DISK.
+>
+> The adopted convention needs the null's **zero-fraction**, and `surface_floors.npz` banks
+> `fALL`, `fALL_mu`, `fALL_beta`, `fALL_sd`, `fALL_n`, `fALL_emp` — **but no `fALL_zerofrac`**;
+> RECUT banked the raw **nullN** offenders only (`surface_nullN_offenders.npz`), not the 200-null
+> `fALL` family. **So the `fALL` floors cannot even be TESTED against the validity gate here, let
+> alone corrected.** Every `fALL` number below stands on the **pre-fix estimator**.
+>
+> **What can be said, and is said instead of a re-cut:** using the *matched* cell's `fN`
+> zero-fraction as a proxy, **all 21 igniting cells are 5+11 at loud `h`, where z = 0.00–0.03** —
+> the regime in which ANCHOR measured the Gumbel and the empirical quantile to agree within a few
+> per cent. **The claim is very probably safe.** *Probably is not a re-cut.* Banking the `fALL`
+> offenders on ACCRE is a CPU job against banks that already exist, and it is listed in §13.
+
 IGNITE: *"under the fALL calibration the map never ignites anywhere (best cell 0.24/real)"*;
 IGNITE-2: *"under fALL the surface never exceeds 0.36 anywhere"*. **SURFACE: 21 cells clear onset
 on the fALL column, best 2.57/real** — and **all 21 are 5+11**. (3+13: 0 cells. 2+14: 0 cells.)
+**[pre-fix estimator — see the box above.]**
 
 | cell | fALL corr | fALL floor (N = 200) | fN corr |
 |---|---|---|---|
@@ -468,13 +597,26 @@ Maximum `D_L` at which the first source can sit and still clear onset:
 4. **The structures are nested on ONE frozen population** (seed 3000). The 5+11 result is a
    statement about promoting *these two* sources; a redraw of the population (different `f_gw`,
    `mc` for the promoted members) is untested, and the per-source yield would move with it.
-5. **`h*` is not bounded below** in 7 of 18 frontier columns (§4). The faint edge of the onset
-   surface is outside this grid.
+5. **`h*` is not bounded below** in 7 of 18 frontier columns (§4) — **re-cut: still 7, and NOT the
+   same 7.** Quote the number, never the names. The faint edge of the onset surface is outside this
+   grid.
 6. **Nothing here touches a real TOA** — simulated array, simulated noise, injected sources,
    a stated cadence-extension convention.
 7. **The 2 cells IGNITE-2 calibrated reproduce here** (0.87 vs 0.92; 0.47 vs 0.54, both within the
    ±0.2-class sky error), on **independent** signal seeds and **independent** N = 100 null banks.
-   The agreement is a cross-check, not a re-use.
+   The agreement is a cross-check, not a re-use. *(The vlbi cell's floor is now restated as the
+   empirical q95 — 7.98 ± 0.54, z = 0.41 — but its count, 0.47, does not move.)*
+8. **THE FLOOR CONVENTION (new, binding).** 15 of 108 cells have a nullN zero-fraction above 20 %,
+   where the D2 Gumbel fits a point mass at zero rather than a tail and errs **permissive**. Those
+   cells now carry the empirical q95 with a bootstrap error, and **the zero-fraction is a required
+   column on every table above.** All 15 sit at h ≤ −13.00 — *the floor fix is a faint-`h`
+   phenomenon and it does not reach the loud cells.*
+9. **The `fALL` column is NOT re-cut** (§9.3), and its zero-fractions were never banked.
+10. **Every ratio or difference between two cells in this report was re-derived**, not inherited:
+    the structure lever (§9.1), the T-optimum (§9.2), the 12/12 and 6/6 T-fall counts, the frontier
+    (§4), the D-4 verdicts (§7). Two of them moved (§9.1, §4). **Anything else in this report of the
+    form "cell A vs cell B" that a future reader adds must be re-derived from the `_recut` banks
+    before it is quoted.**
 
 ---
 
@@ -503,29 +645,48 @@ Maximum `D_L` at which the first source can sit and still clear onset:
 ## 13. WHAT SURFACE SETTLES, AND WHAT IT OPENS
 
 **Settled.**
-1. **The onset exists** — 59 calibrated cells, including one inside IGNITE's own box. IGNITE's
-   specific `h*` values remain retracted; the *generalisation* ("no onset anywhere") is superseded.
-   The onset in the census structure is **h\* = −12.50 at T = 30 yr (lit)**, with a floor of
-   **106.04 ± 4.62 nat (N = 100, α = 0.05)**.
+1. **The onset exists** — **59 calibrated cells** (re-cut; MARGINAL 3, below 46), including one
+   inside IGNITE's own box. IGNITE's specific `h*` values remain retracted; the *generalisation*
+   ("no onset anywhere") is superseded. The onset in the census structure is **h\* = −12.50 at
+   T = 30 yr (lit)**, with a floor of **106.04 ± 4.62 nat (N = 100, α = 0.05, zero-fraction 0.00 —
+   the Gumbel is valid there and the cell is untouched by the floor fix)**.
 2. **The floor is a converging function and its law is real** — `fN ∝ h^1.72`, `fALL ∝ h^1.80`,
    refit on 18 independent Gumbel fits. Only the *normalisation* was ever a max-of-N artifact.
+   **The re-cut does not touch the law** (it is fitted across `h`, and the fix bites only at the
+   faint end) — but the law is now known to have a **validity domain**: the Gumbel that carries it
+   is invalid wherever the null is mostly silent.
 3. **Certification is a property of the POPULATION.** The `k_loud` axis moves the count
    super-linearly and moves the *frontier* by ≥ 0.75 dex — a bigger lever than loudness, tier, or
-   baseline. **`fALL` ignites at 5+11 and nowhere else.**
-4. **T has a ceiling** (~40 yr at loud h), and **T = 30 yr is optimal nowhere.**
+   baseline. **`fALL` ignites at 5+11 and nowhere else** *(pre-fix estimator, §9.3)*.
+4. **T has a ceiling** (~40 yr at loud h), and **T = 30 yr is optimal nowhere** (0/36, re-cut).
 5. **J0437-first, not J1909-first**, at every onset boundary in the census structure — and
    J1909-first at zero noise was itself a floor artifact.
 6. **D-3 closed** (zero-noise ceiling = 1.350 ± 0.82/draw; 0.275 retired, trail recorded; GEO's
    column proven implementable, not oracular). **D-4 closed** (2 retracted, 1 confirmed, 1
-   marginal).
+   marginal — **all four verdicts survive the re-cut**, though the first cell's numbers moved).
+7. **The floor fix is a faint-`h` phenomenon.** 93 of 108 cells — including **57 of the 59
+   onsets** — are bit-identical to the published surface. The loud-cell result never depended on
+   the estimator.
 
 **Open.**
-1. **The faint frontier.** `h*` is unbounded below in 7 of 18 columns. The next grid is fainter,
-   not louder.
+1. **The faint frontier.** `h*` is unbounded below in 7 of 18 columns — **and the re-cut changed
+   which seven.** The next grid is fainter, not louder, and it is now also the grid that would
+   settle whether the two *isolated* faint-edge onsets (§4 caveat) are a frontier or a fluctuation.
 2. **The population axis proper.** SURFACE moved `k_loud` on a frozen 16-source population. The
    real question — the mix, the eccentric minority, the clock-sharing test — is **CHORUS's**, and
    SURFACE has now established the premise it rests on.
 3. **The loop above onset.** Pair B (§5) is the first genuinely above-onset, low-impurity seed set
-   the programme has ever had. **Not run here.**
+   the programme has ever had. **Not run here** — and its two cells are untouched by the floor fix
+   (z = 0.00), so the reservation stands exactly as written.
 4. **The purity hole travels unchanged.** Every count above onset carries wrong certifications, and
    there is no layer left to remove them.
+5. **[PENDING: KINDLE] — the gain contour on the CORRECTED above-onset cells**, with two named
+   questions the re-cut created: (i) the **exactly-1.000 marginality** — two cells (−13.25 and
+   −13.00, T = 40, vlbi, 3+13) post a count of *precisely* 1.000, i.e. 30 correct certifications in
+   30 realisations, so the strict `> 1` bar lands **on a lattice point of a statistic quantised at
+   1/30**. Is that a below-onset cell, or is the bar's strictness doing work no measurement
+   supports? **A convention question, and it must be answered before the contour is drawn, not
+   after.** (ii) whether the two *isolated* faint-edge onsets are contiguous frontier or noise.
+6. **[ACCRE, CPU] Bank SURFACE's `fALL` offenders** and re-cut the 21-cell `fALL` ignition against
+   the validity gate (§9.3). The banks exist; the job is cheap; the claim is currently unverifiable
+   from disk.
