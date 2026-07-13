@@ -51,7 +51,7 @@ os.environ["XLA_PYTHON_CLIENT_PREALLOCATE"] = "false"
 os.environ.pop("XLA_PYTHON_CLIENT_ALLOCATOR", None)
 os.environ.setdefault("XLA_FLAGS", "--xla_gpu_autotune_level=0")
 
-import sys, time
+import sys, time, hashlib
 import numpy as np
 import jax
 jax.config.update("jax_enable_x64", True)
@@ -437,6 +437,71 @@ class B1Split:
 # ============================================================
 # 4. Real noise draws (white + per-pulsar RN GP + HD-correlated GWB GP)
 # ============================================================
+
+# The GWB square root is BANKED, not recomputed. See load_or_build_L_gwb.
+L_GWB_BANK = os.path.join(os.path.dirname(os.path.abspath(__file__)), "b1_L_gwb.npz")
+
+
+def lgwb_fingerprint(L):
+    """Content hash of a GWB square root. Two runs agree iff they draw the same noise."""
+    return hashlib.sha256(np.ascontiguousarray(L, dtype=np.float64).tobytes()).hexdigest()[:16]
+
+
+def load_or_build_L_gwb(Phi_gwb, path=L_GWB_BANK, strict=False):
+    """Return (L_gwb, provenance) with Phi_gwb = L L^T.
+
+    THE THREAD-COUNT HAZARD (CHORUS 2026-07-13, §0.1; found by its g1 gate).
+    Phi_gwb is the HD-correlated GWB prior covariance and its spectrum is NEAR-DEGENERATE.
+    `np.linalg.eigh` fixes the eigenvector basis INSIDE a degenerate subspace arbitrarily,
+    and LAPACK's choice depends on the BLAS THREAD COUNT. Two runs at the same seed but
+    different `--cpus-per-task` therefore draw a ROTATED — different, though
+    equal-in-distribution — GWB realisation. Every banked noisy realisation in this repo
+    (FORGE, IGNITE, IGNITE-2, D4, SURFACE, CHORUS, ANCHOR) was drawn at the convention
+    `--cpus-per-task=8`, and reproduces bit-identically ONLY there. Until this fix,
+    *cpus-per-task was part of the seed* — an undeclared input to every result.
+
+    THE FIX: bank the square root itself. `L_gwb` is a frozen artifact, loaded from disk;
+    no BLAS call sits between the seed and the draw, so `draw(seed)` is bit-identical at
+    ANY thread count, on any machine. Gated by `trackB_lgwb_gate.py`.
+
+    SCOPE OF INFERENCE. The banked artifact must be the one the existing banks were drawn
+    under, i.e. generated at `--cpus-per-task=8` ON ACCRE and validated against ANCHOR's g1
+    replay (80 banked `ig_nullN_*` realisations, bit-identical). A file generated anywhere
+    else reproduces itself forever but NOT the bank. This box (cronus, 24 cores) cannot
+    produce the canonical basis; the fallback path below is therefore a WARNING, not a
+    silent recompute.
+    """
+    if os.path.exists(path):
+        z = np.load(path)
+        L = np.asarray(z["L_gwb"], dtype=np.float64)
+        fp = lgwb_fingerprint(L)
+        banked_fp = str(z["fingerprint"]) if "fingerprint" in z.files else fp
+        if fp != banked_fp:
+            raise RuntimeError(
+                f"L_gwb bank {path} is CORRUPT: fingerprint {fp} != recorded {banked_fp}")
+        if L.shape != Phi_gwb.shape:
+            raise RuntimeError(
+                f"L_gwb bank {path} has shape {L.shape}, problem needs {Phi_gwb.shape} "
+                "— the bank belongs to a different array/GP configuration.")
+        prov = f"BANKED {os.path.basename(path)} fp={fp} cpus={z['cpus'] if 'cpus' in z.files else '?'}"
+        return L, prov
+
+    # ---- fallback: no bank on disk. Recompute, and say so loudly. ----
+    nthreads = os.environ.get("OMP_NUM_THREADS") or os.environ.get("OPENBLAS_NUM_THREADS") or "unset"
+    w, V = np.linalg.eigh(Phi_gwb)
+    w = np.clip(w, 0.0, None)
+    L = V * np.sqrt(w)
+    fp = lgwb_fingerprint(L)
+    msg = (f"[NoiseDrawer] WARNING: no banked L_gwb at {path}. Recomputed by np.linalg.eigh "
+           f"at BLAS threads={nthreads} -> fingerprint {fp}. THIS DRAW IS THREAD-COUNT "
+           f"DEPENDENT and is NOT guaranteed to reproduce any banked realisation. "
+           f"Bank L_gwb (see load_or_build_L_gwb.__doc__) before quoting any number from it.")
+    if strict:
+        raise RuntimeError(msg)
+    print(msg, file=sys.stderr)
+    return L, f"RECOMPUTED-UNSAFE threads={nthreads} fp={fp}"
+
+
 class NoiseDrawer:
     """Draws the three stochastic components the likelihood's covariance actually contains.
 
@@ -448,7 +513,7 @@ class NoiseDrawer:
     (prior variance 1e-14 on the normalised design matrix), not a physical noise process.
     """
 
-    def __init__(self, sp, amo):
+    def __init__(self, sp, amo, lgwb_path=L_GWB_BANK, strict=False):
         self.sp = sp
         it = amo["internals"]
         self.npsr = sp.npsr
@@ -456,9 +521,7 @@ class NoiseDrawer:
         Pinv_gwb = np.asarray(it["Pinv_gwb"])          # (npsr*ngp, npsr*ngp)
         Phi_gwb = np.linalg.inv(0.5 * (Pinv_gwb + Pinv_gwb.T))
         Phi_gwb = 0.5 * (Phi_gwb + Phi_gwb.T)
-        w, V = np.linalg.eigh(Phi_gwb)
-        w = np.clip(w, 0.0, None)
-        self.L_gwb = V * np.sqrt(w)                    # Phi = L L^T
+        self.L_gwb, self.lgwb_prov = load_or_build_L_gwb(Phi_gwb, lgwb_path, strict=strict)
         self.Phi_gwb = Phi_gwb
         self.sig_white = [np.sqrt(nd) for nd in sp.N_diag]
         self.sig_rn = np.sqrt(np.clip(sp.Phi_rn_diag, 0.0, None))   # (npsr, ncomp_rn)

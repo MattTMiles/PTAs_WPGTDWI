@@ -7,3 +7,7 @@ partim_real/
 .ipynb_checkpoints/
 *.pid
 *_results/
+# ...except SAMPLER's. It is 1.2 MB of cronus-local gate evidence (not ACCRE campaign scratch)
+# and it is the ONLY artifact backing the production numbers of the now-tracked MargJax
+# machinery. SAMPLER_dev.md cites these paths directly; artifact-readback requires them to exist.
+!SAMPLER_results/

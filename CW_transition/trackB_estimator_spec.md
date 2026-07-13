@@ -1822,3 +1822,117 @@ the e ≳ 0.85 corner that would clear the absolute 0.003-dex floor is exactly t
 the D1 wrong-counterpart hole (OPEN, un-closable by co-registration); the oracle/implementable
 caveat on any co-registration statistic; and the 15-reals/cell sky-sampling error (GEO: the sky draw
 dominates yield variance).
+
+---
+
+# CONVENTIONS ADOPTED 2026-07-13 (cronus machinery session)
+
+*Five conventions and one fix. Four are floor-independent and BINDING NOW. The fifth (the
+zero-fraction column) is adopted as stated but its consequences for the onset surface are
+PROVISIONAL pending the ACCRE re-score — see `reports/FLOOR_FIX_provisional.md`.*
+
+## CONVENTION — ARTIFACT READBACK (binding)
+
+> **A number is not a result until it is read back off the artifact it claims to come from.**
+
+A streamed log line is not a bank. A progress monitor is not a bank. A number relayed in-session
+before its npz exists is not a result — it is a guess with a decimal point.
+
+**Earned, not invented.** SAMPLER §3.0: a host-RAM OOM silently killed a job, and plausible-looking
+S-4 coverage numbers (`c(truth) = 0.985 / 0.999 / 1.000`, "cond 3.96e10", "0 divergences") were
+relayed in-session. They appear in **no log file** and correspond to **no banked npz**. They were
+discarded, not reported. Nothing but this convention stood between them and a published table.
+
+**It has already paid for itself.** On its first application (2026-07-13) it caught a defect in
+`reports/anchor_ladder.npz`: the `offenders` array is stored in (rung, cell) order while every
+sibling column is in (cell, rung) order — **the array is the transpose of its own metadata, and
+nothing in the file says so.** A naive re-cut marries each offender vector to the WRONG cell's
+label, and the failure is **silent** (both are plausible floors). It was invisible from the report,
+invisible from the column names, and fatal to precisely the "re-cuttable without a GPU" workflow
+ANCHOR §9 recommends. It was found only because a banked number was re-derived from its own raw
+column and did not match. **Re-derive, or you do not know.**
+
+## CONVENTION — CODE-BEHAVIOUR CLAIMS REQUIRE A UNIT TEST (binding)
+
+> **A claim about what the code DOES is not admissible in a brief until a unit test has been run
+> against the code path that does it.** Reading the source is a hypothesis. Running it is evidence.
+
+**Earned:** SAMPLER §8.2 asserted for one working day that the modern target "inherits the snap's
+within-fringe profile via `segment_max`". It does not — `A2.eval_grid` returns fringe *centres* for
+111/116 pulsars, so `segment_max` is the **identity** and the offset is **pinned at u = 0**, not
+profiled. The claim was retracted only when a CPU unit test of the reduction algebra forced a
+re-read of the grid constructor. The error had already propagated into a report.
+
+## CONVENTION — SCOPE-OF-INFERENCE LINE ON EVERY VERDICT (binding)
+
+> **Every verdict states, in the same breath, the population it generalises to and the population
+> it does not.** A verdict without a scope line is a verdict whose scope is silently "everything".
+
+This is the discipline IGNITE-2 failed: two calibrated cells generalised to twenty-four, and
+SURFACE then measured the box open (59 onset cells) where the generalisation said it was shut.
+It is also what protects the good results: SAMPLER's centre-pinning artefact is **exactly
+co-extensive with the Arm-B era** (pre-B1 has `u = 0` exactly, so R's `f = 6.9e-7`, the census
+ceilings, and LAMBDA/F2/L2c are **immune**) — and that immunity is a *measured boundary*, not a
+hope, only because it was stated as one.
+
+## CONVENTION — THE ZERO-FRACTION IS A REQUIRED COLUMN (adopted; consequences PROVISIONAL)
+
+Adopted verbatim from **ANCHOR §4**:
+
+> **The D2 Gumbel floor is valid only where the nullN zero-fraction is ≲ 20 %. Above that, quote the
+> empirical (1−α) quantile with a bootstrap error, and bank the zero-fraction beside it. The
+> zero-fraction is a REQUIRED column, not a caveat.**
+
+The offender statistic is 0.0 whenever a realisation has no cell passing layer 1 ⊕ layer 3; at faint
+`h` that is most realisations, and a Gumbel fitted to a point mass at zero is dragged **down** toward
+it — understating the α = 0.05 bar by up to **2.8×**, and erring **PERMISSIVE**. A floor that is too
+low lets pure-noise offenders through. **This is the dangerous direction.**
+
+**STATUS OF THE CONSEQUENCES — PROVISIONAL.** The floors are re-derivable from the banked summaries;
+the **counts are not** (the per-realisation signal `dlnL` columns live on ACCRE). Measured so far
+(`reports/FLOOR_FIX_provisional.md`, bank `reports/floorfix_provisional.npz`):
+
+- **SURFACE:** the fix touches **15 of 108** cells and only **2 of the 59** onset cells. **57 onsets
+  stand untouched, definitively** — the loud cells have low zero-fractions, exactly as
+  pre-registered. The corrected onset count is **bounded 57 ≤ N ≤ 67**. **Do not quote 59.**
+- **CHORUS: all 26 of 26 cells are Gumbel-invalid**; 23 floors rise, by up to 1.96×.
+- **The e = 0.3 switch-on is INDETERMINATE** (floor +53 %, 6.2σ, against a margin of +0.57 over the
+  bar). **Not refuted; not established. The currently defensible switch number is e = 0.5.**
+- **IGNITE-2's (−13.25, 30, vlbi) cell** — one of the programme's two calibrated cells (STORY
+  S6.2.1) — has zero-fraction **0.45** and its Gumbel is **INVALID**. Its floor must be **restated
+  as 7.06 ± 0.40 nat (empirical q95)**, not 7.59 ± 0.48. Its verdict (below onset) is unchanged.
+
+**Counts are monotone non-increasing in the floor**, and that is the only inference drawn above.
+**No count has been interpolated to a new floor.** Onset flips, the corrected onset table, and the
+e = 0.3 verdict are HELD for the ACCRE re-score.
+
+## FIX — THE BLAS THREAD-COUNT HAZARD, CLOSED (`trackB_b1_core.py`, gated)
+
+**The hazard** (CHORUS §0.1, caught by its g1 gate). `NoiseDrawer` built the GWB noise square root
+by `np.linalg.eigh(Phi_gwb)`. `Phi_gwb` is HD-correlated and **near-degenerate**, so LAPACK's
+eigenvector basis inside a degenerate subspace **depends on the BLAS thread count**. Same seed,
+different `--cpus-per-task` ⇒ a **rotated** (different, equal-in-distribution) GWB realisation.
+**Until this fix, `cpus-per-task` was an undeclared input to every banked noisy number in the repo**
+(FORGE, IGNITE, IGNITE-2, D4, SURFACE, CHORUS, ANCHOR — all drawn at the convention `cpus=8`, and
+bit-reproducible only there).
+
+**Measured, and it is worse than reported.** CHORUS saw 8-vs-16. The gate
+(`CW_transition/trackB_lgwb_gate.py`) finds **five distinct L_gwb and five distinct draws at thread
+counts {1, 2, 8, 16, 24}** — *every* thread count gives a different realisation.
+
+**The fix: bank the square root.** `L_gwb` is now a frozen artifact loaded from disk
+(`load_or_build_L_gwb`, SHA-256 fingerprinted), so **no BLAS call sits between the seed and the
+draw**. With a bank present, `draw(seed)` is **bit-identical at every thread count**. Absent a bank,
+the legacy `eigh` path still runs — but WARNS loudly and tags its provenance `RECOMPUTED-UNSAFE`,
+so it can never silently masquerade as reproducible. Backward-compatible: the fallback is the same
+`eigh`, so the criterion-v2 gates re-pass **8/8 with the census triple bit-identical**.
+
+**GATE `trackB_lgwb_gate.py` — PASS.** G1 hazard confirmed (5 distinct draws across thread counts);
+G2 banked path bit-identical at 1/2/8/16/24 threads; G3 a tampered bank raises rather than drawing
+wrong noise.
+
+**SCOPE OF INFERENCE.** The gate proves the draw is deterministic **given a bank**. It does **not**
+prove the bank is the right one. The canonical `b1_L_gwb.npz` must be generated **on ACCRE at
+`--cpus-per-task=8`** and validated against **ANCHOR's g1 replay** (80 banked `ig_nullN_*`
+realisations, bit-identical) before any banked result is re-derived through it. **cronus (24 cores)
+cannot produce the canonical basis** — which is itself a demonstration of the hazard.

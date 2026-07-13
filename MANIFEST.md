@@ -52,9 +52,26 @@ reopening. Listed so the manifest is complete; **not** flagged as orphaned/super
 **Shared infrastructure & inputs:**
 - `CW_lnL_check/cw_helpers.py` (2026-05-07) — `build_fast_scan_likelihood`,
   `MultiSourceDelay`, scan/peak helpers. **Imported by the CW_transition pipeline.** Core.
-- `data_products/` — **116 `.feather`** pulsar files (frozen 2025-10-14) = the array behind
-  every banked result. `b20_cw_curn_r0.pkl` / `_w_flags.pkl` (git-tracked, ~20 MB each) —
-  bundled sim dataset (provenance under E).
+- `data_products/*.feather` (116 files, 20.5 MB, git-tracked) — **THE ARRAY, AND IT IS A MOCK.**
+  116 pulsars, 30 225 TOAs, span 22.1549 yr (MJD 52467.38–60559.45). Real pulsar names, sky
+  positions, distance priors and timing-model structure; **simulated TOAs** — telescope `AXIS`, a
+  **single 1440.0 MHz channel** across every TOA, median cadence ≈ 23 d. Supplies TOAs, TOA errors,
+  the timing design matrix, sky positions and `pdist` to `cw_helpers.load_pulsars`,
+  `ignite.build_ignite_problem`, `forge_b1`. **Its `residuals` column is an injected CW + CURN
+  realisation** — bit-identical (max|diff| = 0.0, all 116) to `b20_cw_curn_r0.pkl`. **The
+  certification chain never reads it** (`data = inject_delay(θ_true) + NoiseDrawer.draw(seed)`), so
+  no banked result depends on it — *but any future task that treats these residuals as "the data"
+  is measuring an injected CW.* [ANCHOR 2026-07-12, `reports/anchor_data_forensics.npz`]
+- `data_products/b20_cw_curn_r0.pkl`, `..._w_flags.pkl` — the same array as the feathers, as
+  `enterprise.pulsar_edited.Tempo2Pulsar` objects (needs the cronus fork; `_w_flags` also needs
+  `dill`). **Not a stray artifact — it IS the feathers' residual column**, in enterprise form.
+- `CW_transition/b1_L_gwb.npz` — **the banked GWB noise square root** (`Phi_gwb = L Lᵀ`).
+  Load-bearing and NOT optional: `np.linalg.eigh` fixes the eigenvector basis of the
+  near-degenerate HD covariance in a way that **depends on the BLAS thread count**, so without this
+  bank `NoiseDrawer.draw(seed)` returns a different realisation at every `--cpus-per-task`. Every
+  banked noisy result in the repo was drawn at `cpus=8`. Gated by `CW_transition/trackB_lgwb_gate.py`.
+  **The canonical file must be generated on ACCRE at `cpus=8` and validated against ANCHOR's g1
+  replay before use** (see the spec's 2026-07-13 conventions block).
 - `get_distance.py` (repo root) — **byte-identical** to the canonical
   `/home/mattm/soft/scripts/MISC/get_distance.py` (A0 prior source).
 - `fake_pta_maker.py` — simulation-input maker (referenced by the simulation flow).
@@ -112,14 +129,11 @@ mistake stale output for current. Need a deprecation note, NOT deletion:**
 ## E. UNKNOWN — can't classify from headers alone
 
 - `global_covar.cvm` (2025-08-18, root) — best guess: cached enterprise global covariance matrix.
-- `data_products/b20_cw_curn_r0.pkl` + `_w_flags.pkl` (~20 MB, git-tracked) — **provenance
-  IDENTIFIED (SHOVEL, 2026-07): the full 116-pulsar `enterprise.pulsar_edited.Tempo2Pulsar`
-  array with an injected CW + CURN, realisation 0** (opcode walk: `list` of 116 `Tempo2Pulsar`,
-  113 distinct `Jhhmm±ddmm` names; the same array as the 116 `data_products/*.feather`). **`b20`
-  is a build/batch tag, NOT "20 pulsars."** `r0.pkl` dumped 2025-10-04; `_w_flags.pkl` re-dumped
-  2025-10-14 (matches the frozen feather-set date) with backend/system `_flags` populated and a
-  newer numpy. Generated during the Oct-2025 `hessian_check_enterprise_edited` lnL work (intro
-  commit `45882ad`). Still no doc ties a banked *result* to it → keep as benign data artifact.
+- ~~`data_products/b20_cw_curn_r0.pkl` + `_w_flags.pkl`~~ — **RECLASSIFIED → §A (ANCHOR
+  2026-07-12).** No longer UNKNOWN, and **not** "a benign data artifact sitting beside the
+  canonical data": it **IS the feathers' residual column**, in enterprise form — an injected
+  CW + CURN realisation, bit-identical (max|diff| = 0.0, all 116) to the feather `residuals`.
+  See §A. (`b20` is a build/batch tag, NOT "20 pulsars".)
 - `CW_lnL_check/holodeck_bundled_population_sample.npz` (16 MB) — holodeck SMBHB population
   sample; regenerable via `make_holodeck_bundled_population.py` (present), but not doc-cited.
 
