@@ -11,3 +11,9 @@ partim_real/
 # and it is the ONLY artifact backing the production numbers of the now-tracked MargJax
 # machinery. SAMPLER_dev.md cites these paths directly; artifact-readback requires them to exist.
 !SAMPLER_results/
+
+# The canonical GWB square root (84 MB). NOT committed: it is a frozen ACCRE-local
+# artifact, not source. reports/b1_L_gwb_manifest.npz carries its fingerprint, SHA-256 and
+# g1 gate evidence so any machine can VERIFY it holds the canonical bank. Regenerate ON ACCRE
+# ONLY: python CW_transition/make_lgwb_bank.py, then re-run the g1 gate (anchor.py gate).
+CW_transition/b1_L_gwb.npz
