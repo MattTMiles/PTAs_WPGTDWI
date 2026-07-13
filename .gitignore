@@ -6,3 +6,4 @@ partim_real/
 .venv-holodeck/
 .ipynb_checkpoints/
 *.pid
+*_results/
