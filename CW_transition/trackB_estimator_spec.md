@@ -1936,3 +1936,27 @@ prove the bank is the right one. The canonical `b1_L_gwb.npz` must be generated 
 `--cpus-per-task=8`** and validated against **ANCHOR's g1 replay** (80 banked `ig_nullN_*`
 realisations, bit-identical) before any banked result is re-derived through it. **cronus (24 cores)
 cannot produce the canonical basis** — which is itself a demonstration of the hazard.
+
+## CONVENTION — AGENTS PREPARE COMMITS; MATT EXECUTES THEM (binding, 2026-07-13)
+
+> **Agents prepare commits — staged files, message, gate evidence — and STOP. Matt executes all
+> commit/amend/tag/push actions. No agent ever runs `git commit`, `git push`, `git tag`, or a
+> history rewrite on tracked state. Author and committer identity on all project commits is Matt.**
+
+The agent's deliverable is a commit that is *ready*: the right files staged and nothing else, a
+message that states what was measured and what is held, and the gate output that licenses it. The
+agent does not press the button. This keeps every mutation of shared history — and every rewrite of
+history other machines may already have pulled — under one hand, which is the only hand that knows
+what ACCRE has fetched.
+
+**Corollary, on history rewrites specifically.** A force-push is not a local operation: it is a
+mutation of state other machines hold. Before any rewrite of a pushed commit, establish which
+machines have already pulled it; after the rewrite, every one of them must
+`git fetch && git reset --hard origin/<branch>`. An agent may *prepare* a rewrite and state its
+blast radius. It may not execute one.
+
+**Corollary, on identity.** `Co-Authored-By:` is a message trailer, not an identity field. It does
+not affect `%an`/`%ae`/`%cn`/`%ce` and is not what this convention governs. Do not rewrite pushed
+history to remove a trailer unless the trailer itself is the thing being objected to — and say so
+explicitly, because `--amend --reset-author --no-edit` does **not** remove one (`--no-edit` keeps
+the message verbatim).
