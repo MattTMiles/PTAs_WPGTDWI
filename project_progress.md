@@ -1905,7 +1905,10 @@ not the absolute Fisher heights.
   deficit was too OPTIMISTIC. cronus/4090, jug-gpu).** Completed Tiers A and B on the frozen 4-seed
   protocol and measured the break-even as a CURVE rather than extrapolating a point.
   **THREE-TIER TABLE:** f(A)=0.0847+-0.131 (sky only), f(B)=0.0481+-0.0227 (+EM period),
-  f(C)=0.0431+-0.0369 (+host D_L); ln Z_needle tier-independent to **0.003 nat** across three boxes
+  f(C)=0.0431+-0.0369 (+host D_L; **5-seed auto-ingest — TRAIL**. **D-2 ADJUDICATED 2026-07-15:
+  the frozen 4-seed protocol number f(C)=0.0323+-0.0134 is PRIMARY**; both FAIL, verdict-invariant;
+  pre-publication re-run at a stated seed count under the standard convention flagged); ln Z_needle
+  tier-independent to **0.003 nat** across three boxes
   and two independent bracket algorithms. All three gates FAILED on the range statistic; all three
   verdicts FAIL on the +-2sigma band by 4.4x-13x. **The tier gradient is FLAT and mildly INVERTED**
   (f falls as conditioning tightens): Z_box(A) >= Z_box(C) is required by integration over a 24000x
@@ -2204,9 +2207,12 @@ noise is **fringe correctness, not count excess**.
   not a refinement, it is the load-bearing next step.
 - Figures: `reports/atlas_M2_contour_kappa.png` (self-clocking min-e contour + κ validation),
   `reports/atlas_M3_ignition.png` (rank-3 ignition R_a(e) vs the R=1 line).
-- Consistency flag, carried not hidden: the npz `e` column for the M4 rows holds the κ≥20 min-e
-  (0.516/0.526/0.501) while the markdown labels it `e* (>20×)` (0.59/0.58/0.66); σ_mc was evaluated
-  at the npz values. Do not silently reconcile.
+- Consistency flag (D-1) — **RESOLVED 2026-07-15** by direct read of `reports/atlas_m2m4_summary.npz`:
+  the npz `e` column holds the κ≥20 min-e (0.516/0.526/0.501), and σ_mc — hence the σ(D_L)/D_L payoff
+  — was evaluated at those npz values. So the M4 payoff is quoted at the **κ≥20 self-clock threshold**
+  (e ≈ 0.50–0.53); the markdown's `e* (>20×)` label (0.59/0.58/0.66, the relative-improvement entry
+  bar) was the mislabel, corrected in `reports/ATLAS_etrack_map.md` §M4. No re-derivation needed —
+  the numbers were already at the κ≥20 `e`; only the threshold label moved.
 
 ### 10.5 FORGE — the B1 loop under real noise
 
@@ -3173,17 +3179,27 @@ structurally un-closable by co-registration).
      vlbi, 3+13) — post a count of **precisely 1.000**: 30 correct certifications in 30
      realisations. **The count statistic is quantised at 1/30, and the strict `> 1` bar lands
      exactly on a lattice point.** Both currently read *below onset* on the strictness of an
-     inequality. **Is that a measurement or a convention?** It is a convention, it is currently
-     undeclared, and it is doing work. *A bar that can be decided by `>` versus `≥` is not yet a
-     bar.*
+     inequality. **RESOLVED as convention D-6 (2026-07-13): the onset bar is the STRICT `>`** — both
+     1.000 cells read below onset; `≥` would move `N_onset` 59 → 61 (footnoted in the paper). Stated
+     once in the spec's criterion section. **NOTE — two different "1.000"s:** this is the SURFACE
+     *count* on the onset bar. The loop *gain* "1.000" is a **separate statistic**, and KINDLE §1.4
+     **RETIRED it as degenerate** — `|C_it|/|C_{it−1}|` is an `n/n` tautology on holds and NaN on
+     ignitions, so ratio-gain > 1 is unreachable by construction; it is replaced by additive
+     `ΔN = |C_fix| − |C_0|` + margin flow, and kept only as a labelled degenerate trail column.
+     *(Deck: the F8 "measured gain 1.000" caption box is retired — queued: EMBER.)*
    - **(ii) THE ISOLATED FAINT-EDGE ONSETS.** The newly-gained `vlbi 2+14 T=50` column certifies at
      h = −13.25 (1.17) while **every louder h in that column sits below the bar** (0.33–0.90). It is
      a frontier column by the letter of the definition with no contiguous frontier running down to
      it. This is **not** a re-cut artifact — the floor grows as ≈ h^1.5–2, so a faint cell can
      out-certify a loud one, and the *published* surface already showed the pattern — but **whether
      it is a frontier or a fluctuation is unmeasured.**
-2. **[ACCRE, CPU] Bank SURFACE's `fALL` offenders** and re-cut the 21-cell `fALL` ignition against
-   the validity gate. **The last unfinished piece of the floor fix** (§10.16(g)).
+2. ~~**[ACCRE, CPU] Bank SURFACE's `fALL` offenders** and re-cut the 21-cell `fALL` ignition against
+   the validity gate.~~ **CLOSED (RECOVERED) by KINDLE §2 (2026-07-13).** The `fALL` offenders are a
+   pure function of `dlnL_det`/`lnK`/`qmax` — banked in every `sf_null{N,A,L}` file — so they were
+   recomputed from disk, not lost. Re-cut against the validity gate: **21 → 21, zero verdict changes,
+   gates 0.000e+00**; all 21 igniting cells carry `fALL` zero-fraction 0.00–0.01 (Gumbel valid,
+   untouched). The floor fix's last open piece is closed. Banked `reports/surface_fALL_offenders.npz`
+   (orientation declared), `KINDLE_results/kindle_recut_fALL.npz`.
 3. **The faint frontier.** `h*` is unbounded below in 7 of 18 columns. **The next grid is fainter,
    not louder** — and it is the same grid that would settle (1)(ii).
 4. **REAL-ARRAY.** Every prior in the criterion is keyed to the 116-pulsar mock:
@@ -3197,3 +3213,168 @@ structurally un-closable by co-registration).
 5. **The EOB tier** — still the corner the toy tier cannot see.
 6. **The purity hole travels unchanged.** Every count above onset carries wrong certifications, and
    there is **no layer left to remove them.**
+
+### 10.18 THE CONSOLIDATION FOLD (cronus, 2026-07-16) — EMBER · SPARK · AVALANCHE · MAGPIE · PRISM
+
+Primary sources, all now tracked: `reports/EMBER_offtruth_ladder.md`, `reports/SPARK_launch_criterion.md`,
+`reports/AVALANCHE_cascade.md`, `reports/MAGPIE_audit.md`, `reports/chorus_ch_README.md`, and
+`PRISM_xiao_comparison.md` (repo root, untracked, cronus). **CPU only. No new realisations. Every number
+below is read off the artifact it claims to come from** (ARTIFACT READBACK, §Conventions-07-13).
+
+**(a) EMBER — the loop's final anatomy, and a CAPTION CONFLATION CAUGHT AT THE FOLD.** → STORY **S8.5**.
+324 signal realisations (9 cells × 3 arms × N = 12) + 112 scrambled; gates b1–b4 all PASS (b4
+**0.000e+00**). **The honest (map) arm: `ΔN = 0.000` in ALL 9 cells, 0 loop-generated wrong certs, steps
+0.00 in 7 of 9 cells, in-basin 0.00–0.42.** The mechanism is `mc` coldness: the Earth term's information
+gain over the prior is 162–389× on `log10_fgw` but **1.00–1.73× on `log10_mc`**, so the honest MAP start
+is a near-pure `mc` displacement — measured **1.484 / 2.027 / 0.874 dex**, median **2968× the mc
+certification tolerance** — **on the one axis the loop can act on.** *Truth repairs (+0.000…+0.417); map
+holds. Neither grows a wrong cert.*
+
+> **THE VERDICT LANGUAGE IS NOW DECOMPOSED BY CAMPAIGN, AND THIS IS THE DURABLE PART.** The proposed F8
+> caption — *"safe, self-cleaning, consolidating"* — **borrowed IGNITE-2's adjectives and attached them to
+> EMBER's arm. RETIRED.** `ΔN = 0.000` in all 9 is **not "consolidating"; it is INERT.** The corrected
+> three-claim form: **(1) GIVEN CERTIFIED SEEDS at/near truth — holds, occasionally +1, self-cleans
+> scrambled false alarms → IGNITE-2 (40/40; 3 of 6 shed) + CHORUS (30/30 flat). (2) FROM HONEST COLD
+> STARTS — INERT → EMBER (ΔN = 0.000 in all 9; D1 travels through unamplified BECAUSE nothing engages).
+> (3) DANGER MODE — MOTION under a WRONG COUNTERPART → EMBER.** ***No adjective crosses a campaign
+> boundary.***
+> **It was caught by reading AVALANCHE's tracked gloss** (*"D1-unamplified was true only because that loop
+> was INERT"*) **against the proposed caption, BEFORE the fold.** *This is the SCRIBE-D1 disease — a master
+> citing a source that does not say what the master says — **prevented in real time** rather than audited
+> later. The fold is where a claim's source is checked, or it is where a claim's source is lost.*
+
+**The safety boundary is CORRECTED: (wrong counterpart) × (MOTION), not × (engagement).** Of 112 scrambled
+realisations, 5 manufactured. **MOTION: sensitivity 1.00 (5/5), spec 0.72, Fisher p = 0.002 — necessary
+in-sample. ENGAGEMENT: 0.60 (3/5), p = 0.333 (n.s.) — the pre-registered boundary is FALSIFIED IN ITS
+LETTER (2 of 5 manufacturers started DISENGAGED), while its rationale survives.** The **JOINT
+"engaged AND mobile" is REFUTED** (sensitivity collapses to 0.60). β_motion = +0.357 > β_engagement =
++0.308. **Positive control: 7/7 signal realisations with ΔN > 0 moved** — *motion drives ANY count change;
+a TRUE COUNTERPART is what makes it a repair rather than a manufacture.* **Scope, travelling: N = 112,
+5 events; motion is a PROCESS quantity, so the claim is the ORDERING, not a rate.**
+
+**Two things folded because they bound the verdict.** **(i) `ΔN ≥ 0` is one-sided in arm (b) BY
+CONSTRUCTION** (`|C₀| = 0` at a cold start), so **DEGRADES cannot fire through ΔN there at all — the safety
+claim rests on `wrong_grown = 0`, not on `ΔN = 0`** (EMBER §1.5, stated in the pre-registration so a null
+could not be misread). **(ii) Arm (b) is BASIN-ANCHORED in `f`** (1.7 dex ≈ 250 bins at T = 40 → the
+Earth-term likelihood is periodogram-like; *a blind global frequency search is a property of the SEARCH,
+not of the loop*), so **it measures the loop's response to PARAMETER IGNORANCE (dominantly mc), NOT to a
+search failure. B0.2's gap is untouched.**
+
+**D1, framed exact:** the loop carries **90 inherited wrong certs** across the 324 (arm totals 8 / 28 / 107
+truth / map / fix), **grows 0**, **cleans 1**. ***The loop neither creates nor cures D1.*** *(EMBER banks
+isolated cleaning — one scrambled seed ran **ΔN = −4** — but **1 of 90 is not a cure**, and systematic
+self-cleaning remains IGNITE-2's property, not EMBER's.)*
+
+**(b) SPARK — CASCADE-ALIVE, and the SELECTIVITY mechanism.** → STORY **S8.6.2–S8.6.8**. AVALANCHE's
+ground (2) is **CLOSED**: the `[E]→[D]` edge now exists (`MaskedDelay` wired into an ncw = 1 detector,
+certified set entering as runtime `(pmask, Ldist)` — **soft/q-weighted per spec §3, never hard-locked;
+uncertified pulsars sit at `m_p = 0`, decohered rather than pinned to a wrong MAP fringe**). Gate **g0b is
+bit-identical at zero certified pulsars** (0.000e+00, full 14 976-pt grid).
+
+> **THE MECHANISM, AND NOBODY PREDICTED HALF OF IT.** **(a) signal rises 13.709 → 40.575 = 2.96×.**
+> **(b) THE FLOOR FALLS 19.498 → 7.491 (2.6×)** — *with pulsar terms on at known distances the template is
+> **rigid**: it must match a specific two-component (Earth + pterm) structure at a fixed lever arm, and
+> noise is far less able to mimic it under the profile.* ***COHERENT DETECTION IS MORE SELECTIVE, NOT
+> MERELY LOUDER.*** **(c) At achievable certified sets the FLOOR channel DOMINATES:** `sC_m1e05`'s signal
+> median is **LOWER** than s0's (12.990 vs 13.709, **gain −0.204**) and **it still recruits +2**, purely on
+> the floor drop. ***"Anyone pricing this cascade on signal gain alone would have called it dead."***
+> **SPARK's own pre-flight estimate that coherence buys ≤2× is REFUTED — wrong in the cascade's favour,
+> because it priced only the signal channel and missed template rigidity entirely.**
+
+Recruitment **4/13 (s0) → 7/13** at an achievable certified set, **12/13** at the 116-pulsar ceiling. Cost
+**+0.578 nat** for growing the list 3 → 16 (`K_sum` ×1.707; first recruit +0.108) — *because `dL` is the
+MIN over the source list.* **Gain > cost at every certified set tested → CASCADE-ALIVE.** All five floors
+re-cut from raw to **|dev| = 0.00e+00**; zero-fractions ≤ 0.008 → **Gumbel valid at the v2.2 gate**.
+**Not contaminated by D1:** wrong-cert rate on the cohered sets is **1.05–1.21 %**.
+**The levers MULTIPLY, they do not COMPOUND:** 14/116 buys 14 % of the ceiling — roughly linear in
+`N_cert`. *The channel budget sets how many certify; it does not amplify what each is worth.*
+
+**Caveats, travelling verbatim:** **oracle-anchored, NO trials factor** (*"the robust readout is the
+RELATIVE one — the gain and the recruitment DELTA — not '4/13 reservoir sources are detectable today.'
+They are not."*); **the B0.2 search gap is untouched and still binding**; **the achievable states are
+deliberately optimistic** (most-certified realisation ever banked, not the mean — *"the honest
+per-realisation expectation is recruitment of order +1, not +3"*); **N = 1 on the signal side** (the sign
+is secure, **the integer counts are not**); **one cell** (h = −13.25, T = 30, lit) — no T = 40, no VLBI.
+
+**Two superseded SPARK runs, and the lesson.** The ncw = 1 F-stat ledger's CASCADE-ALIVE is **RETRACTED**
+(loud-sidelobe leakage — *the tell was a **null floor of 145.3** where a χ²₄ statistic belongs near 9.5* —
+plus `SEED_MC = 9.0` mis-specification, **fatal for the pulsar term**, which *lowered* the statistic). The
+oracle-dlnL ledger **died in its own null** (inserting `k` at its true amplitude under the null → a **100 %
+zero point mass**): ***"dlnL-at-truth is not a detection statistic — it already knows the true amplitude,
+which under the null does not exist."*** > ***THE NULL IS THE DIAGNOSTIC. A campaign that null-calibrates
+only at the end learns this too late.***
+
+**(c) AVALANCHE — the pre-flight STOP, recorded as the exemplar.** → STORY **S8.6.1**. **Zero GPU-hours.
+Three independent kills, all found by READING:** (1) the premise is already refuted by **B0.2** (self-found
+source error ~0.5 scaled vs ~1e-4 tolerance, **confident-wrong** so the q > 0.9 layer cannot catch it);
+(2) the `[E]→[D]` edge **does not exist in code**; (3) the **cost gate fires on arithmetic** — ≈300 GPU-hr
+of per-iteration null refits against the brief's own ~80 GPU-hr STOP. **It declined the pre-registered
+fallback too**: *"it is a cheaper way to run a campaign that should not run."*
+***The convention it exemplifies: READ THE MACHINERY AND THE RECORD BEFORE SPENDING. Three kills, zero
+GPU-hours, and a successor design (§7) that SPARK executed for ≈75 GPU-MINUTES.***
+
+**(d) MAGPIE J1/J3 — the channel budget, and a demotion.** → STORY **S7.6.4a–c**, **S3.3.9**.
+**J1: the mixed-population switch is set by the ACTIVE-HARMONIC CHANNEL BUDGET, not per-source κ.** The
+**equal-κ contrast** is decisive: m1e03 / m2e03 / m3e03 all carry **κ = 2.65** (κ is per-source; a second
+member does not change either source's κ) yet `n_active` **23 → 30 → 37** flips the grade **below →
+CONFIRMED → CONFIRMED**. **Every ON cell ≥ 30 channels; every OFF/marginal ≤ 23** (switch ≈ 27); **no κ
+analogue — κ = 2.65 sits in both.** r(n_active) = +0.53 vs r(κ) = +0.26. Per-source lift is **broadly
+distributed** (> 0.5 nat to a median of **47** pulsars) — *the registration-multiplication signature.*
+**MAGPIE's own pre-RECUT teaser is SUPERSEDED by its own follow-up** (it read the `f_orb = −9` row; CHORUS
+sits at ≈ −8.2). **Caveat: κ and `n_active` are collinear along e (0.73 vs 0.81) — they separate only on
+the member-count axis at fixed e, which is exactly where the test lives.**
+
+> **THE `n_active` CONVENTION — REQUIRED, and it is the ORIENTATION convention wearing a second costume.**
+> ***`n_active` = TOTAL active harmonic channels across the 16-member population, a CIRCULAR member
+> contributing exactly 1:*** `n_active = (16 − n_ecc)·1 + n_ecc·c(e)`, `c(e) = 8 / 17 / 32` at
+> `e = 0.3 / 0.5 / 0.7` (`reports/chorus_ch_README.md:30`). **Read back off `ch_analysis.npz:surface_nactive`,
+> whose all-circular cell `m0e00 = 16` is what fixes the circular member at 1 channel** — reproducing
+> 15+8 = **23**, 14+16 = **30**, 13+24 = **37**, 15+17 = **32**, 15+32 = **47**, every value.
+> ***THE TRAP: `EMBER §4.3` prints a column ALSO called `n_active` carrying 16 / 17 / 32 — the ECCENTRIC
+> SUBTOTALS (`c(e)·n_ecc`). Joined naively to the ≥30 threshold they put EMBER's own CONFIRMED C1/C2 rungs
+> BELOW the bar and make the channel-budget switch look refuted by EMBER.*** **It is not — EMBER's map arm
+> is inert in every chorus cell, so no reading of that column moves an EMBER number; only the label
+> collides.** **A shared column name requires a stated definition, or the join is a silent transpose.**
+> *(And EMBER says so itself: it **"neither confirms nor refutes the channel-budget switch"** — it lacks
+> the equal-κ contrast. **J1 stands alone.**)*
+
+**J3: the excess-power correlation is DEMOTED to a signal-mediated ARTIFACT.** χ²/N × GEO cert-freq
+**ρ = +0.417 (p = 3e−6)** is **circular on the simulated spine**: `χ²/N = resid power/(N σ²)`, and the
+residuals **ARE the injected CW+CURN**, so χ²/N is elevated for exactly the pulsars whose geometry couples
+to the injected source — *the same coupling that produces the certifying dlnL.* **The noise-only control
+PASSES** (`no_cw` nulls: ρ = −0.03, p = 0.8 → signal-mediated, not a timing-structure artifact); **jointly
+controlling σ_TOA / n_TOA / K collapses it to +0.145 (n.s.)**. ***THE KEEPER, transferable and
+non-circular: CERTIFICATION IS DECOUPLED FROM TIMING PRECISION*** (RMS × cert **+0.036, p = 0.7**) — **on
+a real array the LOUDEST-COUPLED, not the BEST-TIMED, pulsars carry the first certifications.**
+*"Excess power certifies" is retired as a target-selection claim on simulated data.*
+
+**(e) PRISM — the positioning, and the readback tag CLEARED.** → STORY **S12** (new related-work section).
+**The lead citation is theirs, which is why it is credible:** Xiao et al. **v3's new Supplement III**
+concludes that breaking the distance degeneracy **requires the chirp-mass-dominated regime
+(`R_sys ≲ 0.25`)** — ***our chirp-mass wall (S4.2.16 / S11.2.1) in band-slope coordinates, derived
+independently, and absent from their own abstract.*** **The P4 paragraph's readback tag is CLEARED**:
+SPARK's **2.96× / 19.498 → 7.491 / +0.578 nat** verified by direct read of the tracked
+`reports/SPARK_launch_criterion.md` §2/§3.
+**Recorded honestly:** *"ours contains theirs" is true **in specification, not in delivery*** — their
+pair-2D is a **rank-2** object; we hold rank-1 (E-step, built) and rank-N (**SAMPLER, PENDING**), and a
+referee who asks to see the joint sampler would be right to. **The two withheld attacks** (the
+**min-over-84 order statistic on their headline precision**, 12× pairing spread by their own Supp VI; and
+the **poisoned-partner selection** — *their rule selects the narrowest partner, and a confident wrong
+fringe IS narrow*) are recorded in the **discussion-section holding pen, NOT the paragraph**, and both
+carry the scope line that **neither is a measurement of their pipeline.**
+**Appendix A1's fix APPLIED:** **STORY S3.1.1 is now scoped *"at our fiducial `dL`, under current
+priors"*** — Wen et al. work at 4 nHz where λ ≈ 2.4 pc (fringes ~5× wider, their anchors near **K ~ 2.5**),
+and their 1 pc is an **assumed SKA forecast** while our census measures **today**. ***The two claims are
+not in contradiction; they are about different frequencies and different epochs — and our own
+SCOPE-OF-INFERENCE convention is what caught it.***
+
+**(f) HOUSEKEEPING.** **SCRIBE's D1/D2 spec-advancement fixes HAVE ALREADY SHIPPED** — verified by
+readback: `"do not quote 59"`, `"INDETERMINATE"`, `"queued, no compute yet"` are **all absent** from
+`trackB_estimator_spec.md`; the line numbers in the fold brief (1897/1899) had shifted because the spec was
+already advanced. **One residual seam FIXED here:** the spec said the `criterion-v2.2` tag *"is to be cut
+by Matt"* — **the tag EXISTS** (`226c013b`, → `db2075a`), as AVALANCHE §0 independently flagged against a
+stale memory note. **Gates: 8/8 PASS, census triple bit-identical, on the edited tree.**
+**Unsourced tags FLAGGED, not folded** (STORY App. A): **GLACIER**, **"S2b arrow-2"** resolve nowhere in
+the repo; **LOTTERY** is EXPLAINER's figure F12, not a campaign. **EPOCH is real and is recorded, sourced
+to SPARK §6.** *A tag relayed in-session before its report exists is a campaign with a name and no
+content.*

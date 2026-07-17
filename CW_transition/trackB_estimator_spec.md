@@ -1663,14 +1663,38 @@ It is one only if the estimator converges.**
 
 ---
 
-# CRITERION-v2.1 (adopted 2026-07-12, tag `criterion-v2.1`) — CANONICAL
+# CRITERION-v2.1 (adopted 2026-07-12, tag `criterion-v2.1`) — CANONICAL, extended to `criterion-v2.2`
 
 **The operative criterion is UNCHANGED from criterion-v2. What v2.1 adds is two rejections, each by
 its own pre-registration, and the conventions they forced.**
 
+> **`criterion-v2.2` (adopted 2026-07-13; masters STORY §Standing-conventions, project_progress
+> §10.16) = criterion-v2.1 PLUS the floor-validity gate** (the zero-fraction is a required column;
+> above a ~20 % nullN zero-fraction the D2 Gumbel is invalid and the floor is the empirical (1−α)
+> quantile with a bootstrap error — see the CONVENTION below, now SETTLED by RECUT). The DETECTION /
+> CERTIFICATION / PURITY lines are unchanged; only the floor estimator's validity domain is added.
+> *(The git tag `criterion-v2.2` **EXISTS** — `226c013b`, resolving to `db2075a`. Verified 2026-07-16;
+> AVALANCHE §0 independently flagged the same thing against a stale memory note. **Open, and Matt's alone:
+> whether the tag should be force-moved onto `d87db93`** — the KINDLE commit, which differs from the tag
+> only additively and which every campaign since has actually worked at. See EMBER §0.)*
+
     DETECTION      dlnL_a > max( ln K_counted,a , floor(h, T, tol) )     [D1 family, D2 estimator]
     CERTIFICATION  q_max,a > 0.9  (strict 0.99)   applied ONLY within detections
+    ONSET          count( dlnL > floor + its own fit error ) > 1   -- STRICT inequality (see below)
     PURITY         NONE. Both candidate layers were tested and BOTH ARE REJECTED.
+
+## CONVENTION — THE ONSET BAR IS A STRICT INEQUALITY (adopted 2026-07-13, D-6)
+
+> **A cell is ONSET iff its correct-certification count, evaluated at floor + the floor's own fit
+> error, is `> 1` (STRICT).** This is the form SURFACE's figures were drawn to. A count of exactly
+> 1.000 reads **below onset**.
+
+The count is quantised at 1/N_real (1/30 on the census grid), so the strict `> 1` bar can land on a
+lattice point, and `>` versus `≥` is then a live convention, not a measurement. It is resolved here
+in favour of `>`. **Boundary cells that flip under `≥`:** exactly two — **(−13.25, 40, vlbi, 3+13)**
+and **(−13.00, 40, vlbi, 3+13)**, both posting a count of precisely 1.000 (30/30). Under `≥` both
+become onset and **`N_onset` moves 59 → 61**. No other cell sits on the lattice point. The paper
+should footnote this boundary; the adopted count is **59** under the strict bar.
 
 ## D3 — PURITY LAYER (per-pulsar): **TESTED, REJECTED** (IGNITE-2, `reports/IGNITE2_softloop.md` §1)
 
@@ -1791,7 +1815,15 @@ properly-calibrated onset exists anywhere in the modelled box.** An onset number
 floor's `N` and fit error is not quoted. (The 10-null floors at the other 22 cells carry ±2–18 nat
 fit errors and cannot support an onset claim.)
 
-## CHORUS — PRE-REGISTRATION (the mixed-eccentricity population campaign; queued, no compute yet)
+## CHORUS — DELIVERED (the mixed-eccentricity population campaign; `reports/CHORUS_mixed_pop.md`, 2026-07-13)
+
+> **DELIVERED.** 26 mixture cells, 4 000 nulls, 40 exact pairs, 30 loops. Write-up
+> `reports/CHORUS_mixed_pop.md` (masters: STORY S7.6.2–S7.6.6, project_progress §10.14); floors
+> re-cut by RECUT (`reports/recut_chorus.npz`). Headline: **the clock is NOT shared** (0 of ~120
+> lifted certifications circular-attributed — certification is a property of the source, not a
+> shared array resource), the eccentric structure transforms the count (up to 14.8× lit / 12.4×
+> vlbi), and the e-switch threshold is a mixture property (single member → e = 0.5; pair → e = 0.3).
+> The pre-registration below is kept as the record of what was fixed before compute.
 
 **The open question IGNITE-2 flagged and nothing in this campaign has touched: every result above is
 for a SINGLE-POPULATION source model. Nature supplies a MIXTURE.** CHORUS measures whether an
@@ -1828,8 +1860,10 @@ dominates yield variance).
 # CONVENTIONS ADOPTED 2026-07-13 (cronus machinery session)
 
 *Five conventions and one fix. Four are floor-independent and BINDING NOW. The fifth (the
-zero-fraction column) is adopted as stated but its consequences for the onset surface are
-PROVISIONAL pending the ACCRE re-score — see `reports/FLOOR_FIX_provisional.md`.*
+zero-fraction column) is adopted as stated; its consequences for the onset surface were held
+PROVISIONAL pending the ACCRE re-score and are now **SETTLED by RECUT** (`reports/RECUT_floors.md`,
+2026-07-13; tag `criterion-v2.2`). The section below is folded to the settled numbers; the
+provisional bounds (`reports/FLOOR_FIX_provisional.md`) are kept as a trail, not as live claims.*
 
 ## CONVENTION — ARTIFACT READBACK (binding)
 
@@ -1875,7 +1909,7 @@ co-extensive with the Arm-B era** (pre-B1 has `u = 0` exactly, so R's `f = 6.9e-
 ceilings, and LAMBDA/F2/L2c are **immune**) — and that immunity is a *measured boundary*, not a
 hope, only because it was stated as one.
 
-## CONVENTION — THE ZERO-FRACTION IS A REQUIRED COLUMN (adopted; consequences PROVISIONAL)
+## CONVENTION — THE ZERO-FRACTION IS A REQUIRED COLUMN (adopted — `criterion-v2.2`; consequences SETTLED by RECUT)
 
 Adopted verbatim from **ANCHOR §4**:
 
@@ -1888,23 +1922,34 @@ The offender statistic is 0.0 whenever a realisation has no cell passing layer 1
 it — understating the α = 0.05 bar by up to **2.8×**, and erring **PERMISSIVE**. A floor that is too
 low lets pure-noise offenders through. **This is the dangerous direction.**
 
-**STATUS OF THE CONSEQUENCES — PROVISIONAL.** The floors are re-derivable from the banked summaries;
-the **counts are not** (the per-realisation signal `dlnL` columns live on ACCRE). Measured so far
-(`reports/FLOOR_FIX_provisional.md`, bank `reports/floorfix_provisional.npz`):
+**STATUS OF THE CONSEQUENCES — SETTLED (RECUT, ACCRE, 2026-07-13; `reports/RECUT_floors.md`,
+banks `reports/recut_surface.npz`, `recut_chorus.npz`).** The per-realisation signal `dlnL` columns
+were re-scored on ACCRE against the adopted floor; every count below is re-cut from the raw columns,
+none bounded or interpolated. Both re-scores pass the A (floors) and B (counts, 108/108 verdicts)
+readback gates at **0.000e+00**. The provisional bounds are kept as a trail:
 
-- **SURFACE:** the fix touches **15 of 108** cells and only **2 of the 59** onset cells. **57 onsets
-  stand untouched, definitively** — the loud cells have low zero-fractions, exactly as
-  pre-registered. The corrected onset count is **bounded 57 ≤ N ≤ 67**. **Do not quote 59.**
-- **CHORUS: all 26 of 26 cells are Gumbel-invalid**; 23 floors rise, by up to 1.96×.
-- **The e = 0.3 switch-on is INDETERMINATE** (floor +53 %, 6.2σ, against a margin of +0.57 over the
-  bar). **Not refuted; not established. The currently defensible switch number is e = 0.5.**
+- **SURFACE: `N_onset = 59` (settled).** The provisional bound (57 ≤ N ≤ 67) is resolved. The fix
+  touches **15 of 108** cells; 93 are untouched, **including 57 of the 59 onsets**. **Two onsets
+  died and two were born** — the total is stable, the map is not; the coincidence with the pre-fix
+  count of 59 is a coincidence, not a confirmation. Both cells the provisional analysis named at
+  risk are RETRACTED (re-cut 0.77 and 0.90; neither bound ≤1.20/≤1.37 reached). (RECUT §1.)
+- **CHORUS: all 26 of 26 cells are Gumbel-invalid**; 23 floors rise, by up to 1.96×. (RECUT §2.)
+- **The e = 0.3 switch-on is REFUTED for a single member / CONFIRMED for a pair.** One e = 0.3
+  member: **lit collapses 1.57 → 0.70 (below the bar, REFUTED); vlbi reads 1.03 — MARGINAL, not
+  confirmed** (clears the bar at the floor, fails at floor + bootstrap error 0.60). Two or more
+  e = 0.3 members: **CONFIRMED, both tiers.** The externally quotable statement: **single member →
+  switch-on at e = 0.5; two or more → e = 0.3.** The interim binding to e = 0.5 stands and was the
+  right call. (RECUT §2 / §2.1.)
 - **IGNITE-2's (−13.25, 30, vlbi) cell** — one of the programme's two calibrated cells (STORY
-  S6.2.1) — has zero-fraction **0.45** and its Gumbel is **INVALID**. Its floor must be **restated
-  as 7.06 ± 0.40 nat (empirical q95)**, not 7.59 ± 0.48. Its verdict (below onset) is unchanged.
+  S6.2.1) — has zero-fraction **0.45** and its Gumbel is **INVALID**. Its floor is **restated as
+  7.06 ± 0.40 nat (empirical q95)**, not 7.59 ± 0.48. Its verdict (below onset) is unchanged.
 
-**Counts are monotone non-increasing in the floor**, and that is the only inference drawn above.
-**No count has been interpolated to a new floor.** Onset flips, the corrected onset table, and the
-e = 0.3 verdict are HELD for the ACCRE re-score.
+**Counts are monotone non-increasing in the floor.** The onset flips, the corrected onset table, and
+the e = 0.3 verdict are SETTLED by the RECUT re-score — no longer held. **Two claims were checked
+rather than assumed and both moved** (RECUT §1.3 / §2.3): the `h*`-unbounded-below column membership
+(reinstated at 7/18, but not the same seven columns) and CHORUS's "trade inverts at n_ecc = 3"
+(no longer a clean claim). Any difference or ratio between two cells is RE-DERIVED from the re-cut
+banks, never carried forward.
 
 ## FIX — THE BLAS THREAD-COUNT HAZARD, CLOSED (`trackB_b1_core.py`, gated)
 
