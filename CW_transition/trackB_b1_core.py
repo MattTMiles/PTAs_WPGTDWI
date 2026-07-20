@@ -80,6 +80,9 @@ NEXT_TIER = ["J2222-0137", "J1744-1134", "J0030+0451", "J1600-3053", "J1017-7156
 
 B_CERT = 512                         # certification fringe budget -- NEVER lower
 PMASK = "__pmask"                    # runtime per-pulsar pulsar-term mask key
+SMASK = "__smask"                    # runtime per-SOURCE feed weight (the source-side twin of
+                                     # PMASK; FORGE-G soft source side). ABSENT -> weight 1 for
+                                     # every source, so every pre-FORGE_G caller is bit-identical.
 
 # population config (the saved-seed draw used by every Track B deliverable)
 POP = dict(ncw=16, seed=3000, population=(3, -13.25, -14.25))
@@ -127,8 +130,27 @@ class MaskedDelay:
         m = params[PMASK][self.ipsr]
         args = (self.psr.toas, self.psr.pos, cw["cos_gwtheta"], cw["gwphi"], cw["cos_inc"],
                 cw["log10_mc"], cw["log10_fgw"], cw["log10_h"], cw["phase0"], cw["psi"])
-        d_full = jnp.sum(self._full(*args, L), axis=0)
-        d_earth = jnp.sum(self._earth(*args), axis=0)
+        # Per-SOURCE feed weight w_s (SMASK). w_s == 1 -> the source contributes its full delay;
+        # w_s == 0 -> the source is ABSENT from the template (exactly, in fp64) -- the source-side
+        # analogue of switching a pulsar term off. ABSENT key -> w_s == 1 for every source, so the
+        # 1.0*x == x identity leaves every pre-FORGE_G caller bit-identical.
+        full = self._full(*args, L)                 # (n_src, n_toa)
+        earth = self._earth(*args)                   # (n_src, n_toa)
+        w = params.get(SMASK, None)
+        if w is not None:
+            # jnp.where SELECTS 0 for a not-fed source rather than MULTIPLYING by 0. A carried,
+            # not-fed source may sit anywhere in its prior (incl. the coalescence region SPARK-3
+            # §2 maps), where its waveform is non-evaluable; `0.0 * NaN == NaN` would let ONE such
+            # source poison the whole array (SPARK-3 §2.1's exact mechanism). Selection makes
+            # w_s == 0 TRUE absence -- a carried source cannot NaN the template. A FED source
+            # (w_s > 0) is still evaluated and must be valid, as it must be.
+            gate = (w > 0.0)[:, jnp.newaxis]
+            wcol = w[:, jnp.newaxis]
+            d_full = jnp.sum(jnp.where(gate, wcol * full, 0.0), axis=0)
+            d_earth = jnp.sum(jnp.where(gate, wcol * earth, 0.0), axis=0)
+        else:
+            d_full = jnp.sum(full, axis=0)
+            d_earth = jnp.sum(earth, axis=0)
         return d_earth + m * (d_full - d_earth)
 
 
@@ -321,6 +343,7 @@ class B1Split:
         else:
             self.cf = dsm.matrix_factor(self.FtNmF + Pinv)
 
+        self.smask = None                       # per-source feed weight (FORGE-G); None -> all-on
         self._ppab = jax.jit(self._per_pulsar_ab_impl)
         self.a_const = self.a_const_from(theta_truth, data_ref, mask_ref)
         self._Minv = None
@@ -346,6 +369,26 @@ class B1Split:
         self._ab_fns = {}                       # per-pulsar jitted evaluators are now stale
         self._ppab = jax.jit(self._per_pulsar_ab_impl)
 
+    def set_smask(self, w):
+        """Set the per-source feed weight (FORGE-G soft source side). Mirrors enable_fast_full:
+        smask is closed over inside the jitted evaluators via _params, so changing it invalidates
+        every compiled per-pulsar evaluator. w == None restores the incumbent all-on behaviour.
+
+        The pterm-only fast-full residual (ys_full = MultiSourceDelay) does NOT honour SMASK, so a
+        non-None smask forces the masked residual path -- the caller (B1Marg) must not re-enable
+        fast-full while a smask is live. Gated by the soft-source module's threshold-inf limit."""
+        if w is not None:
+            w = jnp.asarray(np.asarray(w, dtype=np.float64))
+            if self._fast_full:
+                self.enable_fast_full(False)     # MultiSourceDelay ignores SMASK -- force masked path
+        same = (self.smask is None and w is None) or (
+            self.smask is not None and w is not None
+            and self.smask.shape == w.shape and bool(jnp.all(self.smask == w)))
+        self.smask = w
+        if not same:
+            self._ab_fns = {}
+            self._ppab = jax.jit(self._per_pulsar_ab_impl)
+
     # ---- core algebra ----
     def _params(self, theta_arr, data_tuple, pmask):
         params = dict(self.frozen)
@@ -354,6 +397,8 @@ class B1Split:
         for dk, d in zip(self.data_keys, data_tuple):
             params[dk] = d
         params[PMASK] = pmask
+        if self.smask is not None:
+            params[SMASK] = self.smask
         return params
 
     def _per_pulsar_ab_impl(self, theta_arr, data_tuple, pmask):

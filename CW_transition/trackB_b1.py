@@ -114,6 +114,18 @@ class B1Marg:
         self.lnprior = self.FT.lnprior; self.uk = self.FT.uk
         self.n_calls = 0
 
+    def set_smask(self, w):
+        """Forward a per-source feed weight to the split (FORGE-G soft source side) and clear the
+        batched evaluators, which close over sp.smask through sp._params at trace time. A non-None
+        smask forces the masked residual path; the all-on fast-full optimisation is unavailable
+        while a smask is live (MultiSourceDelay does not honour SMASK)."""
+        if w is not None and self.all_on:
+            self.sp.enable_fast_full(False)
+            self.all_on = False
+        self.sp.set_smask(w)
+        self._abb = {}
+        self._ppab_b = jax.jit(jax.vmap(self.sp._per_pulsar_ab_impl, in_axes=(0, None, None)))
+
     # ---- theta packing ----
     def theta_of(self, src_T):
         src_T = np.atleast_2d(np.asarray(src_T, float))
