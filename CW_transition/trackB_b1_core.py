@@ -83,6 +83,17 @@ PMASK = "__pmask"                    # runtime per-pulsar pulsar-term mask key
 SMASK = "__smask"                    # runtime per-SOURCE feed weight (the source-side twin of
                                      # PMASK; FORGE-G soft source side). ABSENT -> weight 1 for
                                      # every source, so every pre-FORGE_G caller is bit-identical.
+                                     # FORGE-G2: a JITTED RUNTIME argument (TURBINE) -- pattern
+                                     # changes never recompile; only None <-> array retraces.
+
+# Double-where guard (TURBINE, FORGE-G2). A CARRIED (w_s == 0) source's waveform inputs are
+# replaced by this known-evaluable point BEFORE the waveform is evaluated, so neither the
+# primal nor any gradient ever touches the carried source's actual params (which may sit in
+# the non-evaluable coalescence corner or be junk -- SPARK-3 §2). Values: the benign corner
+# of the generative prior box (lowest chirp mass x lowest frequency = longest coalescence
+# time), zero angles.
+SMASK_SAFE = dict(cos_gwtheta=0.0, gwphi=1.0, cos_inc=0.0, log10_mc=8.5,
+                  log10_fgw=-8.0, log10_h=-15.0, phase0=0.0, psi=0.0)
 
 # population config (the saved-seed draw used by every Track B deliverable)
 POP = dict(ncw=16, seed=3000, population=(3, -13.25, -14.25))
@@ -128,23 +139,31 @@ class MaskedDelay:
         cw = {k: jnp.stack([params[f"cw_{k}{s}"] for s in self._suf]) for k in self._G}
         L = params[self._pdist_key]
         m = params[PMASK][self.ipsr]
-        args = (self.psr.toas, self.psr.pos, cw["cos_gwtheta"], cw["gwphi"], cw["cos_inc"],
-                cw["log10_mc"], cw["log10_fgw"], cw["log10_h"], cw["phase0"], cw["psi"])
         # Per-SOURCE feed weight w_s (SMASK). w_s == 1 -> the source contributes its full delay;
         # w_s == 0 -> the source is ABSENT from the template (exactly, in fp64) -- the source-side
         # analogue of switching a pulsar term off. ABSENT key -> w_s == 1 for every source, so the
-        # 1.0*x == x identity leaves every pre-FORGE_G caller bit-identical.
-        full = self._full(*args, L)                 # (n_src, n_toa)
-        earth = self._earth(*args)                   # (n_src, n_toa)
+        # 1.0*x == x identity leaves every pre-FORGE_G caller bit-identical. FORGE-G2: w may be a
+        # TRACED runtime argument -- nothing here may branch on its values.
         w = params.get(SMASK, None)
         if w is not None:
-            # jnp.where SELECTS 0 for a not-fed source rather than MULTIPLYING by 0. A carried,
-            # not-fed source may sit anywhere in its prior (incl. the coalescence region SPARK-3
-            # §2 maps), where its waveform is non-evaluable; `0.0 * NaN == NaN` would let ONE such
-            # source poison the whole array (SPARK-3 §2.1's exact mechanism). Selection makes
-            # w_s == 0 TRUE absence -- a carried source cannot NaN the template. A FED source
-            # (w_s > 0) is still evaluated and must be valid, as it must be.
-            gate = (w > 0.0)[:, jnp.newaxis]
+            gate1 = w > 0.0
+            # DOUBLE-WHERE (the TURBINE guard). The outer where below already makes a carried
+            # source's VALUE exact zero, but autodiff pushes a (zero) cotangent THROUGH the
+            # waveform evaluated at the carried source's ACTUAL params; if those are
+            # non-evaluable (junk reservoir, coalescence corner -- SPARK-3 §2), 0 * NaN == NaN
+            # poisons the whole gradient. Sanitising the INPUTS means the waveform and its
+            # grads are only ever evaluated at SMASK_SAFE for carried sources; a fed source's
+            # inputs pass through where() unchanged, so the primal stays bit-exact.
+            cw = {k: jnp.where(gate1, cw[k], SMASK_SAFE[k]) for k in self._G}
+        args = (self.psr.toas, self.psr.pos, cw["cos_gwtheta"], cw["gwphi"], cw["cos_inc"],
+                cw["log10_mc"], cw["log10_fgw"], cw["log10_h"], cw["phase0"], cw["psi"])
+        full = self._full(*args, L)                 # (n_src, n_toa)
+        earth = self._earth(*args)                   # (n_src, n_toa)
+        if w is not None:
+            # jnp.where SELECTS 0 for a not-fed source rather than MULTIPLYING by 0. Selection
+            # makes w_s == 0 TRUE absence -- a carried source cannot NaN the template. A FED
+            # source (w_s > 0) is still evaluated at its actual params and must be valid.
+            gate = gate1[:, jnp.newaxis]
             wcol = w[:, jnp.newaxis]
             d_full = jnp.sum(jnp.where(gate, wcol * full, 0.0), axis=0)
             d_earth = jnp.sum(jnp.where(gate, wcol * earth, 0.0), axis=0)
@@ -344,6 +363,7 @@ class B1Split:
             self.cf = dsm.matrix_factor(self.FtNmF + Pinv)
 
         self.smask = None                       # per-source feed weight (FORGE-G); None -> all-on
+                                                # FORGE-G2: a runtime arg of the jitted evaluators
         self._ppab = jax.jit(self._per_pulsar_ab_impl)
         self.a_const = self.a_const_from(theta_truth, data_ref, mask_ref)
         self._Minv = None
@@ -353,7 +373,7 @@ class B1Split:
     def a_const_from(self, theta, data_tuple, pmask):
         """a_const by difference: lnL - (sum a_dep + 0.5[b M^-1 b - ldP - logdet]).
         Invariant to (theta, data, pmask) -- it collects ldN + the rednoise logdet. GATED."""
-        a_dep, b = self._ppab(jnp.asarray(theta), data_tuple, jnp.asarray(pmask))
+        a_dep, b = self._ppab(jnp.asarray(theta), data_tuple, jnp.asarray(pmask), self.smask)
         rest = float(jnp.sum(a_dep)) + 0.5 * float(
             b.reshape(-1) @ dsm.matrix_solve(self.cf_cached, b.reshape(-1))
             - self.ldP_cached - self.logdet_cached)
@@ -370,9 +390,12 @@ class B1Split:
         self._ppab = jax.jit(self._per_pulsar_ab_impl)
 
     def set_smask(self, w):
-        """Set the per-source feed weight (FORGE-G soft source side). Mirrors enable_fast_full:
-        smask is closed over inside the jitted evaluators via _params, so changing it invalidates
-        every compiled per-pulsar evaluator. w == None restores the incumbent all-on behaviour.
+        """Set the per-source feed weight (FORGE-G soft source side). FORGE-G2 (TURBINE): smask
+        is a RUNTIME argument of the jitted evaluators, so changing the PATTERN is a plain
+        argument change -- no cache clear, no recompile. Only switching None <-> array retraces
+        (once per direction: the params pytree gains/loses the SMASK key), and both traces stay
+        cached thereafter. w == None restores the incumbent all-on behaviour: the SMASK key is
+        absent from params, so the trace is bit-identical to the pre-FORGE-G path.
 
         The pterm-only fast-full residual (ys_full = MultiSourceDelay) does NOT honour SMASK, so a
         non-None smask forces the masked residual path -- the caller (B1Marg) must not re-enable
@@ -381,28 +404,22 @@ class B1Split:
             w = jnp.asarray(np.asarray(w, dtype=np.float64))
             if self._fast_full:
                 self.enable_fast_full(False)     # MultiSourceDelay ignores SMASK -- force masked path
-        same = (self.smask is None and w is None) or (
-            self.smask is not None and w is not None
-            and self.smask.shape == w.shape and bool(jnp.all(self.smask == w)))
         self.smask = w
-        if not same:
-            self._ab_fns = {}
-            self._ppab = jax.jit(self._per_pulsar_ab_impl)
 
     # ---- core algebra ----
-    def _params(self, theta_arr, data_tuple, pmask):
+    def _params(self, theta_arr, data_tuple, pmask, smask=None):
         params = dict(self.frozen)
         for k, v in zip(self.theta_keys, theta_arr):
             params[k] = v
         for dk, d in zip(self.data_keys, data_tuple):
             params[dk] = d
         params[PMASK] = pmask
-        if self.smask is not None:
-            params[SMASK] = self.smask
+        if smask is not None:
+            params[SMASK] = smask
         return params
 
-    def _per_pulsar_ab_impl(self, theta_arr, data_tuple, pmask):
-        params = self._params(theta_arr, data_tuple, pmask)
+    def _per_pulsar_ab_impl(self, theta_arr, data_tuple, pmask, smask=None):
+        params = self._params(theta_arr, data_tuple, pmask, smask)
         ytNmy = []; FtNmy = []; TtNmy = []
         for p in range(self.npsr):
             yp = self.ys[p](params)
@@ -417,7 +434,7 @@ class B1Split:
         return a_dep, b
 
     def lnL(self, theta_arr, data_tuple, pmask):
-        a_dep, b = self._ppab(jnp.asarray(theta_arr), data_tuple, jnp.asarray(pmask))
+        a_dep, b = self._ppab(jnp.asarray(theta_arr), data_tuple, jnp.asarray(pmask), self.smask)
         bflat = b.reshape(-1)
         return float(jnp.sum(a_dep) + self.a_const
                      + 0.5 * (bflat @ dsm.matrix_solve(self.cf_cached, bflat)
@@ -431,17 +448,18 @@ class B1Split:
                                       for p in range(self.npsr)])
 
     def _pulsar_ab_fn(self, p):
-        """(theta_base, Lvals, data, pmask) -> (a_dep (B,), b (B,ngp)) for pulsar p.
-        Everything is a runtime arg, so this compiles ONCE and serves every realisation."""
+        """(theta_base, Lvals, data, pmask, smask) -> (a_dep (B,), b (B,ngp)) for pulsar p.
+        Everything is a runtime arg (incl. smask, FORGE-G2), so this compiles ONCE and serves
+        every realisation and every feed pattern."""
         if p in self._ab_fns:
             return self._ab_fns[p]
         Ft = self.Ft[p]; Tt = self.Tt[p]; s1d = self.solve1d[p]; ys_p = self.ys[p]
         cf_p = (self.cf[0][p], self.cf[1]); TtNmF_p = self.TtNmF[p]; AI_p = int(self.AI[p])
 
         @jax.jit
-        def run(theta_base, Lvals, data_tuple, pmask):
+        def run(theta_base, Lvals, data_tuple, pmask, smask):
             def one(L):
-                params = self._params(theta_base.at[AI_p].set(L), data_tuple, pmask)
+                params = self._params(theta_base.at[AI_p].set(L), data_tuple, pmask, smask)
                 yp = ys_p(params); Nmy, _ = s1d(yp)
                 return yp @ Nmy, Ft @ Nmy, Tt @ Nmy
             ytNmy, FtNmy, TtNmy = jax.vmap(one)(Lvals)
@@ -456,7 +474,7 @@ class B1Split:
         """LNL (npsr, B): pulsar p's distance swept over EV[p], all others at theta_base."""
         self.AI = np.asarray(AI); self._ensure_minv()
         tb = jnp.asarray(theta_base); pm = jnp.asarray(pmask)
-        a_base, b_base = self._ppab(tb, data_tuple, pm)
+        a_base, b_base = self._ppab(tb, data_tuple, pm, self.smask)
         a_base = np.asarray(a_base); b_base = np.asarray(b_base)
         bflat = b_base.reshape(-1)
         u = self._Minv @ bflat
@@ -467,7 +485,7 @@ class B1Split:
         npsr, B = EV.shape
         LNL = np.empty((npsr, B))
         for p in range(npsr):
-            a_pf, b_pf = self._pulsar_ab_fn(p)(tb, jnp.asarray(EV[p]), data_tuple, pm)
+            a_pf, b_pf = self._pulsar_ab_fn(p)(tb, jnp.asarray(EV[p]), data_tuple, pm, self.smask)
             a_pf = np.asarray(a_pf); b_pf = np.asarray(b_pf)
             db = b_pf - b_base[p]
             Q_pf = Q_base + 2.0 * (db @ u_p[p]) + np.einsum('bi,ij,bj->b', db, self._Minv_pp[p], db)

@@ -54,15 +54,16 @@ AXIS_NAME = ["cos_gwtheta", "gwphi", "cos_inc", "log10_mc", "log10_fgw", "log10_
 # batched split E-step over a stack of source params (data + mask fixed per call)
 # ============================================================
 def make_pulsar_ab_batch(sp, p):
-    """(thetas (T,nth), Lvals (B,), data, pmask) -> a (T,B), b (T,B,ngp) for pulsar p."""
+    """(thetas (T,nth), Lvals (B,), data, pmask, smask) -> a (T,B), b (T,B,ngp) for pulsar p.
+    smask is a runtime arg (FORGE-G2): feed-pattern changes reuse the compiled evaluator."""
     Ft = sp.Ft[p]; Tt = sp.Tt[p]; s1d = sp.solve1d[p]; ys_p = sp.ys[p]
     cf_p = (sp.cf[0][p], sp.cf[1]); TtNmF_p = sp.TtNmF[p]; AI_p = int(sp.AI[p])
 
     @jax.jit
-    def run(thetas, Lvals, data_tuple, pmask):
+    def run(thetas, Lvals, data_tuple, pmask, smask):
         def per_particle(tb):
             def one(L):
-                params = sp._params(tb.at[AI_p].set(L), data_tuple, pmask)
+                params = sp._params(tb.at[AI_p].set(L), data_tuple, pmask, smask)
                 yp = ys_p(params); Nmy, _ = s1d(yp)
                 return yp @ Nmy, Ft @ Nmy, Tt @ Nmy
             ytNmy, FtNmy, TtNmy = jax.vmap(one)(Lvals)
@@ -107,7 +108,8 @@ class B1Marg:
         self._Minv = self.sp._Minv; self._Minv_pp = self.sp._Minv_pp
         self._const = self.sp.a_const - 0.5 * (self.sp.ldP_cached + self.sp.logdet_cached)
         self._abb = {}
-        self._ppab_b = jax.jit(jax.vmap(self.sp._per_pulsar_ab_impl, in_axes=(0, None, None)))
+        self._ppab_b = jax.jit(jax.vmap(self.sp._per_pulsar_ab_impl,
+                                        in_axes=(0, None, None, None)))
         self.FT = C.FringeTables(P, self.EV, self.dL, prior_key)
         # per-pulsar reduce tables as arrays (prior anchored at L0, NOT at base_L)
         self.order = self.FT.order; self.redidx = self.FT.redidx
@@ -115,16 +117,18 @@ class B1Marg:
         self.n_calls = 0
 
     def set_smask(self, w):
-        """Forward a per-source feed weight to the split (FORGE-G soft source side) and clear the
-        batched evaluators, which close over sp.smask through sp._params at trace time. A non-None
-        smask forces the masked residual path; the all-on fast-full optimisation is unavailable
-        while a smask is live (MultiSourceDelay does not honour SMASK)."""
+        """Forward a per-source feed weight to the split (FORGE-G soft source side). FORGE-G2
+        (TURBINE): smask is a RUNTIME argument of the batched evaluators, so a feed-pattern
+        change is a plain argument change -- the compiled evaluators stay valid and NOTHING is
+        cleared. The batched evaluators are only invalidated when the RESIDUAL path swaps
+        (fast-full off on first non-None smask), because they close over sp.ys at make time.
+        A non-None smask forces the masked residual path; the all-on fast-full optimisation is
+        unavailable while a smask is live (MultiSourceDelay does not honour SMASK)."""
         if w is not None and self.all_on:
             self.sp.enable_fast_full(False)
             self.all_on = False
+            self._abb = {}                       # evaluators captured the fast-full residual
         self.sp.set_smask(w)
-        self._abb = {}
-        self._ppab_b = jax.jit(jax.vmap(self.sp._per_pulsar_ab_impl, in_axes=(0, None, None)))
 
     # ---- theta packing ----
     def theta_of(self, src_T):
@@ -140,7 +144,7 @@ class B1Marg:
         thetas = np.atleast_2d(np.asarray(thetas, float))
         T = thetas.shape[0]
         tb = jnp.asarray(thetas)
-        a_base, b_base = self._ppab_b(tb, self.data, self.mask)
+        a_base, b_base = self._ppab_b(tb, self.data, self.mask, self.sp.smask)
         a_base = np.asarray(a_base); b_base = np.asarray(b_base)
         bflat = b_base.reshape(T, self.npsr * self.ngp)
         u = bflat @ self._Minv
@@ -155,7 +159,8 @@ class B1Marg:
         for p in range(self.npsr):
             if p not in self._abb:
                 self._abb[p] = make_pulsar_ab_batch(self.sp, p)
-            a_pf, b_pf = self._abb[p](tb, jnp.asarray(self.EV[p]), self.data, self.mask)
+            a_pf, b_pf = self._abb[p](tb, jnp.asarray(self.EV[p]), self.data, self.mask,
+                                      self.sp.smask)
             LNL[:, p] = np.asarray(_rank_update(a_pf, b_pf, b_base_j[:, p], u_p_j[:, p],
                                                 Minv_pp_j[p], Qb, sa, ab[:, p], self._const))
         self.n_calls += T
