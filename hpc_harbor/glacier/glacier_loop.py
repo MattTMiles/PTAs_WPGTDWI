@@ -87,6 +87,11 @@ from glacier_pop import (draw_population, source_band_power, a_eff_projection,
 # ---- campaign constants (pre-registered) ----
 T_LABEL = 30
 TIER = "lit"
+# REMEDY A (authorized 2026-07-23): the generative band extends to ~2 nHz so the drain is a
+# measurement, not an edge (GLACIER_capstone.md SSII/V.1 -- the incumbent 10-32 nHz box is
+# outside the array's hearing; certified by the g2a-ii re-gate at this band). Every campaign
+# draw and every BackgroundFit in this driver uses THIS band; banked per cell.
+BAND_CAMPAIGN = (-8.7, -7.5)
 SKIES = list(range(8))
 N_ITER, N_ITER_EXT = 6, 12
 QBAR = 0.9
@@ -305,7 +310,7 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
     p(f"[GLACIER-1] cell {stem} full_floors={full_floors} lane={lane_tag()}")
 
     # ---- census + igniter embedding (paired arms share the census seed) ----
-    pop = draw_population(SEED_POP_BASE + sky, n_src=n_src)
+    pop = draw_population(SEED_POP_BASE + sky, n_src=n_src, band_log10f=BAND_CAMPAIGN)
     slots, n_harm, active, chan, n_clip = embed_igniter(pop, E_IGNITER[arm],
                                                         VENUE_SPAN_S[T_LABEL])
     n_slot = len(slots)
@@ -350,7 +355,7 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
         theta_rec[nd + I_GWPHI] = rng_s.uniform(0, 2*np.pi)
 
     led = PromoteLedger(slots)
-    bf = BackgroundFit(amo)
+    bf = BackgroundFit(amo, band_log10f=BAND_CAMPAIGN)
     box_sigma = np.array([1.0, np.pi, 1.0, 0.5, 0.25, 0.25, np.pi, 0.5*np.pi]) / np.sqrt(3.0)
     a_grid = np.linspace(A_TARGET_LOG10 - 1.0, A_TARGET_LOG10 + 1.0, 41)
     scale = TE.phi_scale({"n_dist": nd}) if hasattr(TE, "phi_scale") else \
@@ -451,7 +456,7 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
                  conc_ratio=ratio, sig_opt=sig_opt, sig_pes=sig_pes,
                  fed_mask=led.fed, promote_events=led.event_array(),
                  areas_deg2=areas, epoch_cross=(areas < EPOCH_AREA_DEG2),
-                 chan_budget=chan, n_clip=n_clip,
+                 chan_budget=chan, n_clip=n_clip, band_log10f=np.array(BAND_CAMPAIGN),
                  dlnL_det=dlnl, lnK=lnK, qmax=q_of, on_true=on_true,
                  wrong_cert=int(wrong.sum()), floor=fl, floor_err=err, floor_est=est,
                  zero_fraction=zf, full_floors=full_floors,
@@ -585,7 +590,7 @@ def mode_gate(verbose=True):
     check_affinity()
     print("=== GLACIER Stage-1 DRIVER GATES ===", flush=True)
     jax, jnp, C, B1, TE, IG, F, FL = _stack()
-    pop = draw_population(SEED_POP_BASE, n_src=32)
+    pop = draw_population(SEED_POP_BASE, n_src=32, band_log10f=BAND_CAMPAIGN)
     slots, n_harm, active, chan, n_clip = embed_igniter(pop, 0.7, VENUE_SPAN_S[15])
     ok = True
     b = (len(slots) == 32 + 31) and (chan > 32)
@@ -616,7 +621,7 @@ def mode_gate(verbose=True):
     ones = jnp.ones(amo["npsr"])
     data = amo["inject_delay"](jnp.asarray(theta), ones)
     # G-d3: carried-absent (h=-18) vs smask-zero, on the background-fit residual terms
-    bfit = BackgroundFit(amo)
+    bfit = BackgroundFit(amo, band_log10f=BAND_CAMPAIGN)
     smask0 = np.zeros(len(slots))
     p0_a, Ft_a = bfit._data_terms(theta, data, ones, smask0)
     th_abs = theta_with_absent(theta, nd, np.arange(len(slots)))
@@ -745,13 +750,23 @@ def main():
     if a.mode == "drillcmp":
         return mode_drillcmp(a.sub, a.sub_b, n_iter=a.iters)
     if a.mode in ("cell", "null"):
-        print("REFUSED: the Stage-1 fan is HELD until (i) FORGE-G2 runtime-SMASK lands in "
-              "the pulled tree and re-gates on this lane (all Bg5 PASS + bit-exact flip "
-              "0.0 + warm flip <10ms), and (ii) the resume drill (modes drillcell x2 + "
-              "drillcmp) passes on that tree. G-d2 (per-target E-step scoreboard) LANDED "
-              "-- run mode `gate` for its verdict. This refusal is the hold, as code.",
-              flush=True)
-        return 3
+        # THE HOLD, AS CODE (amended 2026-07-23, all four items authorized): cell/null run
+        # only when the holds-cleared marker exists. The marker is written BY HAND after the
+        # three gate jobs are green on this tree -- (1) g2a-ii re-gate at BAND_CAMPAIGN,
+        # (2) FORGE-G2 smask battery + Bg5 on this lane, (3) resume drill + driver re-gate --
+        # and records their job ids. Deleting the marker re-arms the hold.
+        import glacier_pop as GPM
+        marker = f"{GPM.OUT}/HOLDS_CLEARED"
+        if not os.path.exists(marker):
+            print(f"REFUSED: no {marker}. The Stage-1 fan is HELD until the three gate "
+                  "jobs are green on this tree: (1) g2a-ii re-gate at BAND_CAMPAIGN "
+                  "(remedy A), (2) FORGE-G2 runtime-SMASK battery (SG1-SG6) + Bg5 on this "
+                  "lane, (3) resume drill (drillcell x2 + drillcmp) + driver-gate re-run. "
+                  "The marker records the green job ids. This refusal is the hold, as code.",
+                  flush=True)
+            return 3
+        with open(marker) as fh:
+            print(f"[GLACIER-1] holds cleared: {fh.read().strip()}", flush=True)
     return 2
 
 
