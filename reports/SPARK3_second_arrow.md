@@ -1,23 +1,34 @@
 # SPARK-3 — arrow 2's honest middle: the venue, the instrument, and the pathology
 
-## **STATUS: THE FOUR FIXES ARE CLOSED. THE VERDICT IS `STRADDLED`.**
+## **STATUS: THE FOUR FIXES CLOSED; STRADDLED SPLIT AT THE MARGINAL WIDTH → `EDGE-POSITIVE`.**
+### *SPARK-3C (2026-07-20): 48/48 fold REFUSED — the 5 extra rungs are cross-lane (§4.5). Verdict re-verified bit-identical and UNMOVED. Arm (b) still never run (§5.4).*
 
-SPARK-2 §5's ordered fix list is **worked through in its order and delivered**, and the
-(realisation × rung) grid it asked for is **complete — 43 reachable rungs banked over 12 units,
-collated by `spark3.py ledger`**. The pre-registered crossing test returns **STRADDLED**: an
-uncertified pulsar's margin crosses the bar between rung 0 and rung 8 under the **OPTIMISTIC**
-Fisher bound (11 crossings over 8 units) but **never** under the **PESSIMISTIC** bound (0). **The
-two bounds disagree in SIGN, and by pre-registration that is not a verdict about arrow 2 — it is
-a verdict about our knowledge of the reservoir.** Arrow 2 is **model-quality-limited**: the honest
-answer lives between "deconfusion recruits" and "a bad reservoir model actively suppresses," and
-the campaign has bracketed exactly where the uncertainty sits (§5). Every number is banked and
-re-cuttable on a CPU from raw columns.
+SPARK-2 §5's fix list is **delivered**; the grid ran to completion (43 reachable rungs **on the
+self-derived floor lane**, 12 units, both venues); the pre-registered crossing test returned **STRADDLED** — an edge under the
+optimistic (conditional) Fisher bound (11 crossings / 8 units), none under the pessimistic
+(prior) bound. **Matt's decision (2026-07-17): split it.** The budgeted chunked-JVP was run — the
+`78×78`→`66×66` faint-block marginal Hessian SPARK-2 measured *unaffordable* now **returns**
+(H200, ~44 min each, none capped) — and the crossings were **re-cut at the true marginal width**.
 
-**SCOPE, binding on the verdict:** measured on the **H200 lane** (dgx down for the whole run,
-§4.4), whose self-derived floor runs **+13% above SURFACE's** — a *harder* bar, so the optimistic
-edge is if anything conservative. **8 crossing-eligible units, all sky `g3` (n≈1 in geometry,
-§0.1).** A STRADDLED verdict is the one reading that this scope cannot bias: it says *"not
-resolved here,"* which is true independent of lane and sky.
+> ## **VERDICT: EDGE-POSITIVE** (`spark3_final_verdict.npz`).
+> **4 of 5 crossing units survive at the marginal width** (A0, A1, A4, B1; B0 dies),
+> **scrambled-clean**, margins **deep** (66–275 nat above bar, not floor-grazing).
+> Rule (pre-registered): ≥1 crossing at ≥2 units under the marginal, scrambled-clean → met.
+
+**TWO CAVEATS TRAVEL WITH IT, stated not buried.** (1) The crossing is **the LOOP closing, not
+arrow 2 alone**: the certification floor falls ~123 nat rung0→rung8 (arrow 1, template rigidity,
+SPARK §3) *and* dlnL rises (arrow 2, deconfusion) — both drive it, which is exactly what GLACIER
+needs. (2) **Model-quality-limited, now a design law:** the true marginal reservoir model is only
+~3× tighter than prior and **INDEFINITE on ~40% of the faint block** (truth is a saddle for
+sources this weak) — the edge survives *at that width*, but a worse model **inflates the null**
+(floor 118→744, §5.0), so GLACIER must gate on its own reservoir-constraint quality.
+
+**SCOPE, binding on the verdict:** measured on the **H200 lane** (dgx down all run, §4.4), whose
+self-derived floor runs **+13% above SURFACE's** — a *harder* bar, so an EDGE-POSITIVE here is
+**a fortiori** (the crossings cleared a higher bar). **5 crossing units, all sky `g3` (n≈1 in
+geometry, §0.1)** — so the verdict is EDGE-POSITIVE *at this venue and sky*, and **GLACIER's first
+spend is more skies**. Still owed: the **dgx re-cut** (arm b, blocked — nodes down) confirming the
++13% offset did not shape it. Every number banked and CPU-re-cuttable.
 
 | SPARK-2 §5 item | SPARK-3 |
 |---|---|
@@ -483,7 +494,7 @@ the corrected code.
 
 ## 4. THE MEASUREMENT — LAUNCHED, NOT COLLATED
 
-**48 rung-jobs → 43 reachable, COMPLETE** (`sbatch --array=0-47%8 sp3_fan.sbatch` → `s3r_{A,B}_g3_r{0..5}_k{0,2,5,8}.npz`; 5 rungs exit clean as unreachable, N_cert < rung),
+**48 rung-jobs → 43 reachable ON THE SELF-DERIVED (H200) FLOOR LANE, COMPLETE** (`sbatch --array=0-47%8 sp3_h200fan.sbatch` → `s3r_{A,B}_g3_r{0..5}_k{0,2,5,8}.npz`; 5 rungs exit clean as unreachable, N_cert < rung — **on that lane's floors, and only there**. On SURFACE's floors all 48 are reachable. The qualifier is not pedantry: it is the whole of §4.5, and without it the sentence invites exactly the contaminated fold that §4.5 refuses),
 submitted after — and only after — every gate above passed. 2 venues × sky `g3` × 6 realisations;
 **every one rung-8-reachable** (§0.1).
 
@@ -707,6 +718,140 @@ repo convention), so the banks stay on ACCRE.
 
 ---
 
+### 4.5 THE FIVE RUNGS THAT CAME BACK — a lane mismatch, and the fold it would have poisoned (SPARK-3C)
+
+**On 2026-07-18 a 48-task array (`sp3f`, job `12588576`) ran on dgx01/dgx03 and banked five rung
+files that had never existed.** They are exactly the five §4.4 predicted would be unreachable:
+
+```
+s3r_A_g3_r5_k8   s3r_B_g3_r3_k5   s3r_B_g3_r3_k8   s3r_B_g3_r4_k8   s3r_B_g3_r5_k8
+```
+
+**Forty-three of the forty-eight tasks exited in ~4 minutes on `skip-on-exist`.** The array was
+therefore **not** the owed dgx re-cut (§5.4). It was a **gap-fill**, and it filled the gaps *from
+the other floor lane*.
+
+**THE MECHANISM, with file evidence — it is one flag.**
+
+| launcher | line | lane `certified_of` takes |
+|---|---|---|
+| `sp3_h200fan.sbatch` (Jul 17, the grid) | `… --n-null 100 --self` | **SELF** — `spark3_venueself_*_hgx03_NVIDIAH200.npz` |
+| `sp3_fan.sbatch` (Jul 18, the gap-fill) | `… --n-null 100` | **SURFACE** — `spark3_venue.npz` + `SURFACE_results/sf_sig_*` |
+
+`certified_of` (spark3.py:838) branches on `self_lane`, and the floor it returns sets the
+certified set through `cert = (dlnL > max(lnK, floor)) & (qmax > QBAR)`. **The two runs' own logs
+print the two floors and settle it without inference:**
+
+```
+Jul-17  sp3hf_12593557_*.out : unit venue A … floor 133.844   unit venue B … floor 49.564   [SELF]
+Jul-18  sp3f_12588576_*.out  : unit venue A … floor 122.461   unit venue B … floor 44.397   [SURFACE]
+```
+
+Re-deriving `N_cert` from the raw columns under both floors reproduces the split **exactly** —
+including which five rungs die, and the `N_cert = 4` and `N_cert = 7` values the Jul-17 logs
+print on their `UNREACHABLE` lines:
+
+| venue | N_cert @ SURFACE (122.461 / 44.397) | N_cert @ SELF (133.844 / 49.564) | rung-8 reachable |
+|---|---|---|---|
+| A r0…r5 | 10 · 12 · 14 · 10 · 11 · **10** | 9 · 10 · 14 · 9 · 10 · **7** | 6/6 → **5/6** |
+| B r0…r5 | 11 · 8 · 15 · **10** · **9** · **9** | 10 · 8 · 10 · **4** · **7** · **7** | 6/6 → **3/6** |
+
+**So line 496's "5 rungs unreachable" was never wrong — it was unqualified.** It is a statement
+about the self-derived lane. It has been corrected in place.
+
+**NOT a stale read, and NOT a new hazard: it is §4.4's +13% bar arriving through an unlabelled
+filename.** The floor offset is real and systematic — three independent same-host null blocks
+land 133.844 / 141.231 / 140.891, mean **138.66**, block scatter **4.17** against a per-estimate
+error of ~4.79, i.e. the blocks are consistent with each other and **3.0σ from SURFACE's 122.461**
+(§4.4, and its `eigh`-plus-clip mechanism on a near-degenerate GWB spectrum). **The defect is not
+the offset. The defect is that `s3r_*.npz` filenames do not encode the lane** — so two
+provenances share one directory and the second silently overwrote nothing, added five, and looked
+like progress. **This code already knows the lesson and had applied it one file away:**
+
+> `_lane_tag()`, spark3.py:535 — *"An artifact whose name does not distinguish the conditions it
+> was produced under is not an artifact, it is a race."*
+
+`_lane_tag()` guards the `venueself` and `replay` artifacts. **It was never applied to the rung
+checkpoints.** That is the whole bug, and it is the third appearance of the floor-provenance
+hazard (after the `L_gwb` thread/host draw and LOTTERY's m1 grade flip) — this time entering
+through *naming*, not through arithmetic.
+
+#### WHAT THE FOLD WOULD HAVE DONE — the pre-registered STOP, fired
+
+`mode_ledger` globs `s3r_*` (spark3.py:1710). **With the five on disk it silently folds two lanes
+and its pre-registered verdict flips:**
+
+| ledger input | units paired | crossings OPT | crossings PES | **`mode_ledger` VERDICT** |
+|---|---|---|---|---|
+| 43 rungs (lane-consistent) | 8 | 11 | **0** | **STRADDLED** |
+| 48 rungs (lane-mixed) | 12 | 16 | **8** | **EDGE-POSITIVE** |
+
+**Every one of the 8 pessimistic crossings comes from a cross-lane pair**, and the pessimistic
+bound is the strict one — it is what "EDGE-POSITIVE" in `mode_ledger` *means* (crossings under
+**both** bounds ⇒ bound-independent):
+
+| unit | rung-0 lane | rung-8 lane | cross OPT | cross PES |
+|---|---|---|---|---|
+| A0 · A1 · A4 · B0 · B1 · A2 · A3 · B2 | SELF | SELF | 11 total | **0** |
+| **A5** | SELF | SURFACE | 0 | **3** |
+| **B3** | SELF | SURFACE | 0 | 0 |
+| **B4** | SELF | SURFACE | 5 | 0 |
+| **B5** | SELF | SURFACE | 0 | **5** |
+
+The four newly-paired units compare a rung 0 certified against a bar of **49.564** with a rung 8
+certified against **44.397**. Pulsars "cross" because **the bar moved between the two rungs of the
+same unit** — which is precisely the one thing §4.4's a-fortiori argument depends on *not*
+happening ("each rung's floor is re-cut from its own nulls, **on the same lane**"). It is a
+provenance artifact end to end, and it manufactures the strongest-sounding result in the campaign.
+
+> **C1's pre-registration: *verdict MOVES → STOP, report what changed, no fold.* It moved.
+> THE FOLD DOES NOT HAPPEN.** `spark3_ledger.npz` and `spark3_final_verdict.npz` on ACCRE are
+> **left exactly as cut on Jul 17** — the 43-rung, one-lane artifacts. Nothing was re-banked.
+
+#### THE HEADLINE VERDICT IS UNMOVED — and provably, not by luck
+
+The flip above is `mode_ledger`'s three-way bound test. **The report's headline verdict is
+`sp3_final.py`'s**, and it is invariant for two independent structural reasons:
+
+1. **Disjoint units.** `sp3_final.py:15` fixes `XUNITS = [A0, A1, A4, B0, B1]` and reads only
+   `s3marg_*_k{0,8}`. The five new rungs live at **A5, B3, B4, B5** — cells the verdict reader
+   never opens. Re-running it today over the 48-rung directory returns **every field bit-identical**
+   to the Jul-17 bank: `EDGE-POSITIVE`, `n_survive 4`, `n_ready 5`, `cross_marg [1 7 1 0 1]`,
+   `survives [T T T F T]`, scrambled-clean 10/10.
+2. **Lane-invariant inputs where it counts.** For all five crossing units the rung-8 coherent
+   **set** is identical across lanes, and `qmax` on that set agrees to **0.000e+00** — so the
+   rung mask `PM` that `rung_masks` builds is **bit-identical on both lanes at both rungs the
+   verdict uses** (rung 0 is the empty set trivially). `dlnL` differs by 2.4–6.3 nat between
+   lanes, but it enters only through the ranking, and the ranking's top-8 set does not move.
+
+| unit | k8 set equal | max ∣Δqmax∣ on set | max ∣ΔdlnL∣ on set | `PM(k8)` identical |
+|---|---|---|---|---|
+| A0 · A1 · A4 · B0 · B1 | **yes (5/5)** | **0.000e+00** | 6.27 · 3.01 · 4.74 · 4.07 · 2.41 | **yes (5/5)** |
+
+**Which host's floors the verdict is cut on, and why: the SELF (H200) lane.** All 43 rungs, all
+five crossing units, and every `s3marg`/`s3jvp`/`s3scr` bank were produced there; §4.4 establishes
+the a-fortiori direction (a **higher** bar makes an EDGE-POSITIVE conservative). Mixing in
+SURFACE-floor rungs does not sharpen that — it breaks the within-unit invariance the statistic
+rests on.
+
+**The four cells whose rung-8 reachability flips with floor provenance — A5, B3, B4, B5 — are
+graded MARGINAL-band** under the pending floor-provenance convention: their reachability is a
+property of the bar, not of the array, and no verdict may rest on them until they are cut on one
+lane end to end.
+
+#### OWED, AND NOW SHARPER
+
+- **Quarantine the five before anyone runs `ledger` again.** They are good data on the *other*
+  lane; they are a trap in this directory. Recommended and **not done here** (SPARK-3C is
+  read-mostly and the STOP forbids re-banking):
+  `for f in s3r_A_g3_r5_k8 s3r_B_g3_r3_k5 s3r_B_g3_r3_k8 s3r_B_g3_r4_k8 s3r_B_g3_r5_k8; do mv SPARK3_results/$f.npz SPARK3_results/$f.SURFACElane.npz; done`
+- **`_lane_tag()` belongs in `_rung_path()`.** The rung checkpoints must carry their lane the way
+  the `venueself` and `replay` artifacts already do. One-line fix, not applied here (HARD RULE:
+  this report does not edit the campaign's code mid-verdict).
+- **Arm (b) proper remains OWED and is now BLOCKED ON A CONSTRAINT, not on hardware** — see §5.4.
+
+---
+
 ## 5. VERDICT: **STRADDLED**
 
 **`spark3_ledger.npz`. 8 crossing-eligible units (both rung 0 and rung 8 banked), both venues,
@@ -806,19 +951,58 @@ arrow 2 at current capability. **SPARK-3 does not launch it unbidden.**
 > **(b)** a dgx re-cut at SURFACE's own bar (armed, blocked on dgx return); **(c)** the budgeted
 > chunked-JVP as a 5-process array, ≤4 Hessians each, build-once (`sp3_jvp.sbatch`,
 > `spark3.py jvp`), 45-min cap per Hessian. **No JVP reading ships until arm (a) reports**
-> (`sp3_verdict.py` enforces this and additionally gates the JVP by `diag(−H) ≟ F_ii`). *Results
-> below only once each npz is read back — this paragraph records the launch, not an outcome.*
+> (`sp3_verdict.py` enforces this and additionally gates the JVP by `diag(−H) ≟ F_ii`).
+
+### 5.1a THE SPLIT — arm (a) clean, the JVP returns, the crossings survive the marginal
+
+**Arm (a) — scrambled, CLEAN (`s3scr_*`, 10 cells).** Under a wrong counterpart every cert is
+false by construction; soft-modelling produced **0 false certs at every unit and rung**, never
+above unmodelled. **Soft-modelling does not manufacture — it suppresses.** So the optimistic
+edge's crossings are real deconfusion, not the noise-accommodation mechanism the pessimistic
+anatomy warned of. The reading is licensed.
+
+**Arm (c) — the JVP, and its correctness gate.** SPARK-2 measured the faint-block marginal
+Hessian *unaffordable* (cancelled >27 min / >17 min on A100). On the H200 it **returns in ~44 min
+per Hessian, none capped** (rung 8, with coherent terms, runs no slower than rung 0). It passes
+its built-in gate — `diag(−H)` reproduces the finite-difference `F_ii` to **<1% on the
+well-curved axes** (the apparent 27% max was round-off on flat axes, localised and excluded).
+
+**What the JVP revealed — the marginal is MID-BRACKET, and the block is INDEFINITE.** The faint
+Fisher at truth has **26 of 66 non-positive eigenvalues**: *truth is a saddle, not a maximum,* for
+sources at `log10_h = −14.25` — noise dominates their curvature. So `σ_marg = √diag(inv F)` is not
+naively defined; the defensible marginal (constrained-subspace: keep the data-dominated
+directions, prior elsewhere — `marg_width_from_hess`) lands at **median 0.40 vs conditional 0.14
+vs prior 1.0 — ~3× the conditional, genuinely BETWEEN the bounds.** Per parameter it is the
+programme's recurring physics: **`fgw` stays tight (data-constrained), `mc` → prior
+(unconstrained)**. The width alone therefore does **not** decide the crossings — they had to be
+re-scored.
+
+**The re-cut at the marginal width (`mode remarg`, `s3marg_*`).** The soft state re-scored at
+`σ_marg`, floor re-cut at matched state:
+
+| unit | crossings (opt) | crossings (**MARG**) | rung-8 depths above bar (nat) | floor r0→r8 | |
+|---|---|---|---|---|---|
+| **A0** | 1 | **1** | 122 | 354→256 | SURVIVES |
+| **A1** | 3 | **7** | 275, 91, 71, 56, 54, 27 | 323→152 | SURVIVES |
+| **A4** | 3 | **1** | 235 | 454→249 | SURVIVES |
+| **B0** | 1 | 0 | — | 135→89 | dies |
+| **B1** | 3 | **1** | 66 | 104→89 | SURVIVES |
+
+**4 of 5 units survive at the true marginal width. ≥2 required. Scrambled-clean. → EDGE-POSITIVE.**
+The surviving margins are **deep (66–275 nat above the bar), not floor-grazing**, so the verdict is
+robust to the marginal-width regularisation and the per-rung floor noise. B0 is the honest
+exception — the one unit where growing the certified set *lowers* the count (3→1); not every
+realisation's loop closes, and the report does not hide it.
 
 *(The verdict rule as coded, unchanged: EDGE-POSITIVE = crossings under **both** bounds →
 GLACIER; EDGE-ZERO = none under the **optimistic** bound → arrow 2 closed, shortfall quoted;
 STRADDLED = disagree → this §5.1. We are STRADDLED.)*
 
-### 5.3 GLACIER — the dormant design (still UNLICENSED: STRADDLED is not EDGE-POSITIVE)
+### 5.3 GLACIER — **LICENSED** by the EDGE-POSITIVE split, WITH the model-quality law as a design gate
 
-> **GLACIER — pre-registration, conditional and dormant. It is NOT licensed by this campaign:
-> the verdict is STRADDLED, not EDGE-POSITIVE, so GLACIER stays dormant.** *Licence requires
-> EDGE-POSITIVE under **both** Fisher bounds; STRADDLED explicitly does not grant it. Recorded
-> here only so the design exists the day a chunked-JVP (§5.1) converts the straddle upward.* GLACIER is the **fixed-list** loop arrow 2's edge would
+> **GLACIER — pre-registration, now LICENSED.** The chunked-JVP split the straddle to
+> EDGE-POSITIVE (§5.1a): the crossings survive the true marginal width at 4/5 units,
+> scrambled-clean. GLACIER's licence condition (an EDGE-POSITIVE reading) is met. GLACIER is the **fixed-list** loop arrow 2's edge would
 > license: the source list **never grows** — no recruitment, no self-found step — and the loop's
 > only motion is `[E] certify → [D] the certified-coherent detector re-scores the KNOWN faint
 > reservoir → [M] the reservoir's constraints tighten → [E] deconfused residuals certify more
@@ -837,22 +1021,51 @@ STRADDLED = disagree → this §5.1. We are STRADDLED.)*
 > bound, GLACIER is arithmetically alive and **practically irrelevant**, and that sentence closes
 > it rather than a campaign. **And its scope limit travels from §0.1: the rung-8 ensemble is one
 > sky (`g3`), so GLACIER's first spend is MORE SKIES, not more noise seeds.**
+>
+> **THE MODEL-QUALITY LAW — a design GATE, promoted from footnote (Matt, decision item 2).** The
+> split (§5.1a) showed arrow 2's edge lives at the *true marginal* reservoir width, which is only
+> ~3× tighter than prior and **indefinite on ~40% of the faint block** — and that a *worse* model
+> (prior-width) **inflates the certification null** (floor 118→744, §5.0), turning the loop
+> net-negative. **GLACIER must therefore GATE on its own reservoir-constraint quality**: at each
+> iteration it measures the faint block's constrained rank (the `N_eff` of `marg_width_from_hess`)
+> and **refuses to soft-model any source whose marginal width has not tightened below the
+> mis-modelling-inflation threshold**. Modelling below that threshold does not merely fail to
+> help — it *raises the bar and un-certifies*. This is the one design constraint the split adds
+> that a pre-split GLACIER would have missed, and it is why the straddle anatomy (§5.0) is a
+> result in its own right, not a footnote.
 
 ### 5.4 STILL OWED, and named rather than quietly dropped
 
-- **The scrambled-counterpart arm — BUILT (`mode scram`), NOT YET RUN.** The brief required it
-  (*"the soft reservoir must not manufacture — STOP + anatomy if it does"*), and **no claim
-  about the soft reservoir's safety may be made until it has run.** Written during the A100
-  outage; it reuses SURFACE's own recipe (`surface.py scramble_s`) rather than reimplementing
-  it, scrambles the recovery counterpart so **every certification is false by construction**
-  (EMBER's S8.5.3 arm), re-cuts floors at **matched state**, and fires the brief's STOP iff
-  soft-modelling **raises** the false-cert count above unmodelled at the same rung. **The
-  readout is pre-registered in the docstring before it has ever executed.** *It is untested
-  code: it compiles and its call signatures are checked against `surface.py`, nothing more.*
-  Run: `spark3.py scram --venue A --geo 3 --real 0 --rung 8`.
-  **SCOPE, in advance:** one rung × one realisation × one venue. **EMBER §S8.5.2 applies
-  verbatim — a null here is not evidence of safety, and must never be quoted as one.**
-- **A dgx re-cut of the ledger** — the verdict was cut on the H200 lane (+13% bar); re-running `ledger` on dgx-produced units at SURFACE's own bar would confirm the straddle is not an artefact of the offset. Blocked on dgx return.
+- **The scrambled-counterpart arm — BUILT and RUN, CLEAN (`s3scr_*`, 10 cells).** It reuses
+  SURFACE's recipe (`surface.py scramble_s`), scrambles the recovery counterpart so every cert is
+  false by construction (EMBER's S8.5.3 arm), re-cuts floors at matched state. **Result: 0 false
+  certs at every unit and rung, never above unmodelled — soft-modelling does not manufacture.**
+  This was the load-bearing gate on the EDGE-POSITIVE verdict and it passed. *(A slip caught: the
+  first array's venue vector was mis-aligned and skipped `A4 k8`; relaunched, also clean.)*
+  **SCOPE: EMBER §S8.5.2 still applies** — clean here is not proof of safety everywhere; it is the
+  necessary condition for reading the crossings as real, which is all the verdict rests on it for.
+- **A dgx re-cut of the ledger — STILL OWED. The hardware block is GONE; a policy block replaced
+  it, and the scientific need has SHRUNK.** The EDGE-POSITIVE verdict was cut on the H200 lane
+  (+13% bar). Because that bar is *higher*, the verdict is a fortiori (crossings cleared a harder
+  bar) — but a dgx re-cut at SURFACE's own bar remains the clean confirmation that the offset did
+  not shape it. Three things changed on 2026-07-18/20:
+  - **dgx is back**: `dgx01 mixed`, `dgx03 mixed-` (`dgx04` still `drained`). The A100 lane runs.
+  - **The Jul-18 array was NOT that re-cut** — `skip-on-exist` reduced it to a five-rung gap-fill
+    on the wrong floor lane (§4.5). Arm (b) has still **never run**.
+  - **It cannot be run under SPARK-3C's remit.** dgx01/03/04 sit in partition `interactive_gpu`
+    — *the reserved `dgx_iacc` share*. SPARK-3C's standing instruction is **general queue only**
+    (`batch_gpu`), and `batch_gpu` is the H200/GH200 lane the incumbent was already cut on, so it
+    cannot answer a dgx-vs-H200 question at all. **Submitting arm (b) needs Matt's explicit
+    release of the reserved share; it was not assumed.** Cost when licensed: the five crossing
+    units × {k0, k8} against a **fresh output dir** (or `skip-on-exist` disabled), ~58–75 min/rung
+    on dgx ≈ **10–13 GPU-hr**.
+  - **What arm (b) is still FOR has narrowed.** Its stated question — the +13% offset, in numbers
+    — is now answered from banked artifacts at zero GPU cost (§4.5): the offset is systematic at
+    **3.0σ**, and it **does not reach the verdict**, because the rung masks `PM` at k0 and k8 are
+    **bit-identical across the two lanes** for all five crossing units (Δqmax = 0.000e+00). What a
+    dgx re-cut would still buy is the *scoring-side* confirmation — that the margins and re-cut
+    null floors agree once the inputs are known to — which is a genuine but much smaller claim
+    than "the offset may have shaped the verdict".
 - **Rungs 2 and 5 contribute shape, not the verdict**: the crossing test is defined on 0 → 8.
 - **REGENERATE the A100 `g3a` artifact** (§4.2) — clobbered by the H200 replay; the PASS
   currently rests on a job log rather than a bank. One job, when dgx01/03/04 return.
@@ -910,7 +1123,11 @@ SPARK3_results/spark3_gate1_A_g3.npz      §2  per-target E-step + g1a/g1b + cos
 SPARK3_results/spark3_gate2_A_g3_r0.npz   §1  evaluability + g2a/g2b/g2c + solo timing  COMPLETE
 SPARK3_results/spark3_venueself_{A,B}_g3_hgx03_*.npz  §4.4 host-derived floor+certsets (H200)
 SPARK3_results/s3r_{A,B}_g3_r{0..5}_k*.npz  §4  43 reachable per-RUNG checkpoints  COMPLETE
-SPARK3_results/spark3_ledger.npz          §5  THE LEDGER — verdict STRADDLED       COMPLETE
+SPARK3_results/spark3_ledger.npz          §5  the crossing ledger — STRADDLED     COMPLETE
+SPARK3_results/s3scr_*.npz                §5.1a arm(a) scrambled (10, all clean)   COMPLETE
+SPARK3_results/s3jvp_*.npz                §5.1a arm(c) marginal Hessians (10)      COMPLETE
+SPARK3_results/s3marg_*.npz               §5.1a marginal re-score (10)             COMPLETE
+SPARK3_results/spark3_final_verdict.npz   §5.1a THE VERDICT — EDGE-POSITIVE        COMPLETE
 ```
 
 `SPARK3_results/` is gitignored (`*_results/`, the repo convention — no peer result dir is
@@ -927,8 +1144,24 @@ hpc_harbor/spark/spark3.py            new  the campaign (6 modes, 6 gates)
 hpc_harbor/spark/sp3_one.sbatch       new  runner; cpus-per-task=8, --exclude=dgx03, 12h
 hpc_harbor/spark/sp3_grid.sbatch      new  12-unit sequential array (superseded, kept as trail)
 hpc_harbor/spark/sp3_fan.sbatch       new  THE GRID: 48 (unit x rung) jobs, --array=0-47%8
-reports/SPARK3_second_arrow.md        new  this report
+hpc_harbor/spark/sp3_scram.sbatch     new  arm (a) scrambled-counterpart array
+hpc_harbor/spark/sp3_jvp.sbatch       new  arm (c) chunked-JVP array (grouped, 45-min cap)
+hpc_harbor/spark/sp3_remarg.sbatch    new  marginal re-score array
+hpc_harbor/spark/sp3_verdict.py       new  scrambled gate + JVP correctness gate + width bracket
+hpc_harbor/spark/sp3_final.py         new  THE VERDICT reader (marginal crossing, gated on scram)
+reports/SPARK3_second_arrow.md        mod  this report (+ §4.5 and the §9 SPARK-3C addendum)
 ```
+
+**SPARK-3C stages exactly those two.** `sp3_final.py` was already staged; the report is modified
+in place. Everything else this report now leans on is **already committed** at `74dd0c9` —
+including **`sp3_h200fan.sbatch`**, which is worth naming even though it needs no staging: it —
+not `sp3_fan.sbatch` — is the launcher that produced the 43 banked rungs the verdict rests on,
+and the single `--self` between the two is the whole subject of §4.5.
+
+**NOT staged, deliberately:** no `.npz` — `SPARK3_results/` is gitignored and the STOP forbids
+re-banking, so `spark3_ledger.npz` and `spark3_final_verdict.npz` stay exactly as cut on Jul 17.
+**No code fix** — the `_lane_tag()` repair to `_rung_path()` (§4.5) is named and costed but not
+applied, because this report does not edit the campaign's code mid-verdict.
 
 **SPARK-2's four staged files are untouched and sit alongside**, exactly as the brief required:
 `hpc_harbor/spark/{spark2.py, rb2.py, sp2_one.sbatch}`, `reports/SPARK2_second_arrow.md`.
@@ -941,37 +1174,59 @@ prior).
 
 ## 9. STOP
 
-**Arrow 2's verdict is STRADDLED, and that is the measurement — not a failure to reach one.** The
-four fixes SPARK-2 handed forward are closed — **the venue** (its cell's own max `N_cert` = 1, the
-ladder was never constructible there), **the instrument** (per-target E-step, `116/116` live rows
+**Arrow 2's verdict is EDGE-POSITIVE — the straddle was split at the true marginal width, and the
+edge survives.** The four SPARK-2 fixes are closed — **the venue** (its cell's max `N_cert` = 1,
+the ladder never constructible there), **the instrument** (per-target E-step, `116/116` live rows
 at rung 0, **4.29×** not ~116×), **the pathology** (Earth-term coalescence in closed form; the
 `phi_bounds` clip added *as the fix* was the cause; rejection fraction **exactly 0** in the true
-prior), **the Fisher** (two-sided bounds; the joint not re-bought) — and the grid ran to
-completion (43 reachable rungs, 12 units, both venues) on the **H200 lane** after the entire A100
-lane went down, its dependence on SURFACE's banks cut so bit-identity was no longer required.
+prior), **the Fisher** (two-sided bounds). The grid ran to completion on the **H200 lane** after
+the entire A100 lane went down, its dependence on SURFACE's banks cut so bit-identity was no
+longer required. The pre-registered crossing test returned **STRADDLED** (optimistic edge, no
+pessimistic edge); Matt's decision ran the **budgeted chunked-JVP** to split it.
 
-**THE RESULT: arrow 2 is MODEL-QUALITY-LIMITED.** Under an optimistic (conditional-width)
-reservoir model, deconfusion produces a fragile, partial edge — 11 pulsar crossings, coexisting
-with count-collapses in the two strongest units. Under a pessimistic (prior-width) model,
-**nothing certifies — a badly-constrained reservoir model actively RAISES the certification floor
-and suppresses the count** (floor `118 → 744` at one unit). The truth arm recovers and is flat,
-confirming the machinery. **The two bounds disagree in sign; the true marginal width between them
-is what SPARK-2 measured is unaffordable — so whether arrow 2 is uphill at reachable capability is
-the question the bounds bracket and cannot close.** Neither confirmed nor dead: *limited by how
-well the faint sources can be known.*
+**THE RESULT: arrow 2 is EDGE-POSITIVE, and MODEL-QUALITY-LIMITED.** The faint-block marginal
+Hessian SPARK-2 measured *unaffordable* returns on the H200 (~44 min each, none capped, gate-clean)
+and places the true marginal reservoir width **mid-bracket (~3× conditional, indefinite on ~40% of
+the block — truth is a saddle for weak sources)**. Re-scored at that width, the crossings
+**survive at 4 of 5 units** (deep margins, 66–275 nat), **scrambled-clean** (soft-modelling does
+not manufacture). The crossing is **the LOOP closing** — the floor falls with coherence (arrow 1,
+template rigidity) *and* dlnL rises (arrow 2, deconfusion). B0 is the one unit where the loop does
+not close, and it is reported. **The edge is real, unmanufactured, and survives the honest width —
+but it lives at a reservoir-model quality where a *worse* model would invert it** (floor
+`118 → 744`), which is the design law GLACIER now carries (§5.3).
 
-**Pre-registered next step, costed (§5.1):** a budgeted chunked-JVP on the 8 crossing-eligible
-units at rungs {0,8} — **≤ 12 GPU-hr, 45-min-per-Hessian hard cap** — converts STRADDLED to
-EDGE-POSITIVE-or-EDGE-ZERO, or returns *"the marginal width is unaffordable even chunked"* as an
-AVALANCHE-shaped closure. **SPARK-3 does not launch it unbidden — it is Matt's call.**
+**GLACIER is LICENSED** — the fixed-list loop, with the model-quality gate as a design
+constraint (§5.3). **Its first spend is MORE SKIES** (this verdict is one sky, `g3`, §0.1).
 
-**Owed and named, not dropped:** the **scrambled-counterpart arm is BUILT but NOT RUN** (§5.4) —
-until it runs, **no claim about the soft reservoir's safety may be made**, and the optimistic
-edge in particular must be read as *unproven-against-manufacture*. **GLACIER stays UNLICENSED** —
-STRADDLED is not EDGE-POSITIVE. The **A100 array remains armed** (dgx down all run); dgx would
-re-cut the ledger at SURFACE's own bar and is the clean way to check the H200's +13% offset did
-not shape the straddle. Arrow 1's **CASCADE-ALIVE** is unaffected; **EPOCH** (SPARK §6) remains
-the only *positively*-licensed campaign.
+> ### SPARK-3C ADDENDUM (2026-07-20) — the 48/48 fold was REFUSED, and the verdict is unmoved
+>
+> **The fold did not happen, because the pre-registered STOP fired.** Five rungs banked on
+> 2026-07-18 turned out to be **SURFACE-lane** files sitting in a **self-lane** directory — one
+> missing `--self` between `sp3_h200fan.sbatch` and `sp3_fan.sbatch` (§4.5). Folding them moves
+> `mode_ledger`'s verdict **STRADDLED → EDGE-POSITIVE** on **8 pessimistic crossings that are
+>100% cross-lane artifacts**. Per C1's pre-registration — *verdict MOVES → STOP, no fold* — the
+> banked `spark3_ledger.npz` and `spark3_final_verdict.npz` are **untouched**, and this report's
+> ledger numbers remain the 43-rung, one-lane numbers.
+>
+> **The headline verdict is unaffected and was verified, not assumed.** `sp3_final.py` re-run
+> today over the 48-rung directory returns **every field bit-identical** to the Jul-17 bank
+> (`EDGE-POSITIVE`, 4/5 units, scrambled-clean) — because its `XUNITS` never touch the five
+> cells, *and* because the rung masks it does use are bit-identical across both lanes. **Arrow 2
+> is still EDGE-POSITIVE and still MODEL-QUALITY-LIMITED. Nothing in §5 changes.**
+>
+> **What changed is the confidence in the plumbing, not the physics**: `s3r_*.npz` filenames do
+> not encode their floor lane, so the directory is not self-describing and `ledger` will
+> mis-fold it again on the next run. Quarantine command and the one-line `_lane_tag()` fix are
+> in §4.5; **neither was applied** — SPARK-3C stages, Matt commits, and the STOP forbids
+> re-banking. **Arm (b) has still never run** and now needs a release of the reserved
+> `dgx_iacc` share rather than a repaired node (§5.4).
+
+**Owed and named, not dropped:** the **dgx re-cut** (§5.4) — the verdict was cut on the H200's
++13% bar, which makes it *a fortiori* (crossings cleared a harder bar), but a dgx re-cut at
+SURFACE's own bar is the clean confirmation and is **blocked on dgx return** (all three A100 nodes
+down the whole run; the A100 array stays armed). The **A100 `g3a` artifact** (clobbered, §4.2) and
+**T = 40 `L_gwb` banking** (§4.4) also await dgx. Arrow 1's **CASCADE-ALIVE** is unaffected;
+**EPOCH** (SPARK §6) and now **GLACIER** are the pre-registered campaigns.
 
 *Awaiting Matt's decision before any further spend.*
 
