@@ -208,35 +208,39 @@ def embed_igniter(pop, e_char, tmax_s):
 # ============================================================
 # per-iteration pieces
 # ============================================================
-def fisher_conditional(amo, jnp, theta, data, pmask, smask, box_sigma, chunk=48):
+def fisher_conditional(amo, jnp, theta_rec, carried, nd, box_sigma, data, pmask,
+                       chunk=48):
     """Per-(census member, axis) conditional widths at the CURRENT joint state (central
-    second differences on logL; smask threaded so carried sources are measured against the
-    template state they would ENTER, not a fantasy all-fed joint). Capped at the prior box
-    (the correct 'we know nothing'). Returns (n_slot, n_axis) sig_opt and sig_pes."""
+    second differences on logL). OWN-TERM-LIVE (the G-d2a rung-mask principle, fixed
+    2026-07-24): member k is measured on a template where K ITSELF IS PRESENT at its
+    recovery params and the OTHER carried members are absent (they live in the fitted
+    GP) -- the conditional question is 'how tight would k's widths be if k ENTERED the
+    joint at this state'. The pre-fix code absented k too, so d2logL/dtheta_k^2 == 0
+    identically and the frontier could never fire at ANY brightness -- caught by the
+    r13p25 ladder cells (a 16x-background source reading ratio 1.000; driver gate G-d4
+    is the standing positive control against regression). Capped at the prior box (the
+    correct 'we know nothing'). Returns (n_slot, n_axis) sig_opt, sig_pes, F_ii."""
     lb = amo["logL_batch_theta"]
-    nd = amo["n_dist"]
-    n_slot = (len(theta) - nd) // NP_SRC
-    idx = np.array([nd + NP_SRC*k + j for k in range(n_slot) for j in FISHER_AXES])
+    n_slot = (len(theta_rec) - nd) // NP_SRC
+    carried = set(int(k) for k in carried)
     box = np.array([box_sigma[j] for _ in range(n_slot) for j in FISHER_AXES])
     step = 1e-3 * box
     stack = []
-    for i in range(len(idx)):
-        for d in (-1, 0, 1):
-            t = theta.copy(); t[idx[i]] += d * step[i]
-            stack.append(t)
+    for k in range(n_slot):
+        # member k's own evaluation template: k live, other carried absent
+        others = np.array(sorted(carried - {k}), dtype=int)
+        th_k = theta_with_absent(theta_rec, nd, others)
+        for a, j in enumerate(FISHER_AXES):
+            i = k * len(FISHER_AXES) + a
+            col = nd + NP_SRC*k + j
+            for d in (-1, 0, 1):
+                t = th_k.copy(); t[col] += d * step[i]
+                stack.append(t)
     stack = np.stack(stack)
-    # thread smask through the batched logL by baking it into a wrapper call: logL_batch
-    # takes (theta, data, pmask); smask rides in via the module-level SMASK key inside
-    # MaskedDelay -- the amortised logL closes over `frozen`, so we pass it explicitly
-    # through the pmask-adjacent channel the core exposes at build time. The GLACIER build
-    # keeps smask in the DATA-side residual only through B1Marg; for the raw logL used here
-    # the carried sources are absent from the template iff their slots are at H_ABSENT.
-    # We therefore evaluate with carried slots' h -> -18 (absent, exact to fp) -- the
-    # numerically identical statement that costs no new plumbing on the gated core.
     lls = []
     for c0 in range(0, len(stack), chunk):
         lls.append(np.asarray(lb(jnp.asarray(stack[c0:c0+chunk]), data, pmask)))
-    L = np.concatenate(lls).reshape(len(idx), 3)
+    L = np.concatenate(lls).reshape(n_slot * len(FISHER_AXES), 3)
     d2 = (L[:, 0] - 2.0*L[:, 1] + L[:, 2]) / (step**2)
     F_ii = -d2
     cond = np.where(F_ii > 0, 1.0/np.sqrt(np.maximum(F_ii, 1e-300)), np.inf)
@@ -406,11 +410,11 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
             p(f"  iter {it}: checkpoint exists -- resumed"); continue
         t_it = time.time()
 
-        # (a) Fisher at the current joint state (carried absent on the raw-logL path)
+        # (a) Fisher at the current joint state -- OWN-TERM-LIVE per member (fixed
+        # 2026-07-24; the measured member is present, the OTHER carried are absent)
         carried = np.where(~led.fed)[0]
-        th_f = theta_with_absent(theta_rec, nd, carried)
-        sig_opt, sig_pes, F_ii = fisher_conditional(amo, jnp, th_f, data, ones, None,
-                                                    box_sigma)
+        sig_opt, sig_pes, F_ii = fisher_conditional(amo, jnp, theta_rec, carried, nd,
+                                                    box_sigma, data, ones)
         # (b) the frontier: worst-axis ratio < GATE_RATIO -> fed (strict; SPARK-3's law)
         ratio = np.max(sig_opt / sig_pes, axis=1)
         want_fed = ratio < GATE_RATIO
@@ -727,6 +731,35 @@ def mode_gate(verbose=True):
     print(f"  G-d2c rung-2 coherent path finite: {'PASS' if b7 else 'FAIL'} "
           f"(max|LNL shift| from coherence {moved:.3e}, report-only at this faint venue)")
     ok &= b7
+
+    # ---- G-d4: FRONTIER POSITIVE CONTROL (added 2026-07-24 after the dead-frontier
+    # defect: the pre-fix fisher_conditional absented the measured member, so ratio was
+    # 1.000 at ANY brightness and nothing could ever ignite -- caught by the r13p25
+    # ladder cells, NOT by these gates, because no gate ever put a bright source across
+    # the frontier. This one does, permanently.) ----
+    box_sigma_g = np.array([1.0, np.pi, 1.0, 0.5, 0.25, 0.25, np.pi, 0.5*np.pi]) / np.sqrt(3.0)
+    th_b = np.asarray(amo["theta_truth"], float).copy()
+    th_b[nd + I_H] = -13.25                       # slot 0 at the onset class
+    data_b = amo["inject_delay"](jnp.asarray(th_b), ones)
+    so, spn, _ = fisher_conditional(amo, jnp, th_b, np.arange(len(slots)), nd,
+                                    box_sigma_g, data_b, ones)
+    rat = np.max(so / spn, axis=1)
+    b8a = rat[0] < GATE_RATIO
+    b8b = float(np.median(rat[1:])) > 0.9
+    print(f"  G-d4a frontier feeds a -13.25 member: ratio[0] = {rat[0]:.4f} "
+          f"(< {GATE_RATIO}) -> {'PASS' if b8a else 'FAIL'}")
+    print(f"  G-d4b faint census stays box-limited: median ratio = "
+          f"{float(np.median(rat[1:])):.3f} (> 0.9) -> {'PASS' if b8b else 'FAIL'}")
+    slots4 = slots.copy(); slots4[0, I_H] = -13.25    # the control census: slot 0 bright
+    led4 = PromoteLedger(slots4)
+    led4.promote(0, slots4[0], iteration=0)           # at (control) drawn truth
+    dl4, _, _, _ = sb.columns(th_b, led4, data_b, ones, np.zeros(0, int),
+                              np.zeros(amo["npsr"]))
+    b8c = float(np.max(dl4)) > 1.0
+    print(f"  G-d4c fed bright member lights the scoreboard: max dlnL = "
+          f"{float(np.max(dl4)):.2f} (> 1) -> {'PASS' if b8c else 'FAIL'}")
+    ok &= b8a and b8b and b8c
+
     print(f"\n=== DRIVER GATES: "
           f"{'PASS (fan HELD on FORGE-G2 runtime-SMASK + resume drill)' if ok else 'FAIL'} "
           f"===", flush=True)

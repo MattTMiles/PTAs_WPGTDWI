@@ -1097,3 +1097,58 @@ ENACTED:
   likeliest-ignition corner (w=0.25, T=40). VENUE_SPAN_S[40] = 47.14 yr PROVISIONAL,
   verified against the cut job's own span print before any T=40 cell runs.
 - Budget: 52 cells ~ 1.4x the sky ladder, within the stated ~1.5x; the 150 STOP stands.
+
+## S4.13 STAGE 1 COMPLETE -- THE VERDICT IS FINAL: INERT-ON-COUNT, CLEAN EVERYWHERE
+
+All 36 cells banked (16 signal + 20 scrambled-null; H200 block 12740413, A100 block
+12740567, all COMPLETED, no CampaignStop anywhere). Totals across the ENTIRE arm:
+**N_resolved = 0, N_cert = 0, wrong_certs = 0.** The drain instrument's global check:
+A_bg - A_eff(drawn) over the 16 signal cells = **+0.024 +- 0.082 dex** -- the fitted
+background tracks the drawn sum with no bias at single-realisation scatter, across two
+GPU architectures on the banked-L provenance. Stage-1 verdict (per Matt's decision 4):
+**INERT-ON-COUNT at the realistic normalisation, a RESULT** -- the population clock read
+through the loop; the machinery's realistic-sky null passed at every gate. Act IV,
+scissors framing. Stage-1 spend: ~9 GPU-hr (vs ~75-85 budgeted -- INERT is cheap).
+
+## S4.14 DEFECT: THE FRONTIER WAS STRUCTURALLY DEAD -- S4.13's COUNT COLUMNS RETRACTED PENDING RE-MEASUREMENT
+
+Caught by the ladder doing exactly what Matt built it for: the first r13p25 cells banked
+a **16x-background source reading concentration ratio 1.000 and max dlnL 0.000** -- while
+the DRAIN saw the monster plainly (A_bg -13.68 vs the -14.6 class). A Fisher matrix
+cannot be blind to a 16x-background source unless the source is not in the template it
+differentiates. It wasn't: `fisher_conditional` was called on
+`theta_with_absent(theta_rec, nd, carried)` -- every carried member absent INCLUDING THE
+MEMBER BEING MEASURED. d2logL/dtheta_k^2 of an absent source is identically zero, so
+sig_opt caps at the box and ratio == 1.000 for every carried member AT ANY BRIGHTNESS.
+The frontier could never fire; nothing could ever take the first bite. (The M-step
+carried-absent fix was correct for the M-step and over-applied to the Fisher; no driver
+gate ever pushed a bright source across the frontier, so the gates were green around a
+dead instrument.)
+
+WHAT THIS RETRACTS AND WHAT IT DOESN'T:
+- S4.13's Stage-1 count columns (N_res = N_cert = 0) were GUARANTEED by the defect, not
+  measured. The INERT direction very likely survives (the arithmetic deficit to onset is
+  real) but it must be RE-MEASURED with a live frontier. RETRACTED PENDING RERUN.
+- The DRAIN columns are unaffected (BackgroundFit never touches fisher_conditional):
+  A_bg - A_eff = +0.024 +- 0.082 dex across 16 cells STANDS, as does the null arm's
+  no-manufacturing record (a dead frontier cannot promote, but the scrambled cells' data
+  path, floors, and wrong-cert checks ran; their evidentiary weight is reduced and they
+  rerun with everything else).
+- All gl2 ladder cells cut so far are INVALID. Everything pre-fix is quarantined in
+  GLACIER_results/preFRONTIERFIX/ (290 banks) -- reruns must not resume from them.
+- The remedy-A/fit-gate/SMASK/L_gwb gate records are UNAFFECTED (none touch the Fisher).
+
+THE FIX (one function): fisher_conditional is now OWN-TERM-LIVE per member -- member k
+is measured on a template where k is PRESENT at its recovery params and the OTHER
+carried members are absent (the G-d2a rung-mask principle applied to the frontier; the
+conditional question is 'how tight would k's widths be if k entered the joint here').
+
+THE STANDING CONTROL (G-d4, added to mode gate): (a) a -13.25 slot-0 member must read
+ratio < GATE_RATIO; (b) the faint census must stay box-limited (median ratio > 0.9);
+(c) fed, the bright member must light the scoreboard (max dlnL > 1). The frontier can
+never die silently again.
+
+SEQUENCE: dgate re-run `12762832` (G-d1..G-d4) -> drill re-run `12762833` (fresh dirs;
+the pre-fix drill only certified resume identity of a loop whose frontier never fired)
+-> on green: Stage-1 rerun (both pools) + sky ladder + array ladder resubmitted. Spend
+lost to the defect: ~10 GPU-hr; cumulative still < 25 vs the 150 STOP.

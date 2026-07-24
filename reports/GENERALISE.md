@@ -245,8 +245,9 @@ built it for.
 
 ## 5. GPU spend ledger + provenance
 
-**4.5 GPU-hr of walltime, sacct-verified, across all 27 GENERALISE jobs** (gates ×2,
-warm, drill, 22 fan tasks) vs the 120 GPU-hr STOP bar and the 8.0 GPU-hr header
+**4.5 GPU-hr of walltime, sacct-verified, across all 27 GENERALISE jobs of 2026-07-23**
+(gates ×2, warm, drill, 22 fan tasks) **+ 1.1 GPU-hr (sacct) for the 8-task A-SKY addendum fan
+(2026-07-24, header estimate 1.8)** vs the 120 GPU-hr STOP bar and the 8.0 GPU-hr header
 estimate — 2-way packing sold back the difference. All jobs on `batch_gpu`/hgx03 (H200);
 the reserved dgx share and every GLACIER job untouched (GLACIER's own jobs ran alongside
 on the same node throughout). One fan task (12739993_0) FAILED post-compute on the
@@ -259,6 +260,68 @@ Every realisation npz carries `host` (hgx03), `blas_threads` (8), and
 from offender and count layers, per the stagec_anchor_a2 class) is in the ledger code;
 a full-bank scan found ZERO such pulsars in this campaign — the guard is a no-op here
 and stands for future re-cuts.
+
+## 4b. ARM A-SKY (addendum 2026-07-24) — the boundary cells under sky marginalisation
+
+The Arm-C treatment applied to Arm A's new-boundary load-bearing cells, so the rescoped
+headline carries its error bars from birth. Cells (all n_ecc = 1, lit, **T = 30
+pre-registered** — the census baseline and the Arm-C precedent; the T axis belongs to
+Arm A, not this addendum): (h = −12.75, e = 0.3, 3+13), (−12.75, e = 0.3, 5+11),
+(−12.50, e = 0.3, 3+13), and the old-edge continuity point (−13.00, e = 0.5, 3+13).
+8 skies each (GEO draws 4–11, sky-paired with Arm C), per-sky N = 100 floors
+(v2.2, zero-fraction columns), 15 signal/sky, placement redrawn per (structure, sky)
+among the k_loud slots. Verdict bar inherited from Arm C: survives iff count at
+floor + err > 1 in ≥ 6/8 skies. Seeds 67/68.xM (+10M dist). Header estimate 1.8 GPU-hr
+(banked warm walls) — Arm-C class, launched untrimmed.
+
+**COMPLETE** — 32/32 units (3,680 realisations), all 8 fan tasks COMPLETED under
+backfill during the node-drain window. Figure `GENERALISE_AS_sky.png`; bank
+`gen_armAS_sky.npz`; per-sky rows (floor ± err, estimator, zero-fraction, placement,
+wrong rate) in the ledgers and analysis output.
+
+| cell | pooled-sky (Arm A) | sky median | mean ± sky σ (range) | CONFIRMED skies | verdict (Arm-C vocabulary) |
+|---|---|---|---|---|---|
+| e0.3, h −12.75, 3+13 | 2.07 CONFIRMED | 0.90 | 1.33 ± 1.59 (0.20–5.13) | 2/8 | **FAILS-marginalisation** |
+| **e0.3, h −12.75, 5+11** | 9.20 CONFIRMED | **1.77** | **3.18 ± 3.02 (0.27–7.93)** | **6/8** | **CONFIRMED-under-marginalisation** |
+| e0.3, h −12.50, 3+13 | 2.07 CONFIRMED | 0.90 | 1.43 ± 1.45 (0.27–4.67) | 2/8 | **FAILS-marginalisation** |
+| e0.5, h −13.00, 3+13 (old edge) | 4.07 CONFIRMED | 1.33 | 2.22 ± 2.51 (0.20–7.33) | 4/8 | **FAILS-marginalisation** |
+
+> ### VERDICT — THE SURVIVING EXTERNAL STATEMENT
+> **Exactly one of the four boundary cells survives sky marginalisation: the
+> structure-assisted one.** The paper's quotable external sentence is:
+> ***"In a 5+11 population at h ≥ −12.75, a single e = 0.3 member switches the
+> certified count on in ≥ 6 of 8 independent skies (sky median 1.77, mean 3.18 ± 3.02).
+> Every single-member 3+13 switch claim — including the old e = 0.5 edge at
+> h = −13.0 — is a sky-lottery statement (2–4 of 8 skies), quotable only as a
+> sky-ensemble median with its band, never as a per-sky guarantee."***
+> The eccentricity and structure levers survive as levers; what sky marginalisation
+> removes is every *threshold* claim that rested on a single-member 3+13 population.
+
+**The floor-vs-h check (pre-registered readout #4): the swings do NOT calm at higher h —
+as `floor ∝ h^1.66` predicts.** Per-cell floor mean (min–max across skies, max/min):
+h = −13.0: 26.6 nat (14.2–41.8, **2.9×**); h = −12.75 3+13: 65.8 (39.5–100.7, **2.5×**);
+h = −12.5: 184.1 (105.8–360.0, **3.4×**); 5+11 h = −12.75: 128.0 (59.9–259.8, **4.3×**).
+The absolute floors climb the h^1.66 ladder while the RELATIVE sky swing stays a
+factor ~2.5–4.3 everywhere — loudness buys no floor calm. Unlike Arm C's
+census-loudness cells, zero-fractions here are 0.00 in 30/32 units (the loud box is
+Gumbel-valid; the floor-0.0 sky class does not appear).
+
+**A confounded observation, flagged not claimed:** in every 3+13 cell the single
+placement-0 sky (s10 — the census member slot, f_orb at the top of the band) posts the
+cell's extreme count (5.13 / 4.67 / 7.33), consistent with ATLAS's the-first-source-
+must-live-at-the-top-of-the-band (S7.4.1) — but placement and sky are jointly redrawn
+(as pre-registered), so the two are NOT separable at n = 8; the 5+11 survivor's
+confirmations spread across placements 0/2/3. A placement-controlled ensemble is the
+natural follow-up if this matters for the paper.
+
+**QUEUE EVENT (2026-07-24 ~14:00, recorded for the trail):** the H200 general lane is
+being DRAINED — job 12762708 (account/QOS `nodeupgrade`, priority 2e9) requests all
+8 H200s for 14 days, and every freed GPU is held for it. The A-SKY fan (12761163) AND
+GLACIER's remaining spillover block (glfan2h [28–35]) are both frozen behind it with
+4 GPUs idle. A-SKY stays queued (1-h walltime tasks; they run the moment the drain
+lifts or a backfill window opens). No alternative venue is authorized: the dgx share is
+untouchable per the brief, GH200 is aarch64 (no x86 jax wheels), and the A4000/3090
+class is fp64-crippled (REQUIREMENTS §4).
 
 ## 6. VERDICT BLOCK (one line per arm)
 
@@ -274,3 +337,7 @@ and stands for future re-cuts.
   (best 4/8 vs the ≥ 6/8 bar); the bar sits inside the sky scatter in every cell; every
   lit-vs-vlbi ordering is within sky sigma (NOT a result); the collapse is sky geometry,
   not eccentric-member placement — channel budget is necessary, not sufficient.
+- **ARM A-SKY (addendum):** of Arm A's four boundary cells, only the structure-assisted
+  one survives (5+11, e = 0.3, h = −12.75: 6/8 skies, median 1.77) — every single-member
+  3+13 threshold claim, the old e = 0.5 edge included, is a sky lottery (2–4/8). Floor
+  sky-swings stay ×2.5–4.3 at every loudness (h^1.66 confirmed: no floor calm at high h).
