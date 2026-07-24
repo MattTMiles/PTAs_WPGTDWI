@@ -78,7 +78,8 @@ for p in ("CW_lnL_check", "CW_transition", "hpc_harbor/forge", "hpc_harbor/ignit
           "hpc_harbor/atlas", "hpc_harbor/spark", "hpc_harbor/glacier"):
     sys.path.insert(0, f"{HSYMT}/{p}")
 
-from glacier_pop import (draw_population, source_band_power, a_eff_projection,
+from glacier_pop import (draw_population, draw_population_conditional, LADDER_RUNGS,
+                         source_band_power, a_eff_projection,
                          PromoteLedger, BackgroundFit, CampaignStop, bank_npz, lane_tag,
                          check_affinity, build_glacier_problem, OUT,
                          N_POP_DEFAULT, SEED_POP_BASE, A_TARGET_LOG10,
@@ -92,6 +93,12 @@ TIER = "lit"
 # outside the array's hearing; certified by the g2a-ii re-gate at this band). Every campaign
 # draw and every BackgroundFit in this driver uses THIS band; banked per cell.
 BAND_CAMPAIGN = (-8.7, -7.5)
+# The canonical GWB square roots per venue (host-freedom fix; cut by gl_lgwb_t30.py at
+# cpus=8 on hgx03, cross-host gated by gl_lgwb_xhost.py). strict=True -- a missing bank
+# is a CRASH, never a silent thread/host-dependent recompute. T=40 added for the
+# STAGE-2a ARRAY LADDER (2026-07-24 addendum).
+LGWB_BANKS = {30: "/home/mattm/projects/HSYMT/CW_transition/b1_L_gwb_T30.npz",
+              40: "/home/mattm/projects/HSYMT/CW_transition/b1_L_gwb_T40.npz"}
 SKIES = list(range(8))
 N_ITER, N_ITER_EXT = 6, 12
 QBAR = 0.9
@@ -144,7 +151,9 @@ TSUN_S = 4.925490947e-6              # discovery const.Tsun (s)
 # ASSERTED against the built problem's own getspan in run_cell/mode_gate -- a feather-set
 # change fails loudly, never silently mis-guards the comb.
 YR_S = 365.25 * 86400.0
-VENUE_SPAN_S = {15: 22.15 * YR_S, 30: 37.14 * YR_S}
+VENUE_SPAN_S = {15: 22.15 * YR_S, 30: 37.14 * YR_S,
+                40: 47.17 * YR_S}   # T=40 MEASURED (bank-cut job 12741097 build print:
+                                    # "EXTENSION dT=25yr: span 22.15->47.17 yr")
 
 
 def embed_igniter(pop, e_char, tmax_s):
@@ -293,36 +302,59 @@ def localisation_area_deg2(F_ii_sky):
 # THE CELL -- one (arm, sky), all iterations in-process
 # ============================================================
 def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_ITER,
-             full_floors=None, verbose=True):
+             full_floors=None, verbose=True, rung=None, t_label=None, wscale=1.0):
     """The campaign cell. Checkpointed per iteration; resume = skip-on-exist readback.
     scrambled=True: the counterpart-scrambled null arm (igniter sky scrambled in the
     RECOVERY template; data at truth) -- the manufacturing control, run through the FULL
     loop. STOPs (CampaignStop) on: null-arm promote, null-arm wrong cert, frozen-census
-    violation."""
+    violation.
+    rung: a LADDER_RUNGS key -> STAGE-2a conditional-sky cell (Option C, authorized
+    2026-07-24): the census is the conditional draw for (rung, sky); the igniter arm is
+    a PROPERTY OF THE CONDITIONED LOUDEST MEMBER (e07 ties it into the eccentric comb --
+    at the feasible rung this doubles as the probe of structure-assisted onset below the
+    measured box); stems gl2_<rung>_*; the conditioning record is banked per iteration."""
     check_affinity()
     p = print if verbose else (lambda *a, **k: None)
     if full_floors is None:
         full_floors = scrambled or (sky in FULL_FLOOR_SKIES)
     jax, jnp, C, B1, TE, IG, F, FL = _stack()
 
+    # STAGE-2a array ladder (2026-07-24 addendum): t_label + wscale are venue axes of
+    # the ladder's ARRAY side. Defaults reproduce the incumbent stems bit-for-bit.
+    T = T_LABEL if t_label is None else int(t_label)
+    if T not in LGWB_BANKS:
+        raise CampaignStop(f"no canonical L_gwb bank declared for T={T}")
+    wtag = "" if wscale == 1.0 else "_w" + f"{wscale:g}".replace(".", "p")
     kind = f"null{real}" if scrambled else "cell"
-    stem = cell_stem(arm, sky, kind)
-    p(f"[GLACIER-1] cell {stem} full_floors={full_floors} lane={lane_tag()}")
+    stem = cell_stem(arm, sky, kind) if rung is None else \
+        f"gl2_{rung}{wtag}_{kind}_{arm}_s{sky}_T{T}_{TIER}"
+    p(f"[GLACIER-{'1' if rung is None else '2'}] cell {stem} full_floors={full_floors} "
+      f"wscale={wscale:g} lane={lane_tag()}")
 
     # ---- census + igniter embedding (paired arms share the census seed) ----
-    pop = draw_population(SEED_POP_BASE + sky, n_src=n_src, band_log10f=BAND_CAMPAIGN)
+    if rung is None:
+        pop = draw_population(SEED_POP_BASE + sky, n_src=n_src, band_log10f=BAND_CAMPAIGN)
+        cond = None
+    else:
+        pop, cond = draw_population_conditional(sky, rung, n_src=n_src,
+                                                band_log10f=BAND_CAMPAIGN)
+        p(f"  conditioning [{cond['cond_mode']}]: brightest {cond['h_brightest']:+.3f} "
+          f"(scan {cond['n_scanned']}), excess x{cond['excess_power_ratio']:.2f}, "
+          f"A_eq {cond['a_equiv_log10']:+.3f}, tension {cond['tension_sigma']:+.1f}sigma")
+    # amendment 2026-07-23: A_eff(drawn) is definitional (the drain's reference) -- banked
+    a_eff_drawn, _ = a_eff_projection(pop["src"], band_log10f=BAND_CAMPAIGN)
     slots, n_harm, active, chan, n_clip = embed_igniter(pop, E_IGNITER[arm],
-                                                        VENUE_SPAN_S[T_LABEL])
+                                                        VENUE_SPAN_S[T])
     n_slot = len(slots)
     p(f"  census n={n_src} (+{n_harm} harmonic slots), channel budget {chan}, "
       f"merger-guard n_clip {n_clip}")
 
     # ---- problem + data ----
     pop_slots = dict(pop); pop_slots["src"] = slots; pop_slots["n_src"] = n_slot
-    G = build_glacier_problem(T_LABEL, pop_slots, verbose=verbose)
-    if abs(G["span_s"] / VENUE_SPAN_S[T_LABEL] - 1.0) > 0.02:
+    G = build_glacier_problem(T, pop_slots, verbose=verbose)
+    if abs(G["span_s"] / VENUE_SPAN_S[T] - 1.0) > 0.02:
         raise CampaignStop(f"built span {G['span_s']:.4e}s differs >2% from the declared "
-                           f"VENUE_SPAN_S[{T_LABEL}] = {VENUE_SPAN_S[T_LABEL]:.4e}s -- "
+                           f"VENUE_SPAN_S[{T}] = {VENUE_SPAN_S[T]:.4e}s -- "
                            f"the merger guard was cut against a wrong span; STOP.")
     G["slots"] = slots
     amo = G["amo"]
@@ -337,14 +369,14 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
     theta_true[sb.AI] = L_true                     # data at the DRAWN distance truth
     clean = amo["inject_delay"](jnp.asarray(theta_true), ones)
     # NO stochastic GWB in the data -- the background IS the unresolved sum. Noise is
-    # white+RN only, drawn through the banked-L_gwb-free path (components below): but the
-    # drawer itself still factives the GWB block at construction, and at T=30 there is NO
-    # canonical b1_L_gwb bank -- take the declared RECOMPUTED-UNSAFE branch (host-pinned;
-    # the fp prints in the log; spark.force_recompute_lgwb, kindle convention).
-    from spark import force_recompute_lgwb
-    force_recompute_lgwb(C)
-    ndraw = C.NoiseDrawer(sb.sp, amo)
-    noise = ndraw.draw(noise_seed, components=("white", "rn"))
+    # white+RN only (components below). The drawer loads the CANONICAL T=30 L_gwb bank,
+    # STRICT (no silent recompute): with L frozen, draw(seed) is HOST-FREE up to BLAS
+    # matmul reduction order (gated <1e-10 by gl_lgwb_xhost.py on the A100 lane) -- the
+    # eigh basis freedom that forced host-pinning is gone (cut 2026-07-23, Matt's call:
+    # the physics is hardware-invariant; freeze the artifact, not the host).
+    ndraw = C.NoiseDrawer(sb.sp, amo, lgwb_path=LGWB_BANKS[T], strict=True)
+    p(f"  L_gwb: {ndraw.lgwb_prov}")
+    noise = ndraw.draw(noise_seed, components=("white", "rn"), white_scale=wscale)
     data = tuple(jnp.asarray(np.asarray(c) + np.asarray(n)) for c, n in zip(clean, noise))
 
     # ---- recovery template state (scramble applies HERE, never to the data) ----
@@ -358,8 +390,7 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
     bf = BackgroundFit(amo, band_log10f=BAND_CAMPAIGN)
     box_sigma = np.array([1.0, np.pi, 1.0, 0.5, 0.25, 0.25, np.pi, 0.5*np.pi]) / np.sqrt(3.0)
     a_grid = np.linspace(A_TARGET_LOG10 - 1.0, A_TARGET_LOG10 + 1.0, 41)
-    scale = TE.phi_scale({"n_dist": nd}) if hasattr(TE, "phi_scale") else \
-        np.array([0.1, 0.1, 0.1, 0.05, 0.02, 0.05, 0.3, 0.3])
+    scale = TE.phi_scale({"ncw": 1})     # one 8-param block; mstep indexes by axis
     carried_floor = None
     prev_cert_idx, prev_q = np.zeros(0, int), np.zeros(amo["npsr"])
 
@@ -424,10 +455,19 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
         if full_floors or it in CARRY_REFIT_ITERS:
             off = _null_offenders(sb, ndraw, jnp, theta_rec, led, sky, it,
                                   prev_cert_idx, prev_q,
-                                  n_null=N_NULL_FULL if full_floors else 32)
+                                  n_null=N_NULL_FULL if full_floors else 32,
+                                  wscale=wscale)
             zf = float((off == 0.0).mean())
-            gu, mu, beta, gsd, nn = FL["gumbel_floor"](off)
-            fl, err, est = FL["adopt"](gu, gsd, off, zf)
+            if float(np.ptp(off)) == 0.0:
+                # Degenerate offender sample (typically ALL-ZERO at a faint joint state:
+                # no null draw certifies anything). The Gumbel MLE is undefined here
+                # (scipy's bracket search overflows on a constant sample), and ANCHOR
+                # S4's high-zero-fraction branch is the empirical quantile anyway --
+                # adopt it directly, labelled so the bank shows the estimator switch.
+                fl, err, est = FL["emp_quantile"](off), 0.0, "emp_q95_degenerate"
+            else:
+                gu, mu, beta, gsd, nn = FL["gumbel_floor"](off)
+                fl, err, est = FL["adopt"](gu, gsd, off, zf)
             if (carried_floor is not None and not full_floors
                     and abs(fl - carried_floor[0]) > 2.0 * max(err, carried_floor[1])):
                 p(f"  DRIFT GATE FIRED at iter {it}: refit floor {fl:.2f} vs carried "
@@ -457,6 +497,9 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
                  fed_mask=led.fed, promote_events=led.event_array(),
                  areas_deg2=areas, epoch_cross=(areas < EPOCH_AREA_DEG2),
                  chan_budget=chan, n_clip=n_clip, band_log10f=np.array(BAND_CAMPAIGN),
+                 a_eff_drawn=a_eff_drawn,
+                 **({} if cond is None else {f"cond_{k}": v for k, v in cond.items()}),
+                 t_label=T, wscale=wscale,
                  dlnL_det=dlnl, lnK=lnK, qmax=q_of, on_true=on_true,
                  wrong_cert=int(wrong.sum()), floor=fl, floor_err=err, floor_est=est,
                  zero_fraction=zf, full_floors=full_floors,
@@ -475,7 +518,7 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
 
 
 def _null_offenders(sb, ndraw, jnp, theta_rec, led, sky, it, prev_cert_idx, prev_q,
-                    n_null):
+                    n_null, wscale=1.0):
     """Offender statistic over fresh no-CW null draws at THIS iteration's joint state
     (white+rn only -- consistent with the campaign's data model). The drawer is the
     CELL's drawer, built once (a NoiseDrawer construction refactors the GWB block --
@@ -483,7 +526,8 @@ def _null_offenders(sb, ndraw, jnp, theta_rec, led, sky, it, prev_cert_idx, prev
     off = []
     ones = jnp.ones(sb.npsr)
     for i in range(n_null):
-        nz = ndraw.draw(9_000 + 100*sky + i, components=("white", "rn"))
+        nz = ndraw.draw(9_000 + 100*sky + i, components=("white", "rn"),
+                        white_scale=wscale)
         dnull = tuple(jnp.asarray(np.asarray(n)) for n in nz)
         dlnl, lnK, q_of, _ = sb.columns(theta_rec, led, dnull, ones,
                                         prev_cert_idx, prev_q)
@@ -729,7 +773,14 @@ def mode_drillcmp(sub_a="drill_resume", sub_b="drill_straight", n_iter=3):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("mode", choices=["gate", "cell", "null", "drillcell", "drillcmp"])
+    ap.add_argument("mode", choices=["gate", "cell", "null", "cell2", "null2",
+                                     "drillcell", "drillcmp"])
+    ap.add_argument("--rung", choices=list(LADDER_RUNGS), default="r13p9",
+                    help="STAGE-2a ladder rung (cell2/null2 only)")
+    ap.add_argument("--wscale", type=float, default=1.0, choices=[1.0, 0.5, 0.25],
+                    help="STAGE-2a ARRAY ladder: white-noise rms scale (cell2/null2)")
+    ap.add_argument("--t", type=int, default=T_LABEL, choices=[30, 40],
+                    help="STAGE-2a ARRAY ladder: venue T (cell2/null2)")
     ap.add_argument("--arm", choices=list(ARMS), default="e07")
     ap.add_argument("--sky", type=int, default=0)
     ap.add_argument("--real", type=int, default=0)
@@ -767,6 +818,20 @@ def main():
             return 3
         with open(marker) as fh:
             print(f"[GLACIER-1] holds cleared: {fh.read().strip()}", flush=True)
+        return run_cell(a.arm, a.sky, scrambled=(a.mode == "null"), real=a.real)
+    if a.mode in ("cell2", "null2"):
+        # STAGE-2a conditioning ladder (Option C, Matt 2026-07-24). Same evidence gate
+        # as stage 1 (the marker), plus the ladder's own CPU gates must have passed
+        # (glacier_pop.py gate2 -- gl2_ladder_gates bank exists).
+        import glacier_pop as GPM
+        marker = f"{GPM.OUT}/HOLDS_CLEARED"
+        gates2 = glob.glob(f"{GPM.OUT}/gl2_ladder_gates__*.npz")
+        if not (os.path.exists(marker) and gates2):
+            print(f"REFUSED: stage-2a needs {marker} AND a gl2_ladder_gates bank "
+                  "(glacier_pop.py gate2).", flush=True)
+            return 3
+        return run_cell(a.arm, a.sky, scrambled=(a.mode == "null2"), real=a.real,
+                        rung=a.rung, t_label=a.t, wscale=a.wscale)
     return 2
 
 

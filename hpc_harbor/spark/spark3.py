@@ -279,7 +279,9 @@ def estep_per_target(sp, theta_base, EV, AI, data_tuple, PM, jnp):
         Q_base = float(bflat @ u)
         u_p = u.reshape(sp.npsr, sp.ngp_gwb)
         sum_a = float(a_base.sum())
-        a_pf, b_pf = sp._pulsar_ab_fn(p)(tb, jnp.asarray(EV[p]), data_tuple, pm)
+        # FORGE-G2: the evaluator takes smask as a runtime positional arg; pass the split's
+        # own current mask (None for SPARK-3 -- the SMASK key stays absent, trace unchanged)
+        a_pf, b_pf = sp._pulsar_ab_fn(p)(tb, jnp.asarray(EV[p]), data_tuple, pm, sp.smask)
         a_pf = np.asarray(a_pf); b_pf = np.asarray(b_pf)
         db = b_pf - b_base[p]
         Q_pf = (Q_base + 2.0 * (db @ u_p[p])

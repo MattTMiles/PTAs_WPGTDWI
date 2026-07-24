@@ -17,3 +17,4 @@ partim_real/
 # g1 gate evidence so any machine can VERIFY it holds the canonical bank. Regenerate ON ACCRE
 # ONLY: python CW_transition/make_lgwb_bank.py, then re-run the g1 gate (anchor.py gate).
 CW_transition/b1_L_gwb.npz
+CW_transition/b1_L_gwb*.npz

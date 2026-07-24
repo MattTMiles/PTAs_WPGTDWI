@@ -764,7 +764,7 @@ Held on disk, NOT staged (working state, not evidence): `GLACIER_results/*` bank
 fit-gate banks, three forensic banks, band-A bank — per repo convention results dirs stay
 untracked; the LEAN bank above is the tracked evidence).
 
-### V.6 STOP
+### V.6 STOP (superseded by SESSION 4 below -- all four DECISION items were authorized)
 
 Stopping here, per the brief. Not run, by hold: the fan (`cell`/`null` — refused in code),
 `gl_drill.sbatch` (post-FORGE-G2 only), the remedy-A re-gate (behind authorisation (1)).
@@ -772,3 +772,328 @@ Budget spent this session: ~1.9 GPU-hr (forensic 2-leg ~0.6, band-A study ~0.5, 
 driver-gate runs ~0.8) against the 150 STOP — cumulative campaign spend remains under 5 GPU-hr.
 The next session fires on Matt's readback of §V.4; items (1) and (2) are independent and can
 land in either order.
+
+
+# SESSION 4 — ALL FOUR AUTHORIZED (2026-07-23); items 2+3 GREEN; item 1 STOPPED ON A GATE MIS-CALIBRATION
+
+Matt's readback authorized all four §V.4 items in dependency order. State at this section's
+close: FORGE-G2 confirmed landed and re-gated GREEN on the H200 lane; the driver carries the
+remedy-A band as a declared constant; the fan hold is now EVIDENCE-GATED in code; and the
+remedy-A re-gate STOPPED on its FIRST rung — not the fit, and not remedy A itself.
+
+## S4.1 The tree, and remedy A enacted in the driver
+
+`git pull` resolved by Matt (rebase): `2ad89d1 GLACIER res` atop `a2fd4df FORGE-G2: runtime-
+SMASK`. Verified in code, not assumed: `set_smask` (trackB_b1_core.py) stores the mask and the
+jitted evaluators take it as a RUNTIME argument via `_params`; pattern changes are argument
+changes; only None<->array retraces, once per direction.
+
+`glacier_loop.py` now declares `BAND_CAMPAIGN = (-8.7, -7.5)` (authorization comment inline)
+and threads it through every campaign draw, every `BackgroundFit`, and mode `gate`; the band
+is banked per cell. The fan refusal became an evidence gate: `cell`/`null` refuse unless
+`GLACIER_results/HOLDS_CLEARED` exists (written by hand only when items 1-3 are green, records
+the job ids; deleting it re-arms the hold).
+
+## S4.2 Item 2 GREEN — the FORGE-G2 battery on this lane (job `12714962`, wall 1352 s)
+
+Reference-absent mode, declared (`gl_smask_gate_h200.py`): the baked reference is a cronus
+capture; SG1/SG4/SG6-vs-incumbent are cross-host absolute compares with ==0.0 gates and would
+fail at ~1e-12 on reduction order alone (the gl_g0 scope line). Gated here = the host-portable
+subset, which is the authorization spec verbatim:
+
+| check | result |
+|---|---|
+| SG2 freshly-baked closure == runtime-arg, ==0.0, this host | PASS |
+| SG3 warm pattern flip (median of 20) | 0.80 ms (<10 ms), cache sizes constant -> PASS |
+| SG5 grads through the double-where, carried non-evaluable | PASS |
+| SG6 flip stability \|diff\| = 0.000e+00; warm flips 0.9 s | PASS; one-time None->array retrace **114 s paid in this job**, not the fan |
+| Bg2/Bg4/Bg5a/b/c on the runtime path | ALL PASS (contrasts 0.000e+00) |
+
+## S4.3 Item 1 STOPPED — g2a-i (the A_eff PROJECTION rung) was never a calibrated gate
+
+The re-gate ladder (`gl_g2ba.sbatch`, job `12714961`) failed FAST at g2a-i:
+`|log10 A_eff - log10 A_target| = 0.0166` vs tol 0.01. Everything else on the rung: sum-power
+conservation EXACT (2.2e-16), g2b conservation-at-every-frontier-position exact, g2c
+frozen-census, g2d provenance all PASS. The fit gate (the one the remedy licenses) never ran
+-- fail-fast -- and its venue is already measured FIT-OK by the forensic (job `12706074`:
+Ahat -14.629+-0.021 vs A_eff -14.583, 0.045 dex, tol 0.15).
+
+THE ANATOMY (CPU ensemble, 200 seeds x both bands, n=256):
+
+| band | median \|d log10 A_eff\| | p90 | max | frac > 0.01 |
+|---|---|---|---|---|
+| incumbent (-8.0, -7.5) | 0.0324 | 0.0628 | 0.126 | **85%** |
+| remedy-A (-8.7, -7.5) | 0.0630 | 0.0957 | 0.156 | **95%** |
+
+The session-2 PASS (0.005 dex) was SINGLE-SEED LUCK at the base seed, and the 0.01 tolerance
+was calibrated against that one draw. 85% of seeds miss it at the INCUMBENT band -- the rung
+never had gating power at any band; remedy A merely bought the ticket that exposed it. The
+physics: total band power is normalised exactly by construction (that is the conservation
+that "eat the background" needs); A_eff is a SHAPE projection of a finite f^(-11/3) draw onto
+the -4/3 law, and its finite-N scatter is 0.03-0.06 dex. The fan's own sky seeds land at
+0.003-0.089 dex (skies 1 best, 7 worst).
+
+PROPOSED AMENDMENT (pre-registration change -- Matt authorises, nothing enacted):
+1. g2a-i sum-power conservation stays gated EXACT (<1e-12) -- unchanged.
+2. The A_eff projection rung becomes REPORT-ONLY, banked per draw. Its campaign role was
+   always to DEFINE A_eff as the fit gate's reference; the fit gate stays HARD at 0.15 dex
+   vs A_eff(drawn) -- self-consistent regardless of where the draw's shape lands.
+3. Optional belt: an ensemble-calibrated sanity bound |d log10 A_eff| < 0.16 (observed max
+   over 200 seeds at the campaign band) -- catches generator BUGS, not draw luck.
+Then the ladder re-runs (~0.5 GPU-hr). No other rung changes.
+
+## S4.4 Item 3 IN FLIGHT; item 4 held
+
+dgate re-run (post-push, band-patched tree) job `12739791`; resume drill `12739792`
+(afterok). These are plumbing gates -- their validity does not hinge on S4.3, so they proceed
+under item-3 authorization while item 1 waits on the readback. THE FAN STAYS HELD: the
+HOLDS_CLEARED marker is not written, and will not be until item 1 resolves + dgate/drill are
+green. Budget spent session 4 so far: ~0.6 GPU-hr; cumulative < 6 vs the 150 STOP.
+
+## S4.5 AMENDMENT AUTHORIZED AND ENACTED (Matt's readback, same day) + a FORGE-G2 API ripple
+
+Matt authorized the S4.3 amendment with the optional bound made MANDATORY. Enacted verbatim
+in `glacier_pop.py` gate_cpu (the pre-registration trail is in the code comment, quoting the
+readback: "a gate that most honest draws fail is not a gate"):
+1. Sum-power conservation stays the hard gate, exact (<1e-12) -- unchanged.
+2. A_eff projection DEMOTED to report-only, banked per draw (`a_eff_drawn` added to every
+   cell bank in glacier_loop.py; its role is definitional -- the fit gate's reference).
+3. `AEFF_SANITY_DEX = 0.16` MANDATORY tripwire at campaign scale (n>=200), the observed
+   200-seed max. Provenance BANKED: `reports/glacier_aeff_ensemble.npz` (200 seeds x both
+   bands at n=256; incumbent median 0.0324/max 0.1259, remedy-A median 0.0630/max 0.1562;
+   the note field records the retirement reason). At n<200 the projection stays pure-report
+   (bound calibrated at campaign N; the smoke rung is plumbing-only).
+4. Fit gate unchanged, hard at 0.15 dex vs A_eff-drawn.
+
+**And dgate job `12739791` caught a REAL FORGE-G2 API ripple** (the re-run earned its keep):
+`spark3.estep_per_target` still called the per-pulsar evaluator with the pre-FORGE-G2 4-arg
+signature -- FORGE-G2's diffstat covered trackB_b1*.py only. G-d1/G-d3/drain all PASSED
+before the crash, and the extended band UN-PEGGED even the smoke-venue drain (ahat
+-14.868+-0.049, edge False -- first finite drain at T=15/n=32). Fix: pass `sp.smask` as the
+evaluator's runtime arg (spark3.py:282, matching trackB_b1_core.py:488's own convention);
+for SPARK-3's own use sp.smask is None, the SMASK key stays absent, the trace is unchanged
+-- the verdict lane is undisturbed.
+
+RESUBMITTED (this is the fan's gate record if green): amended ladder `12739879` (own cache
+dir, decoupled from the campaign dir); dgate `12739880` (spark3 fix); drill `12739881`
+(afterok:dgate). On green x3: HOLDS_CLEARED written recording the three job ids, fan fires
+per the amended plan. First-sky readback to Matt before Stage 2 or any rider.
+
+## S4.6 ITEM 1 GREEN -- REMEDY A CERTIFIED (job `12739919`); dgate GREEN (`12739880`); the drill's defect trail
+
+**g2 ladder ALL PASS at the extended band** (T=30, n=256, `--flo -8.7`): scaling identities
+exact (3.2e-16 / 0.0), 42/46 GP modes in-band, and THE GATE:
+**log10 Ahat = -14.6276 +- 0.0210 vs log10 A_eff(drawn) = -14.5834, |diff| = 0.0442 < 0.15
+(pre-stated)** -- matching the forensic's licensing measurement (0.045). Banked:
+`g2gate_fit_T30_s9000000_n256_flom8p7__hgx03_NVIDIAH200.npz`. En route, two rungs behaved
+exactly as the amendment predicts: the tripwire passed where the retired 0.01 gate would
+have failed again, and the SMOKE fitgate (run `12739879`) measured its first FINITE-error
+fit at T=15/n=32 (Ahat -14.77 +- 0.039) sitting 0.264 dex off A_eff -- small-N shape
+mismatch, now REPORT-ONLY per SSV.2's declared smoke role (`gate_fit` gates tolerance only
+at n>=200; enacted before run `12739919`).
+
+**dgate ALL PASS post-FORGE-G2** (`12739880`, 378 s): G-d3 |d p0| = 0.0, G-d2b 100% live
+rows / E-step wall 155.6 s, drain finite with NO edge at the smoke venue (ahat
+-14.868+-0.049 -- the band extension un-pegged even T=15/n=32).
+
+**The resume drill is doing its job** -- three legs, three real defects, all in MY driver
+code, none in the audited machinery:
+1. `12739791`: spark3.estep_per_target 4-arg call (the FORGE-G2 ripple; fixed SSS4.5).
+2. `12739881`: run_cell called `TE.phi_scale({"n_dist": nd})`; the contract is `{"ncw": 1}`
+   (mstep indexes the 8-param base by axis). Fixed.
+3. `12739920`: `gumbel_floor` called unconditionally on the null-offender sample; at a
+   faint joint state the sample is ALL ZEROS and the Gumbel MLE is undefined (scipy
+   bracket-search overflow). Fixed with the degenerate guard: constant sample ->
+   `emp_q95_degenerate` directly (ANCHOR S4's high-zero-fraction branch is empirical
+   anyway), banked with the estimator label. The drill got through build, noise draw,
+   truth-distance draw, frontier, drain, and the E-step wiring before each stop -- the
+   loop body itself is what remains under test in run `12739956`.
+
+Note: `gen_gate`/`gen_warm` jobs co-resident in the queue are a SEPARATE campaign
+(hpc_harbor/generalise/, own JAX cache dir `jax_generalise_shared`) -- no EMBER collision
+with GLACIER; shared fair-share only.
+
+## S4.7 DRILL PASS -- ALL HOLDS CLEARED -- THE FAN IS LIVE
+
+Resume drill `12739956` (1357 s): leg A2 resumed both checkpoints and ran iter 2 live; leg B
+straight control; **drillcmp: ALL TEN COLUMNS IDENTICAL** (theta_rec, fed_mask, a_bg,
+n_cert, dlnL_det, lnK, qmax, floor, zero_fraction, cert_idx) -- checkpoints are
+continuations. Drill-cell physics (n=32, e07, T=30): A_bg = -14.665 +- 0.031 stable across
+iters, floor 0.00 (emp_q95_degenerate -- correct at a state where no null draw certifies),
+N_cert 0, wrong-certs 0, warm iterations ~8 s.
+
+`GLACIER_results/HOLDS_CLEARED` written recording the green record (12739919 / 12714962 /
+12739880 / 12739956); deleting it re-arms the hold in code.
+
+**STAGE-1 FAN FIRED: job `12740008`, --array=0-17%6** (16 signal cells: 2 igniters x 8
+skies x 6 iters; 20 scrambled-null cells; full floors on the verdict subset, drift gate on
+carried skies; TURBINE 2-way packing). Budget ~75-85 GPU-hr against the 150 STOP.
+First-sky readback (array task 0 = e07 skies 0+1, the full-floor calibration pair) goes to
+Matt BEFORE Stage 2 or any extension/escalation rider fires.
+
+## S4.8 HOST-FREEDOM (Matt's call: "the physics should be true on any hardware") -- MEASURED, BANKED, AND THE FAN SPLIT ACROSS POOLS
+
+Matt authorized dgx use and challenged the host-pinning rationale. He was right about the
+mechanism: the floors were never hardware-dependent PHYSICS -- the dependence was the
+RECOMPUTED-UNSAFE branch re-running np.linalg.eigh per job (arbitrary eigenvector basis in
+Phi_gwb's near-degenerate subspaces; backend/thread/host freedom). The T=15 campaign
+already froze that freedom by banking the square root; T=30 never got a bank. Fixed:
+
+1. **`CW_transition/b1_L_gwb_T30.npz` cut** (job `12740303`, hgx03, cpus=8 via
+   APPTAINERENV_ injection -- plain sbatch exports do NOT survive harbor_py's --cleanenv;
+   the cutter's thread-refusal guard caught exactly this on its first run, job 12740157).
+   Geometry-only (5336x5336, npsr 116 x 2x23 gwb comps; census-free -- one bank serves
+   every cell). eigh reconstruction 2.4e-26. **fp = f92c9e36b460d6f5 -- the SAME basis
+   the drill and dgate already ran on** (hgx03's own eigh): banked provenance is
+   CONTINUOUS with the gate record.
+2. **Cross-host identity gate PASS at 0.000e+00** (job `12740304`, dgx03 A100): the three
+   reference realisations redraw BIT-IDENTICALLY through the bank on the A100 host --
+   better than the declared 1e-10 (even BLAS matmul reduction agreed). Draws are
+   HOST-FREE, measured not assumed. The 1.72s "host systematic" is retired for T=30: it
+   was the un-banked eigh, not the hardware.
+3. **Driver switched to the banked path, strict** (glacier_loop.py: NoiseDrawer(...,
+   lgwb_path=LGWB_T30_BANK, strict=True); a missing bank is a CRASH, never a silent
+   recompute; per-cell log prints the bank fp). The cpus=8 affinity refusal stays as
+   declared convention.
+4. **The fan split across pools** (held before any task started, so provenance is uniform
+   banked-L throughout): H200 fan `12740008` --array=0-5 -> cells 0-11 (e07 all skies +
+   none skies 0-3, 2-way packed); A100 fan `12740361` --array=12-35%24 -> cells 12-35
+   (none skies 4-7 + all 20 nulls), one cell per A100-80GB (gl_fan_a100.sbatch), disjoint
+   by construction. Wall-clock estimate drops from 14-24 h (hgx03 alone, contended) to
+   ~6-9 h. First-sky readback unchanged: H200 task 0.
+
+## S4.9 FIRST-SKY READBACK DELIVERED; MATT'S DECISIONS; STAGE-1 VERDICT FORMING
+
+(Corrections to S4.8 job ids, for the record: the fan needed three launches -- 12740008/
+12740361 failed on an unwired cell/null dispatch (the modes had been refusal-only since
+the driver was built; the marker edit cleared the hold but fell through to the fallback
+return -- 3 s failures, no banks touched); 12740413 (H200) ran; the A100 side additionally
+hit the dgx SMT trap (--cpus-per-task=8 arrives as 16 logical CPUs; the affinity refusal
+fired CORRECTLY; --hint=nomultithread ignored by the partition; fixed by one-per-core
+taskset binding) and ran as 12740567.)
+
+**H200 block COMPLETE** (12740413, all 6 tasks, 4.6 GPU-hr total -- far under budget
+because INERT iterations are cheap): e07 skies 0-7 + none skies 0-3. **First-sky readback
+(calibration pair, both arms): N_res = N_cert = 0 at every iteration; min concentration
+ratio 1.000 vs the 0.5 feed bar on all 287 slots; max dlnL 0.00; zero wrong-certs; A_bg
+constant per cell at sigma 0.02-0.03 dex (the loop is a FIXED POINT at zero feed -- the
+machinery working, not failing).** A100 block (12740567) running the rest.
+
+MATT'S DECISIONS (2026-07-24 readback, verbatim substance):
+1. Extension rider NOT FIRED (zero-feed fixed point iterates identically forever);
+   stands available only if a remaining sky resolves something.
+2. Confirmatory arm continues as pre-registered.
+3. STAGE 2 AMENDED -- the CONDITIONAL-SKY arm replaces the time-ladder as primary:
+   (a) re-draw conditioned on the brightest member at onset class (the "day after the
+   first detection" sky), tail selection from the unconditional ensemble, BANK the
+   conditioning probability (the loop-level restatement of SCOUT's clock); >=4 skies,
+   2 igniter variants as properties of the drawn loudest member (e=0.7 vs circular),
+   6 iters, riders as before -- THIS decides COMPOUNDING/CONVERGENT/INERT + the drain
+   verdict. (b) Stage 2b (knee) = the ceiling measurement, unchanged. (c) Time-ladder
+   demoted to one banked arithmetic line: 10x below onset at T=30 with onset ~ T^(5/2)
+   -> ignition at T ~ 75 yr at fixed population ("patience is not the plan").
+4. Stage-1 verdict recorded as a RESULT: **INERT-ON-COUNT at the realistic
+   normalisation** -- the population clock through the loop; the machinery's
+   realistic-sky null passed. Hardens the scissors framing; goes in Act IV.
+
+## S4.10 STAGE-2a BLOCKER -- THE CONDITIONING IS INFEASIBLE, AND THE ZERO IS THE RESULT (STOP for Matt)
+
+Before building the conditional draw, the tail-selection arithmetic was checked against
+the power normalisation (scan banked: `reports/gen_stage2_pcond_scan.npz`, 100k draws):
+
+**The NG15 power-conserving draw has a HARD CEILING on the brightest member:
+log10_h = -13.867** (one source carrying 100% of the band power: sqrt(target) with
+target = A^2 * 0.75 * [x(flo)-x(fhi)] = 1.84e-28). The onset class -13.25 sits
+**+0.62 dex ABOVE the ceiling. P_cond(onset) = 0 EXACTLY** -- not small: a -13.25 member
+ALONE carries ~16x the total NG15 band power. Within this model class (band-limited
+population summing to the NG15 amplitude), *the "day after the first detection" sky is
+not an NG15-consistent sky at all* -- a stronger loop-level restatement of SCOUT's clock
+than a small fraction would have been. The feasible tail: p50/p90/p99.9 of the brightest
+member = -14.15 / -13.98 / -13.87; P(>= -13.9) = 1.4e-2.
+
+Sharpening it: SURFACE's measured box BOTTOMS at h = -13.25 (its lowest grid rung; T=30
+census-structure onset is -12.50 lit; the cheapest onset anywhere at T=30 is 5+11/vlbi AT
+-13.25). Certification below -13.25 is UNMEASURED territory, and the entire NG15-feasible
+tail lives >= 0.6 dex below it.
+
+THE FORK (pre-registration decision -- Matt authorises; nothing built until then):
+(A) Condition at the FEASIBLE tail (e.g. brightest >= -13.9, P_cond = 1.4e-2 banked):
+    the loudest NG15-consistent skies. Likely still INERT (0.6 dex below the measured
+    box) -- but then the statement "even the loudest NG15-consistent sky cannot ignite
+    at T=30" is theorem-grade, modulo the unmeasured structure-assisted onset below
+    -13.25 which the e0.7-variant arm would measure en passant.
+(B) DECLARED super-NG15 universe: set the brightest AT -13.25; total power then exceeds
+    NG15 by ~16x (equivalent A ~ -14.0, ~12 sigma off the NG15 posterior at sigma=0.05
+    -- banked as the tension number). Measures the loop where detection is possible;
+    abandons NG15 consistency explicitly.
+(C) RECOMMENDED -- the conditioning LADDER: rungs at -13.87 (= arm A, NG15-consistent
+    ceiling) / -13.5 / -13.25 (= arm B, super-NG15, tension banked per rung), >=4 skies
+    x 2 igniter variants at the top and bottom rungs, fewer at the middle. Turns the
+    infeasibility into the x-axis: "how much louder than NG15 must the sky be before
+    the array starts eating" -- the scissors as a measured curve. ~1.5-2x the cost of
+    a single-rung arm; still far under the 150 STOP.
+
+Time-ladder line (decision 3c), banked here as specified: from ~10x below onset at T=30
+with onset ~ T^(5/2), ignition at fixed population arrives at **T ~ 75 yr**; from the
+CEILING sky (best NG15-consistent draw, 0.62 dex short) it is still **T ~ 53 yr**.
+Patience is not the plan.
+
+## S4.11 STAGE-2a AUTHORIZED (Option C) AND LAUNCHED -- THE CONDITIONING LADDER
+
+Matt's decision (2026-07-24): Option C as specced, rungs at brightest = {-13.87(feasible,
+realized as the P=1.4e-2 tail at threshold -13.9), -13.5, -13.25}, tension banked per rung
+AND quoted on the figure axis; >=4 skies x both igniter variants per rung (e07 as a
+property of the conditioned loudest member; at the feasible rung it probes
+structure-assisted onset below the measured box); 6 iters; riders as before; verdict-
+subset floors; scrambled arm at one rung (r13p25). THE DELIVERABLE IS THE CURVE:
+ignition (and where ignited, drain slope + COMPOUNDING/CONVERGENT) vs sky loudness above
+NG15. Pre-registered readings: (i) first-bite loudness; (ii) does eccentricity SHIFT the
+ignition rung; (iii) drain verdict at ignited rungs at the banked 2-sigma-per-top-member
+precision. FRAMING BANKED VERBATIM (also in the gl2_ladder_gates bank): "within the
+NG15-consistent class, no sky contains an onset-class source; the first resolved CW will
+itself be evidence of excess power or exceptional structure; the ladder measures how far
+above the median background the sky must be before the array begins to eat it." The
+T~75yr (median) / ~53yr (best-sky) patience numbers travel beside it.
+
+ENACTED: `draw_population_conditional` + `gate_ladder` (glacier_pop.py; SIGMA_NG15_DEX =
+0.05 declared; SEED_POP2_BASE fresh block; tail mode = rejection scan, trials banked;
+set mode = NG15 sky + ONE exceptional source, excess/tension banked). CPU GATES ALL PASS
+(gl2_ladder_gates bank): tail rung lands at -13.875..-13.892 in 37-141 scans (consistent
+with P_cond = 1.4e-2); power identity exact at every rung x sky; **tension +7.8..8.0
+sigma at -13.5, +12.5 sigma at -13.25** (the axis numbers). Driver: run_cell(rung=...),
+modes cell2/null2 (evidence-gated on HOLDS_CLEARED + the gl2 gates bank), stems gl2_*,
+conditioning record banked per iteration. LAUNCHED: job `12741034` --array=0-35%24 on
+the A100 pool (gl_fan2.sbatch; 24 signal + 12 null cells) while the Stage-1 confirmatory
+arm (12740567) finishes alongside. Ladder cells at ignited rungs are the campaign's
+first cells with live M-steps/promotes -- the drill covered this path (resume identity),
+the scrambled arm covers manufacturing.
+
+## S4.12 STAGE-2a ADDENDUM ENACTED -- THE ARRAY-SIDE RUNGS (the dual ladder)
+
+Matt's addendum (2026-07-24): at the FEASIBLE sky rung only, array-capability rungs --
+white-noise rms x{1, 1/2, 1/4} (catalogue RN + GWB held at measured levels: they don't
+radiometer away), T in {30, 40}, same skies/arms/riders/floors. BOTH thresholds read out
+per cell: FIRST-BITE (N_resolved > 0) and CERTIFICATION (N_cert > 0) -- two curves, both
+on the figure. DELIVERABLE: the ignition boundary in the (sky loudness x array
+capability) plane, NG15's ceiling + the 2026/DSA/SKA marks drawn on. Pre-registered
+question: does DSA-class rms (~1/4) bring the loudest NG15-consistent sky across the
+first-bite frontier at T=30-40?
+
+ENACTED:
+- `NoiseDrawer.draw(..., white_scale=)` (trackB_b1_core.py, additive kwarg): scales the
+  WHITE rms only; the RNG stream is untouched (same normals at any scale -- the scaled
+  draw is the SAME realisation with a quieter radiometer); 1.0 is bit-identical to the
+  incumbent path (IEEE 1.0*x == x).
+- Driver: run_cell(t_label=, wscale=) -- venue axes threaded to the embed span, the
+  build, the span assert, the noise draw AND the null-offender floors (floors calibrate
+  the cell's own venue), stems (gl2_r13p9_w0p5_..._T40_...), and the banks (t_label,
+  wscale columns). cell2/null2 take --wscale {1,0.5,0.25} --t {30,40}.
+- T=40 needs its own canonical L_gwb (more GP modes; the strict loader correctly refuses
+  the T=30 bank's shape): cutter + cross-host gate parameterized (--t), T=40 bank cut
+  job `12741097` (hgx03, cpus=8) -> A100 cross-host gate `12741098` -> the array fan
+  `12741099` (gl_fan2b.sbatch, --array=0-51%24, afterok) -- 40 signal cells ((w,T) in
+  {(1,40),(0.5,30),(0.5,40),(0.25,30),(0.25,40)} x 2 arms x 4 skies; the (1,30) corner
+  IS the sky ladder's r13p9 block, reused not rerun) + 12 scrambled nulls at the
+  likeliest-ignition corner (w=0.25, T=40). VENUE_SPAN_S[40] = 47.14 yr PROVISIONAL,
+  verified against the cut job's own span print before any T=40 cell runs.
+- Budget: 52 cells ~ 1.4x the sky ladder, within the stated ~1.5x; the 150 STOP stands.

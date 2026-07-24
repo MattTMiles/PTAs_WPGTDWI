@@ -26,11 +26,12 @@
 #                                            amplitude vs drawn summed power, tol 0.15 dex
 #      (forensic job 12706074 measured this venue: Ahat -14.629+-0.021 vs A_eff -14.583)
 #
-# CACHE: the campaign dir. The g0b smask battery runs concurrent on ITS OWN dir; the
-# dgate re-run + drill are chained AFTER this job (afterok) so campaign-dir users are
-# serialized (the EMBER first-compile race).
+# CACHE: its OWN dir (amended re-run) -- the dgate/drill chain owns the campaign dir and
+# runs concurrently; concurrent first-compiles on a shared dir are the EMBER race. The
+# compile cost of a cold dir here (~3 min build) is cheaper than serializing behind the
+# drill's multi-hour leg.
 set -uo pipefail
-export HARBOR_JAXCACHE="/home/milesmt/.cache/jax_glacier/campaign"
+export HARBOR_JAXCACHE="/home/milesmt/.cache/jax_glacier/g2ba"
 mkdir -p "$HARBOR_JAXCACHE"
 du -sh /home/milesmt/.cache/jax_glacier 2>/dev/null || true
 source /data/taylor_group/matt_miles/PTAs_WPGTDWI/hpc_harbor/env/harbor_env.sh

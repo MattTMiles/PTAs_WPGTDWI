@@ -589,7 +589,13 @@ class NoiseDrawer:
         self.sig_white = [np.sqrt(nd) for nd in sp.N_diag]
         self.sig_rn = np.sqrt(np.clip(sp.Phi_rn_diag, 0.0, None))   # (npsr, ncomp_rn)
 
-    def draw(self, seed, components=("white", "rn", "gwb")):
+    def draw(self, seed, components=("white", "rn", "gwb"), white_scale=1.0):
+        """white_scale (GLACIER Stage-2a array ladder, 2026-07-24): scales the WHITE
+        component's rms only -- catalogue red noise and the GWB block are held at their
+        measured levels (they do not radiometer away). The SAME normals are drawn at any
+        scale (the RNG stream is untouched), so scaled draws are the same realisation
+        with a quieter radiometer, and white_scale=1.0 is bit-identical to the incumbent
+        path (IEEE: 1.0*x == x)."""
         rng = np.random.default_rng(seed)
         M = self.npsr * self.ngp
         out = []
@@ -598,7 +604,7 @@ class NoiseDrawer:
             n = len(self.sig_white[p])
             r = np.zeros(n)
             if "white" in components:
-                r = r + self.sig_white[p] * rng.standard_normal(n)
+                r = r + white_scale * (self.sig_white[p] * rng.standard_normal(n))
             if "rn" in components:
                 r = r + self.sp.Fs_rn[p] @ (self.sig_rn[p] * rng.standard_normal(self.sig_rn.shape[1]))
             if "gwb" in components:
