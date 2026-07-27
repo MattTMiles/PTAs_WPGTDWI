@@ -1,27 +1,32 @@
 # EXPLAINER — six figures, for a scientist outside the field
 
-**Agent:** EASEL-2 · ACCRE · tag `criterion-v2.1+` (`git rev-parse HEAD` → `6bec3d6`) ·
-**Date:** 2026-07-13 · **READ-ONLY.** No likelihood evaluation, no new realisations. Every
-number below is read out of a banked `.npz`, or re-cut from banked raw statistics using the
-campaign's own definitions. Script: `EXPLAINER_results/explainer_figures.py`.
+**Agent:** EASEL-4 · ACCRE · **Date:** 2026-07-13 · **READ-ONLY.** No likelihood evaluation, no
+new realisations. Every number below is read out of a banked `.npz`, or re-cut from banked raw
+statistics using the campaign's own definitions. Scripts: `reports/explainer_figures{,2,3}.py`.
 
-> ## ⚠ FOUR FIGURES ARE STALE — THE FLOOR FIX (RECUT, 2026-07-13) MOVED THEIR NUMBERS.
+> ## ✅ THE FIVE FLOOR-AFFECTED FIGURES ARE REGENERATED — CAPTIONS AND PNGs NOW AGREE.
 >
 > **`F3_the_honest_criterion.png`, `F4_the_switch.png`, `F5_the_map.png`, `F9_the_growth_path.png`
-> must be REGENERATED from the `_recut` banks before they are shown to anyone.** The captions below
-> have been corrected in place and now disagree with the PNGs they describe. **The other ten
-> figures are unaffected.**
+> and `F11_where_in_the_universe.png` are redrawn from the `_recut` banks** (RECUT, 2026-07-13).
+> The remaining nine figures never depended on the floor and are unchanged.
 >
-> **The one that must not be shown as it stands is F4/F9.** They teach *"a slightly oval orbit
-> (e = 0.3) crosses the bar"* — **that is refuted.** The single-member switch-on is **e = 0.5**.
+> **What changed in the science, not just the pixels:**
 >
-> **And F3 carries an irony worth stating:** the figure that teaches *"fit the bar properly"*
-> illustrates it with the one cell whose properly-fitted Gumbel is **invalid** (its null is 27 %
-> silent). Its lesson survives — the detection is still retracted — but its bar and its count both
-> moved, and *the figure argues for an estimator the programme has since had to bound.*
->
-> Regenerate with `reports/explainer_figures.py` against `recut_surface.npz` / `recut_chorus.npz`.
-> [FLAGGED FOR MATT — figure regeneration is compute + design, not a doc edit, and is not done here.]
+> - **F4 / F9 — the refuted rung is gone.** *"A slightly oval orbit (e = 0.3) crosses the bar"* is
+>   **false** and is no longer drawn. The threshold is **conditional on multiplicity**: **one**
+>   eccentric member switches the count on at **e = 0.5**; **two** members do it at **e = 0.3**
+>   (confirmed in both tiers). F4 carries the two-member case as an inset; F9's e = 0.3 rung is
+>   relabelled as the TWO-member point and the one-member e = 0.5 point is added beside it.
+> - **F5 — the contour moved.** Four cells crossed the boundary (two onsets died at the faint edge,
+>   two were born). N_onset is still 59 — *the number is stable, the map is not.* The "upper bound
+>   / pending re-fit" hatching is **removed**: every floor is re-fit and settled.
+> - **F11 — un-watermarked.** Its two onset strains both survived the re-fit unchanged, so the
+>   curves stand as drawn.
+> - **F3 — the lesson holds and the retraction got FIRMER.** The corrected bar is **lower** (16.60
+>   vs the 19.5 Gumbel it replaces) — the direction that would have *rescued* the detection — and
+>   the count still fails to reach 1 (0.60). The irony is kept and footnoted on the figure: the
+>   cell chosen to teach honest floor-fitting is one whose own Gumbel is **invalid** (its null is
+>   27 % silent).
 
 ## The one-paragraph story
 
@@ -80,45 +85,56 @@ pulsar data is analysed anywhere in this repository.
 > identically; noise alone routinely manufactures 15–20 nats of apparent evidence, because we
 > take the best of ~116 pulsars × thousands of teeth. The earlier bar (red dashed) was set by the
 > loudest of just *ten* noise trials, landed at 13.5, and yielded 1.03 "certifications" per
-> dataset — it looked like a detection. Fitting the bar properly, so that pure noise clears it
-> only 5% of the time (**16.6 ± 1.6** from 100 trials), the same signal data yields **0.60 — and
-> the detection is retracted.** *Confidence never lied; the comparison did.*
+> dataset — it looked like a detection. Setting the bar honestly — at the 95th percentile pure
+> noise actually reaches (**16.6 ± 1.6** from 100 trials) — the same signal data yields **0.60,
+> and the detection is retracted.** *Confidence never lied; the comparison did.*
 >
-> **⚠ FIGURE STALE — and instructively so.** The PNG draws the green bar at **19.5 ± 1.4** (a
-> Gumbel fit) and the count at **0.37**. Under the floor convention adopted after this figure was
-> made, **that Gumbel is INVALID at this very cell**: 27 % of its noise trials produce no candidate
-> at all, so the fit is describing a point mass at zero rather than a tail. The honest bar is the
-> **empirical 95th percentile, 16.60 ± 1.60**, and the count is **0.60**. **The retraction — the
-> entire point of the figure — stands, and stands more firmly** (0.60 is still far below 1). But
-> the figure teaches the reader to trust an estimator that the programme has since had to bound,
-> and it must be redrawn on the empirical bar.
+> **The retraction got FIRMER under the corrected floor, and the reason is worth stating.** The
+> figure used to draw its bar as a Gumbel fit at 19.5. The adopted bar is **lower — 16.60 ± 1.60**
+> — so the correction ran in the direction that would have *rescued* the detection, and the count
+> still fails to reach 1 (it rises only from 0.37 to **0.60**). The retraction therefore no longer
+> leans on the stricter estimator: it survives the most permissive bar the convention allows.
 >
-> Source: re-cut from `SURFACE_results/sf_{nullN,sig}_h1300_T30_lit_k3_*.npz` (100 noise-only +
-> 30 signal realisations) at cell h = 10⁻¹³, T = 30 yr; corrected numbers from
-> `reports/recut_surface.npz` (zero-fraction 0.27 → empirical q95 adopted).
+> **Footnote, and the figure owes it:** the very cell chosen to teach honest floor-fitting had a
+> dishonest floor. 27 % of its noise trials certify nothing at all, so its Gumbel (grey dotted in
+> the PNG) describes a point mass at zero rather than a tail, and ANCHOR §4 forbids it *here*, of
+> all places. The green bar is the empirical percentile instead.
+>
+> Source: histograms re-cut from `SURFACE_results/sf_{nullN,sig}_h1300_T30_lit_k3_*.npz` (100
+> noise-only + 30 signal realisations) at cell h = 10⁻¹³, T = 30 yr; floor and count read from
+> `reports/surface_analysis_recut.npz` (zero-fraction 0.27 → empirical q95 adopted). The
+> generator asserts its own scorer reproduces the bank's re-cut count before drawing.
 
 ### F4 — THE SWITCH · `F4_the_switch.png`
 
 > The census population is three loud sources on circular orbits, and it does not work: **0.37**
 > certified pulsars per dataset, below the bar of 1 (a, leftmost). Now make **one** of those three
 > orbits oval — same loudness, same array, same observing time. **A slightly oval orbit (e = 0.3)
-> does NOT cross the bar** (0.70 — it fails). **A moderately oval one (e = 0.5) does: 3.13.** A
-> strongly oval one (e = 0.7) delivers **5.43, roughly fifteen times the circular count.**
-> An eccentric orbit emits on many harmonics instead of one, and that harmonic comb is a clock
-> the analysis can lock onto. Panel (b) is the honesty check: the noise bar *rises* at the same
-> time (**7.0 → 11.7 nats**), so the gain is a real gain and not a lowered standard.
+> does NOT cross the bar** (0.70 in the lit tier; VLBI's 1.03 grazes it but does not survive the
+> bar's own error). **A moderately oval one (e = 0.5) does: 3.13.** A strongly oval one (e = 0.7)
+> delivers **5.43 — 14.8× the circular count.** An eccentric orbit emits on many harmonics instead
+> of one, and that harmonic comb is a clock the analysis can lock onto.
 >
-> **⚠ FIGURE STALE — AND ITS HEADLINE IS REFUTED.** The PNG shows the e = 0.3 bin clearing the bar
-> at 1.57. **Under the corrected floors it reads 0.70 and fails.** *"One slightly-oval orbit is
-> enough"* is **not true**; **"one moderately-oval orbit (e ≳ 0.5) is enough, OR two mildly-oval
-> ones (e ≳ 0.3)"** is. **Do not present this figure until it is redrawn.** The honesty check in
-> panel (b) is the reason: the noise bar rose *more* than the figure knew — the e = 0.3 cell's
-> bar was understated by 53 %, and it was the bar, not the signal, that was wrong.
+> **The threshold in e is CONDITIONAL on how many orbits carry the shape — that is the content of
+> this figure now.** With **one** eccentric member the switch-on is at **e = 0.5**; with **two** it
+> drops to **e = 0.3** (2.77 lit, 1.77 VLBI — confirmed in *both* tiers). The inset in (a) makes
+> the comparison at fixed e = 0.3: one member fails, two members clear. **Eccentricity is not a
+> single number you must exceed — it trades against multiplicity.**
 >
-> Source: `recut_chorus.npz` (counts + adopted floors), 26 mixture cells × 30 realisations, floors
-> refit per mixture **and re-cut against the empirical q95** (all 26 cells fail the Gumbel validity
-> gate). Caveat: the extra certifications are attributable
-> to the eccentric member's *own* template — the clock is not shared with its circular neighbours.
+> Panel (b) is the honesty check, redrawn on the corrected floors: the noise bar does **not** drop
+> to let the count in. At the switch-on the bar is *higher* than circular (**7.0 → 8.6 nats**)
+> while the count rises 8.5×. Note the bar is **not monotone in e** — it peaks at e = 0.3, the one
+> shape that fails — but no eccentric bar sits below the circular one, so no count here was bought
+> with a lowered standard.
+>
+> **Whisker discipline:** each bar carries a whisker down to the count at *floor + bootstrap
+> error*. A cell is CONFIRMED only if the whisker stays above 1. That is exactly why e = 0.3 fails
+> in both tiers despite VLBI's central value of 1.03.
+>
+> Source: `reports/ch_analysis_recut.npz` (counts + adopted floors + `corr_lo`), 26 mixture cells
+> × 30 realisations, floors refit per mixture **and re-cut against the empirical q95** (all 26
+> cells fail the Gumbel validity gate). Caveat: the extra certifications are attributable to the
+> eccentric member's *own* template — the clock is not shared with its circular neighbours.
 
 ### F5 — THE MAP · `F5_the_map.png`
 
@@ -131,15 +147,23 @@ pulsar data is analysed anywhere in this repository.
 > loud (b) and the boundary sweeps to the faint edge of the map. **How many loud sources exist
 > matters more than how loud the loudest one is** — and nobody has measured that number.
 >
-> **⚠ FIGURE STALE (mildly).** The re-cut moves **4 of the 108 cells** across the boundary — two
-> onsets died at the faint edge and two were born — so **the red on/off contour is drawn in the
-> wrong place at h = 10⁻¹³·²⁵**, though the total (59 cells on) is unchanged. Both headline
-> readings survive exactly: 40 yr still beats 50 in the loud columns (12 of 12), and 30 yr is still
-> optimal nowhere (0 of 36). **The lesson holds; the contour must be redrawn.**
+> **The contour is now drawn from the corrected floors.** The re-cut moved **4 of the 108 cells**
+> across the boundary — two onsets died at the faint edge and two were born — so the faint edge of
+> the red line has shifted, even though the total (**59 cells on**) is unchanged. That coincidence
+> is worth naming: *the number is stable; the map is not.* Both headline readings survive exactly:
+> 40 yr still beats 50 in the loud columns (12 of 12), and 30 yr is still optimal nowhere (0 of 36).
+>
+> **The hatching is gone, and its absence is the news.** Cells whose floor could not be fitted with
+> a Gumbel (too many noise trials certify nothing at all) used to be hatched and their counts
+> flagged as *upper bounds pending re-fit*. Those floors are now re-fit on the empirical 95th
+> percentile with a bootstrap error. **No cell on this map is an upper bound any more.** A thin
+> dotted border marks the five re-fit cells in these two panels — provenance, not a warning.
 >
 > Source: `reports/surface_analysis_recut.npz`, 108 cells × 30 signal realisations, each with
 > its own floor (Gumbel where the null's zero-fraction ≤ 20 %, empirical 95th percentile with a
-> bootstrap error above it). Panels show the "today's distance knowledge" (lit) tier.
+> bootstrap error above it). The contour is drawn on `corr_lo` — the count at floor + error — so
+> the boundary appears only where it survives its own calibration error. Panels show the "today's
+> distance knowledge" (lit) tier.
 
 ### F6 — THE PAYOFF · `F6_the_payoff.png`
 
@@ -197,23 +221,27 @@ Script: `EXPLAINER_results/explainer_figures2.py`.
 > The whole array is 116 pulsars, but **the science does not need the array — it needs the first
 > handful.** Three certified pulsars make the source a useful standard siren *and* pin it to a
 > single galaxy; five saturates (more buy nothing). Today's all-circular population delivers
-> **0.37** per dataset — below even one. Making a single loud orbit **slightly** oval (e = 0.3)
-> **is not enough — it reaches 0.70 and still fails.** Making it **moderately** oval (e = 0.5)
-> reaches **3.13 — the three-pulsar siren threshold, exactly**; making it strongly oval (e = 0.7)
-> reaches **5.43, at saturation.** **One eccentric source still supplies the entire handful the
-> science needs — but it must be moderately eccentric, not slightly**, and it does so at unchanged
-> loudness.
+> **0.37** per dataset — below even one.
 >
-> **⚠ FIGURE STALE — its e = 0.3 rung is refuted** (see F4). The growth path is real; **its first
-> rung is one step further up the eccentricity axis than the figure draws it.** The corrected
-> reading is arguably the *cleaner* story: e = 0.5 lands the count at **3.13**, which is precisely
-> the three-pulsar threshold the figure is built around — *the switch-on and the science threshold
-> coincide.*
+> **The growth path has two first rungs, and the ladder now shows both.** Making a single loud
+> orbit **moderately** oval (e = 0.5) reaches **3.13 — the three-pulsar siren threshold, exactly**:
+> *the switch-on and the science threshold coincide.* Or, at the *slighter* eccentricity of
+> e = 0.3, put the shape on **two** orbits instead of one and the count reaches **2.77** — the same
+> rung, bought a different way. (A **single** member at e = 0.3 is **not** enough: it re-cuts to
+> 0.70 and fails — the marker that used to sit here is refuted, see F4.) Strongly oval (e = 0.7)
+> reaches **5.43, at saturation.**
 >
-> Source: `recut_chorus.npz`, CHORUS mixture cells (census loudness, 30 yr, lit tier); SURFACE's best cell over the
-> 108-cell box (7.93); GEO's 40 sky draws (18 pulsars certify in ≥1 sky — the same 18 as SIREN's
-> geometry union); SURFACE's `percert` (70 distinct pulsars certify *somewhere* in the box, so 46
-> never certify at any modelled loudness).
+> **One eccentric source still supplies the entire handful the science needs — provided it is
+> moderately eccentric, or provided it has company.** Either way, at unchanged loudness.
+>
+> Source: `reports/ch_analysis_recut.npz`, CHORUS mixture cells (census loudness, 30 yr, lit tier);
+> SURFACE's best cell over the re-cut 108-cell box (7.93); GEO's 40 sky draws (18 pulsars certify
+> in ≥1 sky — the same 18 as SIREN's geometry union); `percert` **re-cut against the adopted
+> floors** (70 distinct pulsars certify *somewhere* in the box, so 46 never certify at any modelled
+> loudness). `percert` is floor-dependent and the re-cut bank does not carry it, so the generator
+> re-derives it from the per-realisation banks and **gates itself**: the same scorer at the old
+> Gumbel floors must reproduce the banked `percert` on all 108 cells (it does), and the union is
+> **unchanged at 70** under the correction. Verified, not assumed.
 
 ### F10 — THE UPGRADED ARRAY · `F10_the_upgraded_array.png`
 
@@ -279,11 +307,15 @@ Script: `EXPLAINER_results/explainer_figures3.py`.
 > *inside* the Virgo cluster, which is a small volume to bet a discovery on. Add two more loud
 > sources to the population and the same binary works out to **~53 Mpc**, roughly a 180× larger
 > volume. The red stars mark ATLAS's self-clocking corners with the eccentricity each demands.
-> **Marked PROVISIONAL:** the onset floors these curves rest on are pending the RECUT re-fit, and
-> the faint end of that surface is exactly where the floors are known to be permissive.
 >
-> Source: SURFACE's own amplitude relation, evaluated at its banked onsets (h* = 10⁻¹²·⁵ census,
-> 10⁻¹³·²⁵ at 5-loud); reproduces SURFACE §10's 9.4 / 53.1 Mpc exactly.
+> **The PROVISIONAL watermark is lifted.** These curves rest on two onset strains, and the floor
+> re-fit — which *did* move four cells across the onset boundary — left **both of them unchanged**:
+> the census column still switches on at h* = 10⁻¹²·⁵ and the 5-loud column still runs to the faint
+> edge of the grid at 10⁻¹³·²⁵. The generator no longer hard-codes them; it reads the faintest
+> confirmed onset out of the re-cut surface and asserts the two values before drawing.
+>
+> Source: SURFACE's own amplitude relation, evaluated at its **re-cut** onsets (h* = 10⁻¹²·⁵
+> census, 10⁻¹³·²⁵ at 5-loud, T ≥ 40 yr); reproduces SURFACE §10's 9.4 / 53.1 Mpc exactly.
 
 ### F12 — THE GEOMETRY LOTTERY · `F12_the_geometry_lottery.png`
 
@@ -342,10 +374,17 @@ Script: `EXPLAINER_results/explainer_figures3.py`.
    somewhere in SURFACE's 108-cell box). Both are plotted; neither is 30.
 7. **F2.5 is plotted from STORY, not from npz** — its two source banks are not in this checkout
    (see its caption). This is the only figure in the set not built from a banked array.
-8. **F11 is PROVISIONAL** and watermarked as such: its onset floors are pending the RECUT re-fit.
+8. **F11 is no longer PROVISIONAL.** The watermark is lifted: the RECUT re-fit left both onset
+   strains its curves rest on unchanged, and the generator now asserts them out of the re-cut bank
+   rather than hard-coding them.
 9. **F2.7 carries a DISPUTED flag from STORY** — ATLAS's npz and markdown disagree on which
    eccentricity threshold the M4 payoff numbers are quoted at. Not reconciled here.
-10. **F5's faintest column is estimator-limited.** Its floor is fitted where 60% of noise-only
-   realisations produce no offender at all, which ANCHOR measured as biased permissive (its
-   convention: the Gumbel floor is valid only below a ~20% zero-fraction). The count there is an
-   upper bound. Flagging this *on* F5 is offered and not yet applied.
+10. **F5's faintest column is no longer estimator-limited.** Its floors were fitted where up to 78%
+   of noise-only realisations produce no offender at all — which ANCHOR measured as biased
+   permissive (its convention: the Gumbel floor is valid only below a ~20% zero-fraction). Those
+   15 floors are now **re-fit on the empirical 95th percentile with a bootstrap error**, the counts
+   are re-cut against them, and **no count on F5 is an upper bound**. The re-fit cells carry a
+   dotted border on the figure. Two onsets at the faint edge did not survive it.
+11. **Every count in F4, F5 and F9 is now scored against a floor that passes its own validity
+   gate**, and each generator gates itself against the banks before drawing (F3 re-derives the
+   cell's count, F9 re-derives `percert` and must reproduce all 108 banked cells at the old floors).

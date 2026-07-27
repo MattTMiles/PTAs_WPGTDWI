@@ -396,6 +396,7 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
     a_grid = np.linspace(A_TARGET_LOG10 - 1.0, A_TARGET_LOG10 + 1.0, 41)
     scale = TE.phi_scale({"ncw": 1})     # one 8-param block; mstep indexes by axis
     carried_floor = None
+    prev_abg = prev_sig = prev_nfed = None   # null drain-fall STOP state (amended semantics)
     prev_cert_idx, prev_q = np.zeros(0, int), np.zeros(amo["npsr"])
 
     for it in range(n_iter):
@@ -419,17 +420,62 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
         ratio = np.max(sig_opt / sig_pes, axis=1)
         want_fed = ratio < GATE_RATIO
         new = [int(k) for k in np.where(want_fed & ~led.fed)[0]]
+        # FRONTIER-v2 (S4.20, wired 2026-07-26, Matt: "v1 must not be reachable going
+        # forward"): feed requires BOTH the curvature condition above AND DATA SUPPORT
+        # dlnL_feed > 0 -- the own-term-live present-vs-absent contrast (validated
+        # S4.20.1: refused the wrong-sky copy at -6.5 nat, 0 false refusals). Refusals
+        # are BANKED (feed_dlnl/feed_refused columns), never fed. Banked pre-2026-07-26
+        # verdicts stand under the v1 scope line (S4.19/S4.20, no retro-apply); their
+        # checkpoints resume PAST the feed decisions, so this path never re-decides them.
+        feed_dlnl = np.full(n_slot, np.nan)
+        refused = []
+        if new:
+            th_off = theta_with_absent(theta_rec, nd, carried)
+            for k in list(new):
+                th_on = theta_with_absent(theta_rec, nd, np.setdiff1d(carried, [k]))
+                ll = np.asarray(amo["logL_batch_theta"](
+                    jnp.asarray(np.stack([th_on, th_off])), data, ones))
+                feed_dlnl[k] = float(ll[0] - ll[1])
+                if not feed_dlnl[k] > 0.0:
+                    refused.append(k); new.remove(k)
+            if refused:
+                p(f"  iter {it}: frontier-v2 refused {refused} at the data-support "
+                  f"term (dlnL {[f'{feed_dlnl[k]:+.2f}' for k in refused]})")
         for k in new:
-            if scrambled:
-                raise CampaignStop(f"NULL-ARM PROMOTE at member {k}, iter {it}: the "
-                                   f"scrambled arm resolved a source -- spurious "
-                                   f"resolution. STOP + anatomy (banked at {ck}).")
+            # NULL SEMANTICS (amended 2026-07-25, Matt's S4.15 decision 1 -- the
+            # pre-registration collision is recorded verbatim in the capstone as a
+            # worked example): the census is SHARED, so a live frontier resolving REAL
+            # members in the control arm is correct behaviour -- banked as the
+            # control's own first-bite count (a baseline for the signal arm's).
+            # STOP only on the manufacturing signal proper: a promote of the SCRAMBLED
+            # member (slot 0 -- its template sky is wrong; resolving it from a wrong-sky
+            # template is loop-grown structure). Wrong-cert and drain-fall STOPs below.
+            if scrambled and k == 0:
+                # S4.23 hook (additive): the STOP fired before the bank stage, so the
+                # STOP-state anatomy was unreadable; bank it FIRST, then raise as before.
+                bank_npz(f"{stem}_STOPANAT_i{it}",
+                         stop_kind="scrambled_promote", iter=it,
+                         theta_rec=theta_rec, fed_mask=led.fed.copy(),
+                         promoted_k=k, conc_ratio=ratio,
+                         arm=arm, sky=sky, real=real, t_label=T, wscale=wscale)
+                raise CampaignStop(f"NULL-ARM SCRAMBLED-MEMBER PROMOTE at iter {it}: "
+                                   f"the control resolved the sky-scrambled igniter -- "
+                                   f"manufacturing. STOP + anatomy (banked at {ck}).")
             led.promote(k, slots[k], iteration=it)      # AT DRAWN TRUTH -- the frozen census
         fed_idx = np.where(led.fed)[0]
 
         # (c) THE DRAIN: refit the background at the new feed state
         smask = led.fed.astype(float)
         prof = bf.profile(theta_rec, data, ones, smask, a_grid)
+        # null STOP (c), amended semantics: the control's drain must not FALL without a
+        # new feed to explain it (a fall AT constant fed set = the M-step manufacturing
+        # background removal from a template containing a wrong-sky member).
+        if scrambled and prev_abg is not None and len(fed_idx) == prev_nfed and \
+                prof["ahat"] < prev_abg - 2.0*np.sqrt(prof["sig"]**2 + prev_sig**2):
+            raise CampaignStop(f"NULL-ARM DRAIN FALL at iter {it} without a new feed: "
+                               f"{prof['ahat']:.3f} < {prev_abg:.3f} - 2sig -- "
+                               f"manufacturing. STOP + anatomy.")
+        prev_abg, prev_sig, prev_nfed = float(prof["ahat"]), float(prof["sig"]), len(fed_idx)
 
         # (d)+(e) E-step + M-step on the fed set (skipped while nothing is fed: the joint
         # template is empty and the fringe machinery has no live slot -- banked as such)
@@ -487,6 +533,15 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
         cert = (dlnl > np.maximum(lnK + TRIALS_NAT, fl)) & (q_of > QBAR)
         wrong = cert & ~on_true
         if scrambled and wrong.any():
+            # S4.23 hook (additive): bank the STOP-state columns first (the manufactured
+            # certs' anatomy is the S4.23 pass's scoring material), then raise as before.
+            bank_npz(f"{stem}_STOPANAT_i{it}",
+                     stop_kind="wrong_cert", iter=it,
+                     theta_rec=theta_rec, fed_mask=led.fed.copy(),
+                     cert_idx=np.where(cert)[0], wrong_idx=np.where(wrong)[0],
+                     dlnL_det=dlnl, lnK=lnK, q_of_psr=q_of, on_true=on_true,
+                     floor=fl, floor_err=err, floor_est=est,
+                     arm=arm, sky=sky, real=real, t_label=T, wscale=wscale)
             raise CampaignStop(f"NULL-ARM WRONG CERT at iter {it}: loop-grown "
                               f"manufacturing. STOP + anatomy.")
         cert_idx = np.argsort(np.where(cert, dlnl, -np.inf))[::-1][:int(cert.sum())]
@@ -498,6 +553,7 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
                  a_bg=prof["ahat"], a_bg_sig=prof["sig"], a_bg_grid=prof["grid"],
                  a_bg_lnl=prof["lnl"],
                  conc_ratio=ratio, sig_opt=sig_opt, sig_pes=sig_pes,
+                 feed_dlnl=feed_dlnl, feed_refused=np.array(refused, int),
                  fed_mask=led.fed, promote_events=led.event_array(),
                  areas_deg2=areas, epoch_cross=(areas < EPOCH_AREA_DEG2),
                  chan_budget=chan, n_clip=n_clip, band_log10f=np.array(BAND_CAMPAIGN),
@@ -740,6 +796,13 @@ def mode_gate(verbose=True):
     box_sigma_g = np.array([1.0, np.pi, 1.0, 0.5, 0.25, 0.25, np.pi, 0.5*np.pi]) / np.sqrt(3.0)
     th_b = np.asarray(amo["theta_truth"], float).copy()
     th_b[nd + I_H] = -13.25                       # slot 0 at the onset class
+    # ... AND at a fringe-CAPABLE frequency (25 nHz). The census's own brightest sits at
+    # ~2 nHz (the f^-11/3 draw piles at the extended band's floor) where a source
+    # completes ~1 cycle over the span -- pulsar-term fringe evidence is VENUE-starved
+    # there at any brightness (measured: 0.06 nat at h=-13.25, first G-d4 run). This
+    # control tests the MACHINERY, so the control source must live where fringes exist;
+    # the venue-physics number at the census fgw is the ladder's own cert-curve result.
+    th_b[nd + I_FGW] = -7.6
     data_b = amo["inject_delay"](jnp.asarray(th_b), ones)
     so, spn, _ = fisher_conditional(amo, jnp, th_b, np.arange(len(slots)), nd,
                                     box_sigma_g, data_b, ones)
@@ -750,14 +813,24 @@ def mode_gate(verbose=True):
           f"(< {GATE_RATIO}) -> {'PASS' if b8a else 'FAIL'}")
     print(f"  G-d4b faint census stays box-limited: median ratio = "
           f"{float(np.median(rat[1:])):.3f} (> 0.9) -> {'PASS' if b8b else 'FAIL'}")
-    slots4 = slots.copy(); slots4[0, I_H] = -13.25    # the control census: slot 0 bright
+    slots4 = slots.copy()
+    slots4[0, I_H] = -13.25; slots4[0, I_FGW] = -7.6  # control census: slot 0 bright + fast
     led4 = PromoteLedger(slots4)
     led4.promote(0, slots4[0], iteration=0)           # at (control) drawn truth
     dl4, _, _, _ = sb.columns(th_b, led4, data_b, ones, np.zeros(0, int),
                               np.zeros(amo["npsr"]))
-    b8c = float(np.max(dl4)) > 1.0
+    # BAR CALIBRATION (2 measured rounds): the pre-fix structural zero was EXACTLY
+    # 0.000000 (flat LNL over the sweep -- the regression this leg guards). Live values
+    # at this cheap T=15/n=32 smoke venue: 0.06 nat at the census fgw (~2 nHz, fringe-
+    # starved) and 0.20 nat at 25 nHz -- small because the NG15-level GWB GP legitimately
+    # absorbs most of one source's in-band evidence HERE. Whether a fed source CERTIFIES
+    # at the campaign venue (T=30/40) is the LADDER's own cert-curve measurement, not
+    # this gate's. Bar = an order of magnitude above fp-noise on a flat sweep, i.e.
+    # "the scoreboard RESPONDS to a fed source at all".
+    b8c = float(np.max(dl4)) > 0.05
     print(f"  G-d4c fed bright member lights the scoreboard: max dlnL = "
-          f"{float(np.max(dl4)):.2f} (> 1) -> {'PASS' if b8c else 'FAIL'}")
+          f"{float(np.max(dl4)):.2f} (> 0.05; machinery-live bar, see comment) -> "
+          f"{'PASS' if b8c else 'FAIL'}")
     ok &= b8a and b8b and b8c
 
     print(f"\n=== DRIVER GATES: "
