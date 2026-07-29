@@ -582,17 +582,64 @@ def _null_offenders(sb, ndraw, jnp, theta_rec, led, sky, it, prev_cert_idx, prev
     """Offender statistic over fresh no-CW null draws at THIS iteration's joint state
     (white+rn only -- consistent with the campaign's data model). The drawer is the
     CELL's drawer, built once (a NoiseDrawer construction refactors the GWB block --
-    minutes at T=30 -- and must not be paid per refit)."""
+    minutes at T=30 -- and must not be paid per refit).
+
+    ================= DEFECT AND CORRECTION (E0), 2026-07-29, SIEVE-A =================
+    WHAT WAS WRONG.  Until this date the statistic computed here was
+
+        o[a] = q[a] > QBAR ? max(dlnL[a] - max(lnK[a], 0), 0) : 0        (WRONG)
+
+    while the CANONICAL offender -- `recut_surface.offender:75`, and with it
+    surface.py:334, chorus.py:605, ignite2.py:166, spark3.py:1063, anchor.py:322,
+    kindle_d7_fall.py:67 and bank_surface_offenders.py:51, i.e. EVERY other campaign in
+    this programme -- is
+
+        off = max{ dlnL[a] : dlnL[a] > lnK[a] and q[a] > QBAR }, else 0   (CANONICAL)
+
+    The floor returned here is compared against dlnL in criterion-v2.2
+    (`run_cell`: cert = dlnL > max(lnK + TRIALS_NAT, floor)). So GLACIER measured its
+    bar on the (dlnL - lnK) scale and applied it on the dlnL scale -- a scale mismatch
+    in the PERMISSIVE direction. That this was unintended rather than a declared variant
+    is visible two lines up: `_stack()` imports the canonical `offender` into FL and
+    never calls it.
+
+    HOW BIG.  Delta = floor_canonical - floor_glacier, measured on the banked null draws
+    of 38 independent cells across three campaigns (GENERALISE arm A-SKY 32, CHORUS 4,
+    IGNITE-2 2; SIEVE V1): median +6.97 nat, mean +7.42, range [+1.96, +15.37], and
+    POSITIVE IN ALL 38. The sign is not empirical -- it is forced: lnK = log(max(K,1))
+    >= 0, so the pulsar attaining the glacier max also satisfies dlnL > lnK and hence
+    lies in the canonical mask, giving off_glacier <= off_canonical on every draw. For
+    the same reason both statistics vanish on exactly the same draws, so `zero_fraction`
+    and the degenerate-estimator branch below are UNAFFECTED by this correction.
+
+    SCOPE.  Forward-correcting only. It changes the floor, and therefore only the
+    criterion-v2.2 certification bar. It does NOT touch the D2 rigidity gate (R1
+    2F_coh >= 15.132, R2 Delta-2F > 0), which never reads the floor -- so D2's
+    manufactured-set kills stand unchanged. Banked verdicts are re-cut separately and
+    reported as a before/after table (hpc_harbor/sieve/sv_v3_recut.py); they are NOT
+    silently rewritten in place.
+    ==================================================================================
+    """
     off = []
     ones = jnp.ones(sb.npsr)
+    n_nonfinite = 0
     for i in range(n_null):
         nz = ndraw.draw(9_000 + 100*sky + i, components=("white", "rn"),
                         white_scale=wscale)
         dnull = tuple(jnp.asarray(np.asarray(n)) for n in nz)
         dlnl, lnK, q_of, _ = sb.columns(theta_rec, led, dnull, ones,
                                         prev_cert_idx, prev_q)
-        o = np.where(q_of > QBAR, np.maximum(dlnl - np.maximum(lnK, 0.0), 0.0), 0.0)
-        off.append(float(np.max(o)))
+        # Canonical statistic, with spark3.offender:1063's non-finite exclusion: a
+        # pulsar with a single counted fringe (K = 1) has an infinite peak gap, and one
+        # inf silently poisons the extreme-value fit. spark3 documents that guard as
+        # part of the canonical form, so it rides along rather than being a variant.
+        fin = np.isfinite(dlnl)
+        n_nonfinite += int((~fin).sum())
+        m = (dlnl > lnK) & (q_of > QBAR) & fin
+        off.append(float(dlnl[m].max()) if m.any() else 0.0)
+    if n_nonfinite:
+        print(f"  [floor] excluded {n_nonfinite} non-finite dlnL rows across "
+              f"{n_null} null draws", flush=True)
     return np.array(off)
 
 

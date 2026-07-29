@@ -634,6 +634,92 @@ otherwise.
 `AugustDowntime2026` takes the whole cluster 08-10 → 08-13. At ~3 h wallclock per block
 on a 1-free-GPU dgx03 there is ample margin, but the list must not be started after 08-06.
 
+### §2.1 C3 COMPLETE — COMPOSITION DOES NOT OPEN CERTIFICATION, AND REACH DOES NOT COMPOUND
+
+*(PHOENIX, 2026-07-29. Job `12838298`, 4/4 COMPLETED, 24/24 banked, ~3.9 GPU-hr. Build =
+a 3-line argument plumb in `summit_loop.py` forwarding `--wscale`/`--t`; **inert by
+construction**, verified statically — `run_cell` defaults are `t_label=None → T_LABEL=30`
+and `wscale=1.0`, and `wtag=""` at wscale 1.0, so passing (30, 1.0) is a bit-identical
+call. No GPU gate was spent: the D2 vlbi banks are hgx03/H200 and `batch_gpu` cannot start
+before November, so a dgx03 gate could only re-measure the known cross-host offset.)*
+
+The composed cell beside **both** of its parents and the baseline:
+
+| arm | FEED /4 | HOLD /4 | CERT /4 | wrong | mean bite | mean give-back | mean wander |
+|---|---|---|---|---|---|---|---|
+| `lit × w1` — baseline | 3 | 2 | **0** | 0 | −0.302 | +0.247 | 0.081 |
+| `vlbi × w1` — D2 alone | 3 | **3** | **0** | 0 | −0.289 | +0.228 | 0.055 |
+| `lit × w0p5` — array alone | **4** | **4** | **0** | 0 | −0.721 | +0.552 | 0.118 |
+| **`vlbi × w0p5` — C3 COMPOSED** | **4** | 2 | **0** | 0 | −0.734 | +0.559 | 0.098 |
+
+Per sky (F = fed, H = hold, C = cert):
+
+| sky | lit×w1 | vlbi×w1 | lit×w0p5 | **C3 composed** |
+|---|---|---|---|---|
+| 0 | F1/H1/C0 | F1/H1/C0 | F1/H1/C0 | F1/H1/C0 |
+| 1 | F1/H1/C0 | F1/H1/C0 | F1/H1/C0 | F1/**H0**/C0 |
+| 2 | F1/H0/C0 | F1/H1/C0 | F1/H1/C0 | F1/**H0**/C0 |
+| 3 | F0/H0/C0 | F0/H0/C0 | F1/H1/C0 | F1/H1/C0 |
+
+> **C3 VERDICT — three readings, in descending confidence.**
+>
+> **1. CERTIFICATION IS UNTOUCHED BY COMPOSITION: 0/4, as in every single dial.** This is
+> the result the block was cut for. Trust × reach does not put a single pulsar on the
+> certification board at the feasible rung. Combined with D2 (0 at three prior tiers), D3
+> (0 at three array sizes) and the array ladder (0 at six capability points), the count is
+> now **0 certifications in 4 dials × every setting measured at NG15-consistent loudness.**
+> The wall is not a sensitivity limit, not a knowledge limit, and **not a composition
+> limit.**
+>
+> **2. REACH DOES NOT COMPOUND — the two feed-movers are REDUNDANT, not additive.** C3
+> feeds 4/4, exactly what `w0p5` delivers alone; `vlbi` adds no sky. Both levers act on the
+> same marginal sky (sky 3), which is the sky the whole plane has been pointing at. There
+> is no second sky for a second lever to find.
+>
+> **3. TRUST DOES NOT COMPOUND, AND THE POINT ESTIMATE MOVES THE WRONG WAY — stated as
+> suggestive, not demonstrated.** HOLD is 2/4 composed against 3/4 (vlbi) and 4/4 (w0p5):
+> skies 1 and 2 hold under *either* dial alone but not under the composition. **I am not
+> claiming an anti-synergy.** Mean wander in the composed cell is *lower* than in
+> `lit×w0p5` (0.098 vs 0.118), so this is HOLD's ≥2-consecutive-interval threshold
+> landing differently, not more motion — on a 4-sky binary. It needs the C1/C2 blocks (or
+> more skies) before it is more than a flag.
+
+**Drain is inherited from the array dial and `vlbi` contributes ~nothing** (bite −0.734 vs
+−0.721; give-back +0.559 vs +0.552). That is exactly what §1.6 predicts: the loss is booked
+at the **first M-step fit**, and a tighter distance prior does not change where that fit
+lands. Absolute bites carry the LEDGER-B1 reference caveat; the parent-vs-composed
+*differences* do not.
+
+**Safety: clean.** 0 wrong certs across all four blocks; no STOP fired.
+
+### §2.2 SCOPE — the SIEVE-A "E0" floor correction, and why it does not move §1.4/§1.6/§2.1
+
+A concurrent SIEVE-A session corrected `_null_offenders` in `glacier_loop.py` at
+**2026-07-29 12:04**: GLACIER's floor statistic was `max(dlnL − max(lnK,0))` over the
+q-gated set, where every other campaign in the programme uses the canonical
+`max{dlnL : dlnL > lnK and q > QBAR}` — a scale mismatch **in the permissive direction**,
+median **+6.97 nat** too low across 38 banked cells, positive in all 38.
+
+**Every PHOENIX job this session finished before that edit** (frzgate 03:12, frzfan
+04:35–07:22, smtc3 08:51–11:26 vs the 12:04 edit), so the frozen arm and C3 ran on the
+same pre-E0 driver as the banked live arm they are compared against. The paired
+comparisons are internally consistent. What the correction implies for the results above:
+
+- **The CERT = 0 findings are STRENGTHENED, a fortiori.** The floor I certified against was
+  **too low**, i.e. too easy to clear — and nothing certified anyway. Raising the floor by
+  ~7 nat cannot create a certification. §1.4's "0 at every rung", §2.1's 0/4, and the
+  plane's 0/24 on the feasible row all hold under the corrected statistic *with margin*.
+- **FEED, HOLD, DRAIN and WANDER are untouched.** The floor enters only the criterion-v2.2
+  certification bar; it plays no part in the frontier, the M-step, or the background fit.
+  §1.6's frozen-vs-live verdict is entirely a drain/wander result and does not read the
+  floor at all.
+- **The r13p5/none/s3 true certs are unaffected**, per SIEVE-A's own note that both
+  statistics vanish on exactly the same draws, so `zero_fraction` and the degenerate branch
+  are unchanged — that cell's floor stays a measured 0.000 and the binding bar remains the
+  trials term 1.27.
+- **The D2 rigidity gate is untouched** (R1/R2 never read the floor), so the 20/20
+  manufactured-set kills stand.
+
 ---
 
 *(§3 closure test follows as it cuts.)*

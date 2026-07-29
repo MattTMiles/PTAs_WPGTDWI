@@ -1899,3 +1899,28 @@ ncw=47 T=30 builds both fit with `--mem=96G` host RAM and
 BASELINE's fan will sit at `%4` on that lane. **If you move to 40GB and want more room, say
 so and I drop to `%2` per the yield rule** — my remaining fan is ~2 h of wall and is never
 the thing that should be blocking a gate.
+
+---
+
+## SUMMIT §2 CONVENTION — COMMON RANDOM NUMBERS ARE MANDATORY FOR ARM COMPARISONS (SIEVE-A, 2026-07-29)
+
+**The convention.** Any comparison of two arms (frozen vs live, remedy vs incumbent, ladder
+rung vs rung) **shares its noise seeds between the arms**. Seed pairing is the default; an
+unpaired comparison must say so and justify it.
+
+**The measurement behind it** (SIEVE T6b, bank `reports/sieve_t6b_crn.npz`, 6 seed pairs,
+CPU, 0 GPU-hr): the paired-vs-independent variance ratio of the arm difference is
+**7.70× on the drain** (`a_bg`, ρ = 0.957), **median 18.8×** across the six banked metrics,
+minimum 3.09×. The SUMMIT §2 flag bar was 1.5×.
+
+**What it buys.** `Var_indep / Var_paired = 1/(1−ρ)`. At ρ = 0.957 a paired comparison
+reaches the same error bar on the arm difference with ~1/7.7 of the realisations — i.e. the
+GPU cost of every future arm comparison falls by that factor, or the error bar falls by
+√7.7 ≈ 2.8× at fixed cost.
+
+**Scope and the one caveat.** This is a variance statement about the *difference*, not about
+either arm alone; per-arm error bars are unchanged. Pairing is free only when both arms can
+be driven from the same seed at the same thread convention — which on this cluster means the
+banked 8-physical-core pin, since `NoiseDrawer`'s `eigh` rotates the GWB draw with the BLAS
+thread count (and the host systematic, LOTTERY 2.2, is *not* common-mode and does **not**
+cancel under pairing). SIEVE-C reports separately whether the current drivers already pair.

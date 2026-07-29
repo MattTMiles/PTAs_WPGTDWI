@@ -439,3 +439,209 @@ and SIEVE uses its own seed base (`6_100_000`) so a toy can never be mistaken fo
 PHOENIX cell. 6 seed pairs, `n_src = 16`, T = 30, 3 iterations; `Var_indep/Var_paired`
 reported per metric with both the analytic (`Var(Y_f)+Var(Y_l)`) and crossed-pairs
 estimates.
+
+---
+---
+
+# SIEVE-A ADDENDUM — TRUE-CERT VALIDATION (2026-07-29)
+
+*Matt's fairness requirement: the promoted tools must be tested where the loop WORKS, not
+only where it fails. The GLACIER banks hold n = 2 true certifications — insufficient to
+bound anything. V1/V2/V4 move the tests onto true-cert-rich substrate; V3 executes the
+authorised E0 fix.*
+
+## V1 — DOES THE E0 CANONICAL RECUT KEEP TRUE CERTIFICATIONS?
+
+### VERDICT: **YES, but not for free — and my T7 claim of a strictly-dominating fix does not survive n = 1059.** True-cert survival **1044/1059 = 98.58%**; kill rate **1.42% [0.86%, 2.32%]** (Wilson 95%).
+
+`hpc_harbor/sieve/sv_v1_truecert.py`, bank `reports/sieve_v1_truecert.npz`. CPU, banked
+columns only — no likelihood re-evaluated, no campaign verdict moved.
+
+**Substrate: 38 cells, three campaigns, 1059 true certifications** — GENERALISE arm A-SKY
+(32 units = 4 cells × 8 skies, of which the survivor cell `e0.3 h-12.75 5+11` is 8),
+CHORUS soft loops (4 cells), IGNITE-2 soft loops (2 cells). That is 530× the true-cert
+count T7 had to work with.
+
+### The correction to T7
+
+T7 reported the E0 recut as "the only strictly-dominating tightening tested — 2→2 true
+kept, 5 wrong removed." At n = 2 that was the only observable outcome; it was not
+evidence of dominance. At n = 1059 the recut **does** cost true certifications, at
+1.42% [0.86%, 2.32%]. The GLACIER result is fully consistent with that rate (expected
+loss on 2 certs = 0.03), so nothing in T7's arithmetic was wrong — the claim of
+dominance was over-read from a sample that could not support it. The fix is still worth
+making; it is a trade, not a free lunch, and the trade is quantified below.
+
+### The three cuts, scored on every realisation
+
+| cut | what it is | certs | true | wrong | wrong rate |
+|---|---|---:|---:|---:|---:|
+| **A** canonical | what CHORUS/IGNITE-2/GENERALISE actually do, and what the patched GLACIER now does | 1141 | 1059 | 82 | 7.19% |
+| **B** the defect | GLACIER's floor-scale mismatch, reconstructed on these banks | 1809 | 1664 | 145 | 8.02% |
+| **C** E0 scale-matched | T7's recut: the banked floor applied on the scale it was measured on | 1124 | 1044 | 80 | 7.12% |
+
+Per family, true-cert survival under C:
+
+| family | cells | survival | net | kill rate [95%] |
+|---|---:|---:|---:|---|
+| A-SKY survivor (8 skies) | 8 | 369/382 = 96.6% | −13 | 3.40% [2.00%, 5.73%] |
+| A-SKY all | 32 | 960/979 = 98.1% | −19 | 1.94% [1.25%, 3.01%] |
+| CHORUS sloops | 4 | 57/62 = 91.9% | −5 | 8.06% [3.49%, 17.5%] |
+| IGNITE-2 sloops | 2 | 27/18 = 150% | **+9** | 0% [0%, 17.6%] |
+
+**C is not uniformly stricter than A.** It gains certifications in cells with a small
+glacier-scale floor (IGNITE-2, +9) and loses them elsewhere. A and C agree on
+**61329/61480 = 99.75%** of pulsar-rows and disagree in **both** directions. That
+matters for V3: the scale-matched recut is a close stand-in for the canonical cut, not
+an identity.
+
+### Δ — the size of the defect, now measured properly
+
+Δ = floor_canonical − floor_glacier over 38 cells: **median +6.97 nat**, mean +7.42,
+range **[+1.96, +15.37]**, and **positive in all 38**. This supersedes the single
++9.07 nat figure T3 measured on one A-SKY unit's nulls.
+
+The sign is not an empirical regularity — it is forced. `lnK = log(max(K,1)) ≥ 0`, so
+the pulsar attaining the glacier maximum also satisfies `dlnL > lnK` and therefore lies
+in the canonical mask, giving `off_glacier ≤ off_canonical` **on every draw**. For the
+same reason both statistics vanish on exactly the same draws: the measured
+`max|zf_canonical − zf_glacier|` across all 38 cells is **0.000e+00**, exactly. So
+`zero_fraction`, and the degenerate-estimator branch that reads it, are untouched by
+the correction. That identity is load-bearing in V3.
+
+### Gates
+
+- **G-V1a** — the canonical offender array recomputed from each cell's own null banks
+  reproduces the campaign's *banked* offender array element-wise: **32/32 PASS** where a
+  banked array exists (A-SKY `gen_ledger.offenders`), 6 n/a (CHORUS/IGNITE-2 bank a
+  pooled array, not per-cell).
+- **G-V1b** — the floor re-derived from that array with the campaign's own estimator
+  reproduces the banked adopted floor: **38/38 PASS**.
+- **G-V1d** — `off_glacier ≤ off_canonical` pointwise: no violations. This gate is what
+  caught the first pass, which globbed `fnullA`/`fnullN` wrongly (the floor's own null
+  set is `fnullN`; `fnullA`/`fnullL` are the *extra* draws behind the wider `fALL` floor)
+  and printed an impossible Δ = −51 nat for IGNITE-2 as if it were a measurement.
+
+**KILL / PROMOTE:** PROMOTE the canonical statistic (executed in V3). The 1.42% true-cert
+cost is now on the record and is Matt's to accept or refuse.
+
+## V3 — E0 FIX EXECUTED, AND EVERY GLACIER-LINEAGE VERDICT RE-CUT
+
+### VERDICT: **PATCHED AND RE-CUT.** `glacier_loop._null_offenders` now computes the canonical offender. Banked verdicts: **18 → 13 certifications (E0 scale-matched, exact) or 18 → 11 (canonical, Δ-calibrated); wrong 16 → 11 or 9; both true certifications survive every variant.**
+
+Code: `hpc_harbor/glacier/glacier_loop.py` — the defect-and-correction is written into the
+function's own docstring, not just here, so the next reader of that code meets it there.
+Re-cut: `hpc_harbor/sieve/sv_v3_recut.py`, bank `reports/sieve_v3_recut.npz`.
+
+**Coverage: 730 banks** — 504 signal cells + 226 null/scrambled cells, spanning Stage-1
+(`gl1_*`), the sky/array ladders (`gl2_r13p25`, `r13p5`, `r13p9`, `r13p9_w0p25`,
+`r13p9_w0p5`), and the frozen arm (24 banks in `FROZEN_results/`, read-only — it has
+landed). No campaign npz was rewritten; both columns ride in the SIEVE bank so any later
+analysis must state which it used.
+
+| cut | certs | true | wrong |
+|---|---:|---:|---:|
+| v2.2 **as banked** (the defect) | 18 | 2 | 16 |
+| **E0 scale-matched** — exact from the banks | 13 | 2 | 11 |
+| canonical, Δ = +6.97 (central) | 11 | 2 | 9 |
+| canonical, Δ = +1.96 (most permissive) | 17 | 2 | 15 |
+| canonical, Δ = +15.37 (most strict) | 5 | 2 | 3 |
+
+Null/scrambled cells certify **0** under every cut, before and after.
+
+### The context number that reframes the whole finding
+
+**432 of 504 signal cells (86%) carry a DEGENERATE floor** (`floor = 0`,
+`floor_est = emp_q95_degenerate`). There the criterion has already collapsed to the
+trials bar `dlnL > lnK + 0.578`, and E0 is **inert**. The defect bites only on the 72
+non-degenerate cells — which is exactly where all 18 certification events live. So the
+correction is narrow in scope and total in effect on the events that exist.
+
+### One thing this script got wrong first, and why it matters
+
+The Δ-calibrated column initially added the pooled Δ to *every* floor, including the
+degenerate ones — and that killed **both** banked true certifications (their floor is
+0.000 and their `dlnL` is 2.35 and 1.60 nat, so a manufactured +6.97 bar erases them).
+It is wrong because the zero-atom identity above forces Δ = 0 wherever the offender
+sample is degenerate: an all-zero glacier sample **is** an all-zero canonical sample.
+Fixed; both true certs now survive all five variants. Worth recording because the
+plausible-looking "conservative" choice was the destructive one.
+
+### The honest limit, and what is pre-registered for SUMMIT
+
+`_null_offenders` banks only the scalar floor, never the per-pulsar null columns, so
+**GLACIER's null draws are not recoverable from the banks and a bit-exact canonical
+re-cut of banked verdicts requires re-running the nulls on a GPU.** That is
+pre-registered, not performed. Until it is paid, the scale-matched column is the
+defensible one and V1's 99.75% row-agreement is its error bar.
+
+**G-V3a** criterion-v2.2 reproduced on **730/730** banks. **G-V3b** `off_gl ≤ off_can` on
+**226/226** GLACIER null banks; on the 3 that are non-degenerate the GLACIER-native gap is
+median **+5.79 nat** [+3.91, +6.53] — independent of V1's substrate and consistent with it.
+
+Pre-registered for SUMMIT from iteration zero: (1) every GLACIER-lineage run started after
+this commit uses the canonical statistic from iteration 0, and no cell may switch estimator
+mid-trajectory; (2) banked verdicts are re-cut in report only; (3) the bit-exact re-cut
+needs fresh nulls, costed above; (4) **D2 is untouched** — R1 (2F_coh ≥ 15.132) and R2
+(Δ2F > 0) never read the floor, so the manufactured-set kills stand exactly as banked.
+
+## V2 — FALSE-ALARM RATE OF THE T2 TEMPLATE-HEALTH MONITOR ON TRUE-ANCHORED MEMBERS
+
+### VERDICT: **PROMOTION CRITERION MET.** False-alarm rate on truth-anchored **loud** members is **0/600 = 0.0000, 95% upper bound 0.64%** — under both forms of the contrast. PROMOTE to FORGE-B readout.
+
+`hpc_harbor/sieve/sv_v2_monitor.py` + `sv_v2.sbatch`, job **12843873** (COMPLETED, 17m33s,
+general CPU lane, 0 GPU-hr). Bank `reports/sieve_v2_monitor_c1.npz`.
+
+**Substrate: GENERALISE arm A-SKY survivor cell, all 8 skies × 15 realisations × 16
+members = 1920 member-scorings.** A-SKY is truth-anchored *by construction*, not by
+inference: `generalise.py:376` builds the search template as
+`theta_base = theta_src.copy(); theta_base[AI] = L0` — every source parameter at truth,
+only the distances at the fiducial L0. That is the pure fringe problem with zero source
+wander, which is exactly the condition under which a health monitor must not fire.
+
+**CHORUS and IGNITE-2 sloops were deliberately excluded here** even though they hold the
+true certifications V1 used. Their templates are *fitted*, so a member there is anchored
+only to the extent the soft loop converged; scoring them would mix genuine wander into
+the false-alarm count and inflate it. They can supply true certs; they cannot bound a
+false-alarm rate.
+
+### Two contrasts, because T2's promoted quantity sits between them
+
+| contrast | definition | stratum | FAR | 95% CI | median dlnL |
+|---|---|---|---:|---|---:|
+| **incremental** (leave-one-out) | `logL(all 16) − logL(all but i)` | **LOUD (k=5)** | **0/600 = 0.0000** | [0.0000, 0.0064] | +6166 |
+| | | FAINT (11) | 9/1320 = 0.0068 | [0.0036, 0.0129] | +19.3 |
+| | | ALL | 9/1920 = 0.0047 | [0.0025, 0.0089] | +31.2 |
+| **isolated** (member alone) | `logL(only i) − logL(none)` | **LOUD (k=5)** | **0/600 = 0.0000** | [0.0000, 0.0064] | +6321 |
+| | | FAINT (11) | 528/1320 = 0.4000 | [0.3739, 0.4267] | +14.0 |
+| | | ALL | 528/1920 = 0.2750 | [0.2555, 0.2954] | +45.3 |
+
+Wilson intervals (Wald collapses to [0,0] at k = 0, which is the outcome the test exists
+to detect). Per-sky spread is quoted in the bank because the 15 realisations inside a sky
+share one geometry and are not independent: loud FAR is 0.00 in **every** sky.
+
+**The stratification is not a convenience.** A member injected 1.5 dex below the loud set
+carries no support for the data to find, and a monitor that says so is correct, not
+false-alarming — calling that a false alarm would score the monitor on members the loop
+would never feed. The `iso` FAINT rate of 40% is that statement, not a defect: a single
+faint member against an empty template is genuinely unsupported about half the time.
+**The promotion-relevant number is the loud one, and it is zero.**
+
+### Gates
+
+- **G-V2a** — refused to run unless the shared GENERALISE `L_gwb` bank already exists,
+  so the job could not write into another campaign's bank directory. PASS.
+- **G-V2c** — `logL(H_ABSENT = −30) − logL(−45) = +0.000e+00` exactly. −30 *is* the
+  absence plateau on this venue. (spark3's −18 is not, per BASELINE at T = 30; this
+  re-measures rather than inheriting the claim.)
+- **G-V2d** — every present/absent template pair differs. This is the assertion added
+  after T2's degenerate-contrast bug, and it is now load-bearing in two scripts.
+- **Provenance** — `lgwb` fingerprint matched the banked realisation in **120/120**
+  cases, so these are bit-reproductions of A-SKY's own data, not fresh draws from the
+  same law. (8-physical-core pin; `fp=f92c9e36b460d6f5`.)
+
+**KILL / PROMOTE:** **PROMOTE** the incremental (leave-one-out) contrast to the FORGE-B
+readout — 2 likelihood calls per member per iteration, no split, no refit, FAR 0/600 on
+anchored loud members. It remains a template-health monitor, **not** a D2 substitute:
+D2 tests misspecification, this tests data support, and V1/V3 showed those fail in
+different places.
