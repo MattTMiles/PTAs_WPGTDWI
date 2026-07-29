@@ -1672,3 +1672,230 @@ Stage-1 reference artifact; zero banked verdicts touched.
 promote cell. Not skipped, not queued: FAILED-by-CampaignStop at i0 = STOP #4 = its
 banked result (STOPANAT_i0 + S4.22/S4.23.1). The ladder is 51 completed + 1
 STOP-as-result = 52/52 accounted.
+
+### S4.23.3 FRONTIER-v2 WIRING EXERCISED (post-commit ed78a1c verification)
+
+Driver gates re-run on the v2-wired loop: ALL PASS (job 12790931, 7 min). mode_gate
+does not route through run_cell, so a drillcell leg (job 12791290, n=32, own subdir
+drill_v2gate) exercised the live feed block itself: both frontier candidates evaluated
+at the data-support term (+31.5 / +31.1 nat), both fed, feed_refused empty --
+feed_dlnl/feed_refused columns present in the banked cell. The frontier statement is
+now evidenced at all three levels: wired (single feed site, ed78a1c), gated (12790931),
+executed (12791290). v1 unreachable in the loop protocol; banked verdicts stand under
+the S4.19/S4.20 scope line.
+
+## S4.24 DUAL-LADDER HARVEST (bank reports/gl2_dual_ladder.npz, 64 cells) -- TWO FINDINGS, ONE SAFETY-CLASS
+
+THE PLANE (first-bite fb / certs c, max over iters; W = wrong-cert total):
+  SKY (T30,w1):   r13p9  e07 0/4 fb | none fb1 in 3/4, c0
+                  r13p5  e07 fb 3-19, s0 c2 W3 | none fb1-3, s3 c1 (TRUE, x2 iters)
+                  r13p25 e07 fb 3-23, s0 c3 W11, s1 c1 W2 | none fb1-3, c0
+  ARRAY (r13p9):  e07 fb 0/16 at ALL (w,T) -- comb suppression persists to w/4,T40
+                  none fb1 in 12/16, c0 EVERYWHERE on the capability axis
+DSA PRE-REG ANSWER: rms/4 does NOT newly cross first-bite at T=30-40 -- first-bite was
+already ON at baseline for the circular arm (3/4 skies) and never turns on for the
+eccentric arm at any capability; CERTIFICATION crosses NOWHERE on the array ladder.
+At feasible-rung loudness the certification gap is STRUCTURE/VENUE-limited, not
+sensitivity-limited: capability moves neither threshold.
+
+FINDING 1 -- THE CAMPAIGN'S FIRST TRUE CERTIFICATIONS: r13p5/none/s3, pulsar index 8,
+certified at i0 (dlnL 2.35, q 0.990) AND i4 (dlnL 1.60, q 0.980), on_true TRUE both.
+Caveat stated plainly: this sky ran carried floors and the offender sample was
+degenerate (floor 0.0, emp_q95_degenerate) -- the cert clears lnK+0.578 = 1.27, not a
+measured noise floor. Proposed (awaiting Matt): include these certs in the D2
+FALSE-NEGATIVE population (GLACIER's own in-campaign true certs) and re-cut this
+cell's floor at full nulls before any headline use.
+
+FINDING 2 -- SAFETY-CLASS (charter #3), POSTED AND PARKED: THE CASCADE EXTENDS TO
+r13p5/e07/s0 -- 3 wrong certs (i0 psr62 dlnL 14.3 q 1.000; i2 psr62 10.8, psr43 9.4;
+honest floors 4.0-4.9) at the INTERMEDIATE rung, on_true FALSE, banked since the fan
+but NOT reported in the S4.17 readback (which scoped the cascade to r13p25 skies 0-1)
+and NOT in the D2 kill population (the 13). Reporting gap acknowledged here; the cell
+is QUARANTINED from closure claims now, alongside the cascade cells. PROPOSED
+(awaiting Matt, not folded in): score these 3 certs under the frozen S4.21 gate as a
+second report-only population -- direct scoring, no replay needed (full banks exist).
+The pre-registered D2 pass/fail stays the original 13 either way.
+
+### S4.24.1 HARVEST DECISIONS (Matt, 2026-07-27) -- ACCEPTED AS THE STAGE-2a READBACK; CONDITIONS RECORDED BEFORE ANY SCORING
+
+RECORD + FIGURE NOTE: the DSA answer closes the SENSITIVITY axis only -- the GEOMETRY
+axis (COMPASS isotropic control) is now the sole untested capability lever and
+inherits priority accordingly.
+
+FINDING 1 (both proposals approved, with conditions): the two r13p5/none/s3 true
+certs join the FN check as a SEPARATELY LABELED extension arm ("in-campaign marginal
+true certs, dlnL 1.6-2.4"), scored per-cert; the pre-registered FN pass/fail remains
+solely the original adapter population, no blending; a kill of either is ITS OWN LINE
+and triggers the standing escalation. FLOOR RE-CUT at full nulls REQUIRED before any
+headline/figure use; until it lands the certs are labeled PROVISIONAL (trials-bar
+only; degenerate floor) everywhere, and no "first true certification" language enters
+any readback, figure, or capstone summary. If the re-cut floor retires them, that is
+the result. The r13p5/none/s3 cell appears in NO figure until the re-cut lands.
+
+FINDING 2 (approved as proposed): the three r13p5/e07/s0 wrong certs are scored under
+the frozen S4.21 R1/R2 gate as a SECOND report-only population; direct scoring from
+existing banks, no replay; the 13-cert pass/fail unchanged. PREDICTION LOGGED BEFORE
+SCORING (per Matt): expected outcome is R2 KILL FOR ALL THREE, consistent with 18/18;
+any survivor is an immediate escalation under the standing rule, closure language off.
+
+SCOPE SENTENCE, QUOTED VERBATIM (S4.17): "r13p25 e07 skies 0-1 certify 1-3 pulsars at
+EVERY scoring iteration, q = 1.000, dlnL up to 84.8 -- on_true = False in every case
+(~12 wrong certs; zero right certs anywhere in the campaign)". The S4.24 gap
+therefore reads as a SCOPING decision (the STOP posting scoped the cascade to the top
+rung), not concealment -- AND the harvest now supersedes BOTH counts in that
+sentence: the campaign's wrong-cert total includes r13p5/e07/s0 (+3), and "zero right
+certs anywhere" is retired by the (provisional) r13p5/none/s3 pair. The S4.17
+sentence stands in the record as written at the time; S4.24's table is the
+campaign-complete count.
+
+### S4.24.2 EXT-SCORING + RE-CUT VERDICTS (job 12798415, bank gl2_d2_ext)
+
+(A) Finding-2 population, PREDICTION CONFIRMED -- both r13p5/e07/s0 sets KILLED on R2:
+  i0 (n=1): 2F_coh 594.3, Delta2F -75.2   KILLED
+  i2 (n=2): 2F_coh 896.4, Delta2F -108.6  KILLED
+The manufactured-set kill record is now 20/20 across three populations (13 signal-arm
+cascade + 5 null-arm + 2 r13p5 extension sets), R2 the killer in every case. No
+survivor; no escalation.
+
+(B) r13p5/none/s3 floor re-cut at FULL nulls (n=100, both cert iterations): floor
+0.000+-0.03, estimator emp_q95 at zero-fraction 0.970 (ANCHOR S4's high-zf branch --
+the conservative empirical choice, not the permissive Gumbel). The floor is genuinely
+~zero at this faint venue: 97% of null draws produce NO offender at all. The binding
+bar is therefore the trials term lnK+0.578 = 1.27, which both certs clear (dlnL 2.35 /
+1.60). **The certs SURVIVE the re-cut**: per the S4.24.1 condition the PROVISIONAL
+label lifts and the figure ban on this cell lifts. Honest framing carried into any
+use: "certified against the trials bar at a measured-zero noise floor (97% of nulls
+silent)", NOT "beat a noise floor". FN extension arm (per-cert scoring under the
+frozen gate) still pending in the FN run -- a kill there is its own line + escalation.
+
+---
+
+# GLACIER-LITE ADDENDUM (2026-07-27) — LOUDNESS RECONCILIATION: "NG15-consistent" IS NOT ONE POPULATION
+
+REPORT-ONLY. Nothing here arms a protocol step, changes a banked verdict, or enters a
+closure claim. Filed to the main campaign log at Matt's instruction, **before any
+GLACIER-LITE cell was scored**, because the phrase "NG15-consistent loudness" is
+currently doing work across two populations that differ by 1.38 dex.
+
+## The arithmetic
+
+Band-power convention (`glacier_pop._band_power_target`, reproduced in
+`gl_lite.band_power_target`): for `h_c = A (f/f_yr)^(-2/3)`,
+`INT_band h_c^2 df/f = A^2 * 0.75 * [(f/f_yr)^(-4/3)]_hi^lo`.
+Over the generative band `(-8.0, -7.5)` = 10.00–31.62 nHz, at the repo's NG15 convention
+`A = -14.6`:
+
+    NG15 target band power                     = 1.7280e-29
+
+| population | composition | sum h_i^2 | ratio to NG15 | **A_equivalent** |
+|---|---|---|---|---|
+| `trackB_b1_core.POP` (the frozen 16-source B1/SPARK/CHORUS/GEO/SIREN population) | 3 @ `-13.25`, 13 @ `-14.25` | 9.8979e-27 | **572.8x power, 23.9x amplitude (+1.38 dex)** | **-13.22** |
+| `draw_population_conditional(r13p9)` (GLACIER's 256-census feasible rung) | 256 members, band-power-normalised to `A = -14.6`, tail-selected at `-13.9` | 1.728e-29 by construction | 1.0x | **-14.60** |
+
+## What this does and does not correct
+
+- **`ORACLE_IGNITION.md` §9 is CORRECT as written.** Its "NG15-consistent loudness"
+  refers to the `r13p9` rung, which *is* band-power-normalised to `A = -14.6`
+  (`draw_population` normalises `sum h_i^2` to the target exactly, then tail mode
+  rejection-selects on the brightest member). No retraction is owed there.
+- **What must not happen** is transferring that phrase to the frozen 16-source `POP`.
+  That population is not NG15-consistent; it sits **+1.38 dex** above, with an
+  A_equivalent of `-13.22` — louder than GLACIER's own `r13p25` rung, which the capstone
+  (§S4.11) already labels a *declared super-NG15* sky. The 16-source POP carries three
+  members at `-13.25`, not one.
+- Practical consequence for figures: any panel that puts a `trackB`/SPARK/CHORUS/GEO/SIREN
+  result beside a GLACIER `r13p9` result is **not** comparing two NG15 skies. Label both
+  by **A_equivalent**, not by the phrase.
+
+## GLACIER-LITE's own labelling rule (adopted)
+
+The phrase "NG15-consistent loudness" is **struck** from GLACIER-LITE's outputs. Every
+cell is labelled by its measured `a_equivalent`, banked as a column
+(`a_equivalent`, `band_power_ratio`, `pop_band_power`, `ng15_band_power`), alongside a
+`renorm` flag. The campaign runs two arms: the **primary** at the frozen POP
+(`a_equivalent = -13.22`, population-identical to the realistic campaign banks so the
+only variables are noise and knowledge) and a **secondary** NG15-renormalised contrast
+(`a_equivalent = -14.60`, one common dex shift on every strain, geometry untouched),
+banked under `*_ng15` stems and never merged with the primary.
+
+---
+
+# LANE CLAIM — agent BASELINE (2026-07-29), posted BEFORE any fan
+
+**Campaign:** BASELINE — the field-baseline comparison (Earth-term Fe-statistic at matched
+FAP, and the field's per-pulsar fringe MAP scored for purity), beside the criterion's own
+numbers. Report `BASELINE_field.md`. Report-only: **nothing here arms a protocol step,
+moves a banked verdict, or enters a closure claim.**
+
+## The lane situation, measured (not assumed) at 2026-07-29
+
+`sbatch --test-only` probes, both at `--gres=...:1 -t 04:00:00 --cpus-per-task=8`:
+
+| lane | account / qos | verdict |
+|---|---|---|
+| `batch_gpu` H200 (the pinned floor lane) | `taylor_group_acc` / `taylor_group_account_batch_gpu` | **starts 2026-11-04** — still behind the `nodeupgrade` drain (GENERALISE §4b queue event, unchanged since 2026-07-24) |
+| `interactive_gpu` A100-80 | `dsi_dgx_iacc` / `dgx_iacc` | **starts NOW** (dgx03) |
+
+**There is exactly one live GPU lane on this cluster today.** So the claim below is a
+*share* of it, not the lane.
+
+## BASELINE's claim — bounded, and yielding
+
+- **Lane:** `interactive_gpu`, `-A dsi_dgx_iacc -q dgx_iacc`,
+  `--gres=gpu:nvidia_a100-sxm4-80gb:1`, `--cpus-per-task=8 --hint=nomultithread`.
+- **Cap: ≤ 4 concurrent A100-80 (array `%4`).** The `dgx_iacc` entitlement is
+  `a100-sxm4-80gb=16` (HPC_SETUP §1.2), so this leaves **≥ 12** for PHOENIX's GPU arm
+  without either of us queueing behind the other.
+- **Job-name prefix `bl*`** and **`--time` ≤ 04:00:00** per task, so nothing of mine can
+  hold a card long enough to matter.
+- **Banks:** `BASELINE_results/` only. **No** write to `GLACIER_results/`,
+  `GLACIER_LITE_results/`, `SURFACE_results/`, `GENERALISE_results/`, or `SPARK*_results/`
+  — the banked realisations are read-only inputs here.
+- **Reserved shares: untouched.** The `reserved` partition is INACTIVE; `batch_gpu`
+  H200 is not entered at all (it cannot start before November anyway).
+- **Yield rule:** if PHOENIX claims the A100 share or needs > 12 cards, BASELINE drops to
+  `%2` and, failing that, parks. Its whole fan is few-GPU-hr class; it is never the thing
+  that should be blocking.
+
+**PHOENIX: this claim is the A100 `%4` slice under `dsi_dgx_iacc`. The rest of the dgx
+share and all of `batch_gpu` are yours.**
+
+### LANE CLAIM AMENDED (BASELINE, 2026-07-29 ~01:40) — moved OFF the 80GB share entirely
+
+Measured after the claim above was posted:
+
+- **dgx03 is 8/8 A100-80GB allocated** (`rubinom` + `wut18` + PHOENIX's `frzgate` 12833771),
+  and a **priority-2e9 pending job (`goffta1` 12812217) wants all 8 of them for 2 days**
+  from 2026-08-01. `--test-only` on the 80GB type returned start dates 7–8 h out at every
+  walltime I tried; my queued 80GB smoke sat on `ReqNodeNotAvail`.
+- **dgx01 has 7 of 8 A100-40GB free.** A 40GB request started **immediately** (job
+  12833821, dgx01) — the `--test-only` estimate for that lane was wrong by ~7 h.
+
+**BASELINE therefore CANCELLED its 80GB job (12833797) and is pinned to
+`--gres=gpu:nvidia_a100-sxm4-40gb:1` on dgx01, `%4`.** This is a strictly better outcome for
+lane hygiene than the original claim: **PHOENIX has the entire A100-80GB share on dgx03 to
+itself, and BASELINE touches only the 40GB share on dgx01.** The two campaigns cannot now
+contend for the same card at all. Everything else in the claim (cap `%4`, `bl*` job names,
+≤ 4 h walltime, `BASELINE_results/` only, no `reserved`, no `batch_gpu`) stands.
+
+### NOTE TO PHOENIX (BASELINE, 2026-07-29 ~02:35) — the 80GB lane is blocked; the 40GB lane is not
+
+`frzgate` **12834518 is PENDING on `ReqNodeNotAvail`** requesting
+`nvidia_a100-sxm4-80gb:1`. That type exists only on **dgx03** (currently 8/8 allocated, and
+holding a priority-2e9 reservation for `goffta1` from 2026-08-01) and **dgx04** (reserved).
+Its predecessor 12833771 got in only because a card happened to be free at submit time.
+
+**`nvidia_a100-sxm4-40gb` on dgx01 is a different, live lane.** BASELINE moved onto it and
+both of its jobs started **immediately**; `dgx_iacc` entitles the account to 16 of that type
+and dgx01 has 8, of which 5 were free at the time of writing. `--test-only` gives badly
+pessimistic start times for it (it told me 08:42 for a job that started in seconds), so
+**probe it by actually submitting, not by `--test-only`.** The only change needed is the
+`--gres` line.
+
+Caveat worth knowing before you switch: it is **40 GB, not 80 GB**. BASELINE's ncw=16 and
+ncw=47 T=30 builds both fit with `--mem=96G` host RAM and
+`XLA_PYTHON_CLIENT_PREALLOCATE=false`; a build materially larger than those may not.
+
+BASELINE's fan will sit at `%4` on that lane. **If you move to 40GB and want more room, say
+so and I drop to `%2` per the yield rule** — my remaining fan is ~2 h of wall and is never
+the thing that should be blocking a gate.

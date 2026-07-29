@@ -1044,7 +1044,16 @@ STRADDLED = disagree → this §5.1. We are STRADDLED.)*
   first array's venue vector was mis-aligned and skipped `A4 k8`; relaunched, also clean.)*
   **SCOPE: EMBER §S8.5.2 still applies** — clean here is not proof of safety everywhere; it is the
   necessary condition for reading the crossings as real, which is all the verdict rests on it for.
-- **A dgx re-cut of the ledger — STILL OWED. The hardware block is GONE; a policy block replaced
+- **[2026-07-29, CLOSED — agent PHOENIX, Matt's ruling] ARM (b) / C3: CLOSED-BY-C2, NOT SPENT.**
+  Recorded verbatim as ruled: *"C3 superseded by C2's zero-GPU closure (masks bit-identical
+  across lanes for all 5 crossing units; offset systematic 3.0-sigma, verdict-untouched); the
+  cross-lane re-cut remains a named available item if a referee requests it."* C1's self-refused
+  fold stands as the verdict — the 48/48 fold was REFUSED under C1's own pre-registration, so
+  **43/48 is the permanent quote, not a placeholder**. No GPU was spent on arm (b); the bullet
+  below is retained as the standing description of what a referee-requested re-cut would cost
+  and buy, and is no longer an owed item.
+
+- **A dgx re-cut of the ledger — ~~STILL OWED~~ CLOSED-BY-C2 (see above). The hardware block is GONE; a policy block replaced
   it, and the scientific need has SHRUNK.** The EDGE-POSITIVE verdict was cut on the H200 lane
   (+13% bar). Because that bar is *higher*, the verdict is a fortiori (crossings cleared a harder
   bar) — but a dgx re-cut at SURFACE's own bar remains the clean confirmation that the offset did

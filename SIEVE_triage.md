@@ -1,0 +1,441 @@
+# SIEVE — the triage battery
+
+Two agents write into this file. **Sections merge by name; each agent appends only to its
+own sections and never edits the other's.**
+
+- **SIEVE-A** (banked-data / noisy half, ACCRE): **T2, T3, T6b, T7**
+- **SIEVE-C** (deterministic half, cronus): its own sections
+
+**REPORT-ONLY.** Nothing in the SIEVE-A sections arms a protocol step, moves a banked
+verdict, or enters a closure claim. Bars-class findings are **posted and parked** per the
+standing charter — they are stated with their number and left for Matt.
+
+---
+
+## SIEVE-A — STEP 0 RECORD
+
+`git pull --ff-only` **did not run**: branch `glacier_lite` has no upstream
+(`origin` has `master`, `MM_playground`, `add-sampling-notebook` only), so there is
+nothing to fast-forward from. `git fetch --all` returned clean; HEAD is `ed78a1c`,
+unchanged from session start. Read: `GLACIER_capstone.md` §S4.24–S4.24.2 (+ the
+GLACIER-LITE addendum and the BASELINE lane claim), the criterion spec as *wired*
+(`glacier_loop.py:533` for v2.2, `gl_v2_frontier.py` for frontier-v2,
+`spark3.score_from_LNL` for the columns), and `LEDGER_stats_audit.md`, which landed at
+02:13 mid-run and is cited where it bears.
+
+**Lanes.** All four SIEVE-A tests ran on the **general CPU lane** (`batch`). The 0.5 GPU-hr
+allocated to T6b was **not spent** — see §T6b. `SUMMIT`, `PHOENIX` (dgx03 A100-80GB),
+`BASELINE` (dgx01 A100-40GB, `%4`) and the frozen-arm lane were not entered.
+`GLACIER_results/` was read-only throughout; every write went to `SIEVE_results/` or
+`reports/sieve_*.npz`.
+
+---
+
+## T7 — E-PROCESS SCOREBOARD
+
+### VERDICT: **NO-GAIN** as a criterion component — KILL.
+### But the run turned up a separate, strictly-dominating finding: **E0 — GLACIER's floor is cut on a different statistic from every other campaign's**. PROMOTE, posted-and-parked.
+
+**Code** `hpc_harbor/ledger/sieve_t7_eprocess.py` · **bank** `reports/sieve_t7_eprocess.npz`
+**Gate** re-derived criterion-v2.2 mask == banked `n_cert` on **706/706** banks (121 cells).
+
+Three constructions were scored on every banked per-iteration history, all from the raw
+columns (`dlnL_det`, `lnK`, `qmax`, `on_true`, `floor`, `zero_fraction`) with no floor
+re-cut and no likelihood re-evaluated. **E1** is the brief's "vs the null floor
+distribution": the banked pair (`zero_fraction`, `floor` = q95) two-point-calibrates an
+exponential upper tail for the null max-offender, giving a conservative per-pulsar
+p-value, converted by the standard κ=½ calibrator `e = 0.5·p^(−1/2)`. **E2** is
+`exp(dlnL − lnK)`, the criterion's own trials bar on the e-scale. Bar throughout:
+`e ≥ 1/α = 20`.
+
+**The e-process does not discriminate manufacturing.** Of the 18 banked v2.2 certification
+events (16 wrong / 2 on_true), E1 at α=0.05 leaves **2 survivors, both wrong**; E2 leaves
+**13, all wrong**. **Both** of the campaign's true certifications die under both
+constructions (r13p5/none/s3 psr8: E1 1.63, E2 5.23 at i0 and 2.47 at i4 — against a bar
+of 20). On the pre-registered D2 population, E1 kills 11 of 13 and E2 kills 2 of 13, where
+the **D2 rigidity gate kills 13/13 on R2**. The two E1 survivors are
+`r13p25/e07/s0 psr62 @ i0` (E1 63.6) and `@ i5` (E1 33.3) — **the same pulsar that survives
+LEDGER-B2's persistence rule** (`ledger_b2_persistence.npz`: 18 → 2 events, both wrong,
+psr62 runs `[2,2]`). That convergence is the result: psr62 is manufactured with a fringe
+peak-gap of 84.75 nat against `lnK` = 6.05 (E2 ≈ 1.5e34), and no statistic calibrated
+against *noise* can touch it,
+because the failure is **template misspecification**, not a fluctuation. R2's matched-power
+test is a misspecification check and does something an e-process structurally cannot.
+Adopting e-values for v2.3 would cost both true certs and buy 11 kills that D2 already
+makes — **no gain**.
+
+**A resolution limit worth recording.** For a cell whose nulls are silent
+(`zero_fraction ≥ 0.95`, `floor = 0` — which is exactly the true-cert cell) the rule of
+three caps the readable p at `3/n_null`, so with `n_null = 32` **no e-value above 1.63 is
+obtainable from the bank at all**, regardless of construction. The true certs are not
+"rejected" by E1 so much as **unresolvable** at the banked null resolution.
+
+### E0 — GLACIER'S FLOOR IS NOT THE CAMPAIGN'S FLOOR
+
+**Bars-class finding. Posted and parked; not acted on.** It is not in the capstone, not in
+`LEDGER_stats_audit.md`, and not in any report in the tree.
+
+The canonical offender statistic — `recut_surface.offender:75`, the function the floor
+machinery was built around — is the **max over pulsars of `dlnL`**:
+
+```python
+def offender(dlnL, lnK, qmax):
+    """Largest dlnL among pulsars passing layers 1+3. MAX OVER PULSARS -> Gumbel domain."""
+    m = (dlnL > lnK) & (qmax > QBAR)
+    return float(dlnL[m].max()) if m.any() else 0.0
+```
+
+**Every** other campaign in the tree uses that definition, verbatim or re-derived:
+`anchor.py:361,469`, `chorus.py:605`, `ignite2.py:166`, `surface.py:370,448`,
+`spark3.py:1063` ("RECUT recut_surface.py:75-78 verbatim"), `ember.py:378`,
+`kindle_d7_fall.py:143`, `bank_surface_offenders.py:69`.
+
+`glacier_loop._null_offenders:594` does **not**. It hand-rolls a different statistic:
+
+```python
+o = np.where(q_of > QBAR, np.maximum(dlnl - np.maximum(lnK, 0.0), 0.0), 0.0)
+off.append(float(np.max(o)))
+```
+
+— the max over pulsars of **`(dlnL − lnK)₊`**. The gate is equivalent (`(dlnL−lnK)₊ > 0`
+iff `dlnL > lnK`); the **returned value is smaller by `lnK`**. And the resulting floor is
+then compared against `dlnL` (`glacier_loop.py:533`):
+
+```python
+cert[a] = (dlnL[a] > max(lnK[a] + 0.578, floor)) & (qmax[a] > QBAR)
+```
+
+So GLACIER's floors are **systematically low relative to the campaign convention by the
+`lnK` of the argmax pulsar**, and the certification bar is permissive by the same amount.
+Measured on the 18 banked certification events: median `lnK` = **6.08 nat** (6.32 nat over
+the 16 events where the floor is actually the binding term, `floor > 0`); range 0.69–8.67.
+
+**Measured directly on real null draws** (§T3, since GLACIER banks no null offender vectors
+but GENERALISE does): cutting both statistics on the *same* 100 no-CW realisations of the
+A-SKY survivor unit gives q95 = **59.47** (canonical, max `dlnL`) against **50.40**
+(glacier_loop's `(dlnL−lnK)₊`) — a gap of **9.07 nat**. A bar cut with the `glacier_loop`
+statistic and then applied to `dlnL` sits 9.07 nat low at that unit. This is a measurement
+at the A-SKY venue, not at GLACIER's; for GLACIER the shift is bounded by its own `lnK`
+column (median 6.08 nat at the certifying pulsars), and the 18→13 recut below is the
+size of the effect actually visible in the GLACIER record.
+
+This reads as an unintended divergence rather than a declared choice: `glacier_loop._stack()`
+**imports the canonical `offender`** into its `FL` dict and then never calls it — the module
+uses `FL["emp_quantile"]`, `FL["gumbel_floor"]` and `FL["adopt"]` (lines 517–520) and
+nothing else. The right function is in the returned dict, unused.
+
+Self-consistency can be restored from either end — cut the floor on `dlnL` (the canonical
+function), or apply the existing floor to `(dlnL − lnK)₊`. **E0 does the latter**, because
+it needs no null draws and no re-cut: `o[a] > max(0.578, floor)`, same banked floor, same
+estimator, zero new compute. That gives:
+
+| | events | wrong | on_true |
+|---|---|---|---|
+| criterion-v2.2 as wired | 18 | 16 | 2 |
+| E0, floor on its own scale | **13** | **11** | **2** |
+
+**Five wrong certifications are removed and both true certifications survive.** The five
+are `r13p25/e07/s0` psr41@i0 (dlnL 30.48 vs matched bar 32.99), psr111@i0 (30.03 vs 30.26),
+psr101@i3 (16.19 vs 23.00), psr1@i4 (17.69 vs 23.27), and `r13p5/e07/s0` psr43@i2
+(9.44 vs 12.55). Unlike persistence (LEDGER-B2, which costs both true certs) and unlike
+the e-process, **E0 is strictly dominating on the banked record**: it is the only tightening
+tested here that removes wrong certs at zero cost in true ones.
+
+**DESTINATION:** criterion-**v2.3** candidate term, alongside D2 rigidity. Matt's call —
+it changes the meaning of a bar, so it is parked, and the 18→13 recut is quoted as a
+measurement of the divergence, **not** as a proposed re-scoring of any banked verdict.
+
+**Scope of the divergence, stated plainly.** It is confined to `glacier_loop`, so it
+touches GLACIER and anything that inherits its floors (the Stage-1/Stage-2a cells, the
+r13p9/r13p25/r13p5 ladders, and PHOENIX's frozen arm, which runs against those live cells).
+Campaigns that call `recut_surface.offender` — ANCHOR, CHORUS, IGNITE-2, SURFACE, SPARK-3,
+EMBER, KINDLE — are **not** affected. It does not touch the D2 rigidity verdicts (R1/R2 are
+F-statistic tests that never read the floor), so **20/20 manufactured-set kills stand
+unchanged**. What it does touch is every GLACIER statement of the form "cleared the floor".
+
+---
+
+## T3 — PARTIAL AMBIGUITY RESOLUTION vs CRITERION-v2.2
+
+### VERDICT: **PAR-LOOSER**, decisively — and the reason is that its input is not calibrated. KILL for PAR; the calibration curve is the real product.
+
+**Code** `hpc_harbor/sieve/sv_t3_par.py` · **bank** `reports/sieve_t3_par.npz`
+
+The GNSS transplant is exact in form: the fringe integer is the ambiguity, the mode
+spacing `dL` is the lattice, bootstrapped joint success over a subset is
+`P_boot(S) = Π_{a∈S} P_a`, and PAR fixes the largest prefix (sorted by descending `P_a`)
+clearing a level `P0`. **The full float covariance `Q` needed for a true LAMBDA
+Z-transform is measured-unaffordable, not merely unbanked** — it is the same joint Hessian
+SPARK-3 priced and refused (`spark3.faint_fisher_bounds`: two builds failed to return
+inside a 1 h A100-80GB walltime). Declared substitution: `P_a := qmax_a`, the banked fringe
+posterior, which `estep_per_target` already computes with every uncertified pulsar
+**decohered** — the PTA analogue of decorrelation, and one that *removes* information, so
+every joint rate quoted here is a **lower bound** on what a real LAMBDA fix would report.
+
+**The calibration gate fails, and that is the finding.** On the A-SKY survivor unit
+`AS_e03_h1275_k5_s4` (15 realisations × 116 pulsars = 1,740 samples). This is the
+**cleanest possible case**, checked in the code rather than assumed: `generalise.py:373`
+scores at `theta_base = theta_src` with `theta_src` the **drawn truth** (`gen_theta`), only
+the distances moved to `L0` as the fringe machinery requires — **no M-step, no loop, no
+wander, and the whole 16-source population present in the template**. Nothing is
+mis-specified here except the E-step's own conditioning:
+
+| qmax bin | n | mean qmax | empirical P(on_true) |
+|---|---|---|---|
+| [0.90, 0.95) | 64 | 0.9268 | 0.500 ± 0.063 |
+| [0.99, 0.999) | 129 | 0.9963 | 0.620 ± 0.043 |
+| [0.999, 1.000) | 1145 | 1.0000 | 0.853 ± 0.011 |
+| **qmax > 0.9 (what v2.2 gates on)** | **1464** | **0.9942** | **0.786 ± 0.011** |
+
+**`qmax` overstates the fringe-assignment success rate by 0.208 absolute in exactly the
+region criterion-v2.2 uses — a ~19σ gap on 1,464 banked samples.** Every bin is
+over-confident; none is calibrated.
+
+This is the **empirical, banked-data confirmation of LEDGER's A1**, reached from the
+opposite direction: LEDGER identified the mechanism at the lines (`estep_per_target`
+evaluates the fringe posterior at ONE source point, so `q_max` is `P(fringe|θ̂)` charged as
+`P(fringe|data)`) and measured it on a fringe toy (q 0.909 → 0.544 at half a fringe of
+belief-induced peak motion). T3 measures the consequence on the actual banks and puts a
+number on it. **The two are independent and they agree.**
+
+The same read across **all 706 GLACIER per-iteration banks** (81,896 samples) is worse —
+`qmax > 0.9` → on_true **0.305 ± 0.021**, and the most confident bin [0.999, 1.000) is
+**0/90 correct**. Split by loop iteration it is **flat** (i0 0.233, i5 0.343, no trend), so
+this is *not* accumulating M-step wander: it is present at the truth-anchored feed state.
+
+**The two numbers are not the same estimator, and the gap should not be over-read.**
+A-SKY scores through `sp.estep` (global pmask, whole population modelled); GLACIER scores
+through `spark3.estep_per_target` with the carried census `H_ABSENT`. So the 0.786 → 0.305
+difference bundles two things: the **census omission** (GLACIER carries 256 sources, ~250
+of them unmodelled real signal sitting in the residual) and the **E-step variant** (the
+per-target/global-pmask distinction already on record as the SPARK-2 `estep` confound).
+What is common to both, and is the load-bearing claim, is that **`qmax > 0.9` does not
+mean 90 % in either.**
+
+**Consequences for PAR, and the head-to-head.** Because `P_boot` inherits the
+miscalibration multiplicatively, PAR's predicted joint success is meaningless at these
+subset sizes: at `P0 = 0.99` the safe subset averages **79.3 pulsars** with predicted
+`P_boot = 0.992`, and the realised all-members-correct rate is **0/15**. Against
+criterion-v2.2 on the same realisations:
+
+- **census `r13p25/e07/s0` i0** (cascade): v2.2 certifies `{41, 62, 111}`; PAR at
+  `P0=0.99` takes **14** pulsars, **PAR-LOOSER** by 11 — and **0 of the 14 are actually
+  on_true**. Named PAR-only admissions: psr 24, 30, 39, 48, 51, 53, 54, 81 (all `q ≥ 0.997`).
+- **census `r13p5/none/s3` i0** (the true certs): both select exactly `{psr 8}` —
+  **AGREE**, and PAR's 1/1 is genuinely on_true.
+- **A-SKY survivor** (pooled over 15 realisations, v2.2 scored at the **canonical floor
+  59.47** cut from this unit's own 100 banked no-CW nulls — not at floor = 0): PAR takes
+  **79.3 / 85.7 / 88.5** members at `P0 =` 0.99 / 0.95 / 0.90 against v2.2's **8.3**; mean
+  PAR-only **71.0 / 77.4 / 80.2**, mean v2.2-only **0.0** at every level. **PAR is a strict
+  superset in all 15 of 15 realisations.**
+
+**Mechanism, named:** v2.2 carries an **amplitude** requirement (`dlnL` over the floor and
+the trials term) that PAR has no analogue for; PAR carries only the multiplicity charge in
+`Π P_a`. With `P_a` over-confident by 0.21, that charge under-bites, and the amplitude term
+is the only thing standing between the criterion and PAR's 79-pulsar sets. **PAR does not
+tighten anything here; it would loosen the criterion by ~71–80 pulsars per realisation at
+the A-SKY unit and by 11–17 at the cascade cell.**
+
+**By-product, feeding T7/E0.** Cutting the floor on the *same* 100 A-SKY nulls under both
+offender definitions measures the `glacier_loop` divergence directly: canonical q95
+**59.468**, `glacier_loop` statistic q95 **50.395**, gap **+9.072 nat**. Banked as
+`asky_floor_canonical` / `asky_floor_glacier_stat` / `asky_floor_gap`.
+
+**DESTINATION:** PAR **KILL** — not adopted, not pursued. The calibration curve
+(`reports/sieve_t3_par.npz`, `reliability` / `glacier_reliability`) **PROMOTE** to the
+criterion record as the measured cost of LEDGER-A1, and as the empirical case for the
+`n_belief` sigma-point upgrade LEDGER specified. Bars-class (it is a statement about what
+`QBAR = 0.9` actually buys): **posted and parked**.
+
+---
+
+## T2 — LISA-STYLE EVEN/ODD CROSS-VALIDATION
+
+### VERDICT: the cross-validation **DOES NOT DISCRIMINATE** — KILL the split. The pre-registration is **REFUTED on its own terms**: the held-out refit fails the TRUTH-ANCHORED template 11–12 times in 16.
+### But the quantity it wrapped does discriminate, and needs no split: **re-running frontier-v2's own data-support term on already-fed members**. PROMOTE that, at 2 likelihood calls per member.
+
+**Code** `hpc_harbor/sieve/sv_t2_xval.py` · **banks**
+`SIEVE_results/sieve_t2_xval_{r13p25_e07_s0_i5, r13p25_e07_s0_i0, r13p5_none_s3_i0}__*.npz`
+· jobs `12835323/24/25`, wall 2663–3173 s each, **0 GPU-hr**.
+**Gate G-T2a: bit-exact `0.000e+00` on every half built (even, odd, even-rebuilt) in all
+three jobs** — the halves are the same venue, sparser not shorter.
+
+**(B) NO-REFIT — the state scored directly on each half.** Counts are `PASS` = dlnL > 0 on
+*both* halves, per fed slot (8 slots scored per cascade cell of 20–23 fed; 1 of 1 at
+r13p5).
+
+| cell | anchored | wandered |
+|---|---|---|
+| r13p25/e07/s0 **i5** (5 M-steps of motion, all certs wrong) | **8/8 PASS** | **2/8** |
+| r13p25/e07/s0 **i0** | **8/8 PASS** | **1/8** |
+| r13p5/none/s3 i0 (the true certs) | 1/1 PASS | **1/1 PASS** |
+
+That separates cleanly, and in the right direction on both sides: the cascade cell's
+wandered members go sharply **negative** (slot 261: −592.7 / −624.3; slot 260: −531.8 /
+−534.7), while the same slots at the truth-anchored template are all strongly positive
+(+426.9 / +413.5, +325.0 / +343.4). So the data really do contain those sources — the
+negatives are template damage, not absent signal. And at the true-cert cell the wandered
+state **passes**, which is the correct non-alarm: that certification is `on_true`.
+
+**(A) HELD-OUT WITH REFIT — the actual cross-validation — fails.**
+
+| cell | anchored | wandered |
+|---|---|---|
+| r13p25/e07/s0 i5 | **5/16** | 3/16 |
+| r13p25/e07/s0 i0 | **4/16** | 2/16 |
+| r13p5/none/s3 i0 | 2/2 | 2/2 |
+
+The truth-anchored template — the best template that exists — fails its own held-out half
+**11 of 16** times at i5 and **12 of 16** at i0. A test that rejects the truth cannot be
+used to reject anything else. The mechanism is visible in the parameter-consistency column:
+the two half-fits disagree by up to 6.4 M-step widths in `fgw` and 12.6 in `mc` (wandered
+slot 256), and several widths come back non-finite — `mstep_quadratic` is a 2-axis
+quadratic sweep on a half-sized, comb-multimodal surface with ~250 carried sources absent
+from the model, so it overfits its own half and lands badly on the other. This is the same
+multimodality LEDGER files as **C1**, met from a different direction.
+
+**THE SPLIT IS DOING NO WORK — measured, not argued.** Across all 32 scored (cell, state,
+slot) rows the even and odd halves **agree in sign on 32/32**. Every discrimination in
+table (B) is already present in a single full-data evaluation; halving the data only halves
+the SNR. So the LISA-style split is not the useful part of this test, and it costs three
+extra venue builds (~30 min each) to obtain.
+
+**What survives is cheaper than what was proposed.** The discriminating quantity is
+`dlnL(k present) − dlnL(k absent)` at the **current** template with the other carried
+members absent — which is *exactly* `run_cell` step (b)'s frontier-v2 data-support term
+(`glacier_loop.py`, validated S4.20.1), except evaluated on **already-fed** members at the
+current state instead of on candidates at feed time. The loop already computes this
+quantity; it just never re-asks it after a member is fed. Cost to add: **2 likelihood calls
+per fed member per iteration**, full data, no half-venue, no rebuild — genuinely free at
+the scale of an iteration that already spends ~1400 s.
+
+**DESTINATION:** **KILL** the even/odd split. **PROMOTE** the re-asked data-support term as
+a **FORGE-B readout and a criterion-v2.3 candidate** — a fed member whose own-term support
+has gone negative is a member the M-step has walked off its source. Pre-registration for
+any adoption must be written before it is cut on the banked record, since the three cells
+here were used to *find* it. Note the honest limit: it flags 13/16 wandered cascade members
+but the cascade's certifications are on *pulsars*, not on the fed sources, so this is a
+template-health monitor, **not** a replacement for D2 rigidity.
+
+**SCOPE, declared:** 8 of 20–23 fed slots scored per cascade cell (slot order,
+brightest-first), 1 of 1 at r13p5; `--max-fed 8`, banked as `n_fed_total` / `n_fed_scored`.
+The `dlnL_full` reference column is absent by design (see the hazard note below).
+
+### T2 method record — two bugs found before the numbers were believed
+
+Stated because both would have produced a *confirmation* of the pre-registration:
+
+1. **The contrast was degenerate** (submission 3, job `12834899`). `run_cell`'s frontier-v2
+   writes the present-vs-absent pair as `setdiff1d(carried, [k])`, which is correct there
+   because `k` is a *candidate* still in `carried`. T2 scores **already-fed** slots, for
+   which `k ∉ carried`, so `th_on == th_off` and the statistic returned identically
+   `0.000` — printing a clean "wandered FAIL, 0/2 PASS" that matched the pre-registration
+   exactly and was pure artifact. The exact zeros are what gave it away. Fixed by building
+   the absent set as `carried ∪ {k}`; the function now **asserts** the two templates differ
+   rather than trusting it.
+2. `bank_npz` was passed `stem` both positionally and as a keyword, so the science ran and
+   the write failed.
+
+**Operational finding, already banked (first submission `12834458`/`59`/`60`, all FAILED):
+the CPU-lane map-count hazard is not confined to the E-step.** Three live
+`build_b1_amortised` venues at ncw = 287 × 116 pulsars exhaust `vm.max_map_count`
+(65530 on these nodes) and the third build dies inside XLA-CPU with
+`INTERNAL: Failed to materialize symbols: {(<xla_jit_dylib_9>, {negate_power_fusion})}`
+— raised from `MultiSourceDelay.__call__`, not from `estep_per_target`. **Two live venues
+is fine**: full + even built and scored cleanly in every one of the three jobs; only the
+odd build failed. A second failure (`12834779`) showed freeing the full venue was still not
+enough: **compiling** its `logL` on top of a live `NoiseDrawer` (a 227 MB banked `L_gwb`
+plus the refactored GWB block) exhausted the maps by itself — LLVM
+`allocateMappedMemory failed: Cannot allocate memory`. Each JIT section is an mmap, so
+compiles cost maps, not just RAM. The recorded hazard
+(`cpu-lane map-count`, fixed in `fsky_stage0._install_evicting_ab` by evicting one
+executable after use) therefore understates its own scope — it is a property of the
+per-pulsar CW delay compilation generally, and it binds on **venue count**, not only on
+the scoreboard. T2's fix is coarser than eviction and worked at the third attempt: **exactly one venue
+live at a time** across four passes (full → even → odd → even rebuilt), and the full
+venue's `logL` is **never compiled** — it is only asked for `inject_delay` and the noise
+draw. Declared cost of that: the `dlnL_full` reference column is not produced. It was a
+nice-to-have; the pre-registered test is on the halves and is unaffected.
+
+Method, fixed before the runs: each half is a **stock venue build** with the discovery
+pulsars subset to one TOA parity *after* the T-extension, so the halves are **sparser, not
+shorter** — `ds.getspan` is unchanged, hence so are the span-scaled `rn_comp`/`gwb_comp`
+GP counts, and the enterprise pulsars (which carry the injection and `theta_truth`) are
+never subset. The realisation is built **once** on the full venue exactly as `run_cell`
+does and then restricted, so both halves see the same banked noise draw rather than two
+different ones. **Gate G-T2a**: the half `inject_delay(θ)` must equal the full
+`inject_delay(θ)` restricted to that parity, **bit-exact**, on all 116 pulsars — no
+downstream number is quotable otherwise. Cost measured by probe `12834315`:
+`build_b1_amortised` = **640.5 s** per venue at ncw = 287, T = 30, so three builds ≈ 32 min.
+
+---
+
+## T6b — CRN: PAIRED vs INDEPENDENT
+
+### VERDICT: **PAIRING WINS, LARGELY.** Variance ratio **7.7×** on the drain — the metric frozen-vs-live actually reads. **FLAG TO SUMMIT §2 CONVENTIONS** (bar was 1.5×).
+
+**Code** `hpc_harbor/sieve/sv_t6b_crn.py` · **bank**
+`SIEVE_results/sieve_t6b_crn__cn1486_noGPU.npz`, copied to the tracked
+`reports/sieve_t6b_crn.npz` (the `*_results/` gitignore rule keeps campaign banks
+ACCRE-local, and the per-run `yf`/`yl` arrays are what make the numbers below
+re-derivable) · job `12834427`, wall 3839 s, **0 GPU-hr**.
+
+6 seed pairs × 2 arms from one venue build (n_src = 16, T = 30, 3 iterations, circular
+arm), each run through the frozen dial (per-slot freeze-after-first-fit) and the live
+M-step on the **same** noise seed.
+
+| metric | pairs | ρ(frozen, live) | Var_paired | Var_indep | **ratio** |
+|---|---|---|---|---|---|
+| `a_bg` — the drain | 6 | **0.957** | 1.699e−04 | 1.308e−03 | **7.70×** |
+| `a_bg_sig` | 6 | 0.823 | 4.508e−07 | 1.394e−06 | 3.09× |
+| `logL_end` | 6 | 0.986 | 5.707e+02 | 3.461e+04 | 60.6× |
+| `fgw_hat` | 5 | 0.951 | 7.000e−04 | 1.314e−02 | 18.8× |
+| `mc_hat` | 5 | 0.992 | 1.840e−03 | 1.353e−01 | 73.6× |
+| `n_res` | 6 | 1.000 | **0** | 2.133 | ∞ |
+
+Ratios are `Var_indep/Var_paired` with `Var_indep = Var(Y_f) + Var(Y_l)`, the
+estimator-theory value; the crossed-pairs check on all 30 mismatched (i, j) agrees
+closely where both are finite (`a_bg` 7.79× vs 7.70×, `logL_end` 62.6× vs 60.6×).
+**Median over the five finite metrics: 18.8×. Minimum: 3.09×.** Every metric clears
+1.5× by a wide margin, so **the SUMMIT §2 flag is raised**.
+
+**What this buys.** Sharing the seed across arms cuts the variance of the arm difference
+by 7.7× on the drain, i.e. **a paired design needs ~7.7× fewer realisations for the same
+precision on `Δa_bg`** — directly, ~87 % of the GPU cost of any future frozen-vs-live
+style comparison at equal precision. The paired `a_bg` differences are
+`[−0.0260, +0.0005, −0.0134, −0.0151, 0.0000, −0.0312]` dex: a consistent, resolvable
+frozen-minus-live offset that unpaired sampling at n = 6 would have buried, since the
+across-seed spread of `a_bg` itself (~0.03 dex) is the same size as the effect.
+
+**Two caveats, declared.**
+1. `n_res` has **exactly zero** paired variance: the frozen and live arms resolved the
+   same members on all 6 seeds (`[3,1,2,2,0,2]` both arms). At this toy scale the dial
+   moves M-step *parameters* only and never changes the feed set, so the ratio is
+   reported as ∞ but measures nothing. The five parameter/drain metrics carry the result.
+2. `fgw_hat`/`mc_hat` are over **5** pairs, not 6: seed 4 fed nothing (`n_res = 0`), so
+   those metrics are undefined for it in *both* arms. The quoted numbers come from a
+   finite-pair-masked re-analysis of the banked per-run `yf`/`yl` arrays (they are in the
+   bank, so it is reproducible); the driver's own analysis block has been corrected to
+   mask non-finite pairs and print the surviving `n`, but was **not** re-run — that would
+   have cost another 64 min of lane for numbers already banked.
+
+**DESTINATION:** **PROMOTE** → SUMMIT §2 conventions: *pair the seeds across arms in every
+two-arm comparison*. SIEVE-C reports whether the current drivers already do; PHOENIX's
+frozen arm does pair by construction (it inherits the live arm's banked seeds), which this
+number retrospectively justifies.
+
+**Method note. The 0.5 GPU-hr was not spent, and the reason is a result in itself.** The toy's only
+GPU-bound stage was `CertScoreboard.columns` → `spark3.estep_per_target`, which is the
+documented XLA-CPU `vm.max_map_count` exhaustion hazard. But the certification columns do
+**not** enter the arm difference under measurement — **the drain (`a_bg`) is what
+frozen-vs-live actually reads** (capstone S4.15.1 item 2: "0.03–0.30 dex below baseline").
+Dropping the E-step puts the whole test on the general CPU lane, which is why no claimed
+GPU lane was entered. Metrics: `a_bg`, `a_bg_sig`, `logL_end`, and the M-step's own two
+axes `fgw_hat` / `mc_hat` for the first-fed slot, plus `n_res`.
+
+The freeze dial is **reimplemented** (behaviour-verbatim per-slot freeze-after-first-fit);
+`hpc_harbor/frozen/frozen_mstep.py` is never imported, `FROZEN_results/` is never written,
+and SIEVE uses its own seed base (`6_100_000`) so a toy can never be mistaken for a
+PHOENIX cell. 6 seed pairs, `n_src = 16`, T = 30, 3 iterations; `Var_indep/Var_paired`
+reported per metric with both the analytic (`Var(Y_f)+Var(Y_l)`) and crossed-pairs
+estimates.
