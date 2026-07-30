@@ -585,6 +585,24 @@ mid-trajectory; (2) banked verdicts are re-cut in report only; (3) the bit-exact
 needs fresh nulls, costed above; (4) **D2 is untouched** — R1 (2F_coh ≥ 15.132) and R2
 (Δ2F > 0) never read the floor, so the manufactured-set kills stand exactly as banked.
 
+### G-V3c — POST-COMMIT VERIFICATION OF THE PATCH ITSELF (added after commit `657db13`)
+
+The patched `_null_offenders` had been compile-checked but **never executed** — it only
+runs inside a GLACIER cell, on GPU. A patch to a certification bar that has never run is
+not a verified patch, so the new statistic was exercised directly against the canonical
+function on 20 000 random 116-pulsar draws (including 2 858 draws carrying a deliberate
+`inf` from a K = 1 pulsar):
+
+| check | result |
+|---|---|
+| patched inline body vs `recut_surface.offender` | **0 mismatches / 20 000**, the only difference being the declared non-finite guard |
+| zero-atom identity `(off_can == 0) ⇔ (off_gl == 0)` | **0 disagreements / 20 000** |
+| `off_gl ≤ off_can` pointwise | **20 000 / 20 000** |
+
+So the two identities V1 and V3 lean on — the zero atom, and the sign of Δ — are confirmed
+on synthetic draws as well as on the 38 banked cells, and the patch computes the canonical
+statistic exactly.
+
 ## V2 — FALSE-ALARM RATE OF THE T2 TEMPLATE-HEALTH MONITOR ON TRUE-ANCHORED MEMBERS
 
 ### VERDICT: **PROMOTION CRITERION MET.** False-alarm rate on truth-anchored **loud** members is **0/600 = 0.0000, 95% upper bound 0.64%** — under both forms of the contrast. PROMOTE to FORGE-B readout.
@@ -645,3 +663,133 @@ readout — 2 likelihood calls per member per iteration, no split, no refit, FAR
 anchored loud members. It remains a template-health monitor, **not** a D2 substitute:
 D2 tests misspecification, this tests data support, and V1/V3 showed those fail in
 different places.
+
+## V4 — SIGMA-POINT E-STEP AT WORKING-REGIME BELIEF WIDTHS (SIEVE-C T5's working-regime arm)
+
+### STATUS: **IN FLIGHT** — job **12845398**, banks at ~20:25 CT. This section is the PRE-REGISTRATION, written before any number was seen. The verdict goes below it.
+
+`hpc_harbor/sieve/sv_v4_sigma.py` + `sv_v4.sbatch`. Bank
+`SIEVE_results/sieve_v4_sigma_c1__*.npz` → `reports/`. CPU lane, 0 GPU-hr.
+
+### The pre-registered question, and the decision rule
+
+T3 measured `q_max > 0.9` to be uncalibrated: empirical `P(on_true | q_max > 0.9)` is
+**0.786** on the truth-anchored A-SKY banks and **0.305** across GLACIER. LEDGER-A1 named
+the mechanism — the E-step evaluates the fringe posterior at ONE source point, so `q_max`
+is `P(fringe | θ̂)` charged as `P(fringe | data)`.
+
+**The question is whether belief-averaging moves `q_max` toward calibration — not whether
+it changes the certification count.** A variant that raised the count while leaving the
+0.786 gap open has *failed* this test. Decision rule, fixed in advance:
+
+- **ADOPT-FOR-THE-BELIEF-ARM** if `P(on_true | q_max > 0.9)` moves materially toward 0.9
+  at a working-regime rung, with the Wilson interval excluding the incumbent value.
+- **NO-GAIN** if the gap is unmoved (intervals overlapping the incumbent), regardless of
+  what happens to the count.
+- **HARMFUL** if `q_max` moves *away* from calibration, or if the reliability curve
+  degrades at rungs where it was previously acceptable.
+
+### The ladder is in fringes, and the conversion is exact
+
+The pulsar-term phase goes as `f·L`, so a fractional frequency error is indistinguishable
+from a fractional distance error: `δf/f ≡ δL/L`. One fringe is `δL = dL_a`. Hence
+
+    σ(log10 fgw) = n_fr · dL_a / (L0_a · ln 10),   median over pulsars.
+
+Rungs: **0** (the incumbent — A1's `sigma_points` collapses *structurally* to the point
+rule, so this leg is an identity, not an approximation), **0.5** (sub-fringe), **2.0**
+(few-fringe). `w0 = 1/3`, all weights strictly positive, and the average is taken in
+**likelihood** space (logsumexp) — averaging log-likelihoods gives a geometric mean and
+cannot widen a posterior at all, which is the failure mode this test would otherwise walk
+straight into. The rule is imported from `ledger_a1_sigma_estep`, not reimplemented, so
+A1's gates G-L1/G-L2 cover the arithmetic.
+
+### Declared limitations, before the numbers
+
+- **Belief on `log10_fgw` only.** `MSTEP_AXES` is `(I_FGW, I_MC)`, but only fgw has the
+  closed-form fringe conversion above, so only there does a rung label mean what it says.
+  `log10_mc` also moves the pulsar-term phase (the pulsar term is evaluated at a retarded
+  time of order kyr, where the chirp has run) but its fringe-equivalent width would have
+  to be calibrated numerically per cell; adding it with a guessed width would make every
+  rung label a guess. **This is the conservative direction** — one believed axis widens
+  the marginal less than two — so any improvement measured is a **lower bound**.
+- **Reduced scope, and it is a cost wall, not a choice** (see below): ~7 realisations of
+  120, `n_belief = 2`, 3 rungs. All 8 skies are still represented (realisation-major
+  sweep) and the number actually scored is printed and banked, never silently truncated.
+
+### The cost wall, measured across three submissions
+
+| | |
+|---|---|
+| job 12844088 | **DIED** in the first sigma point — `Failed to materialize symbols` / LLVM `Cannot allocate memory` from `trackB_b1_core.estep:488`. 116 per-pulsar evaluators × ~4k mappings **cannot** fit under `vm.max_map_count = 65530` on any slate. |
+| fix | `fsky_stage0._install_evicting_ab` ported in, plus `jax.clear_caches()` after the build: maps **30468 → 2036**. Eviction is mandatory here, not hygiene. |
+| job 12844432 | Runs, but **368 s per E-step** (~3.1 s/pulsar), flat across calls. |
+| hypothesis | `chorus.py:197` sets `jax_persistent_cache_min_compile_time_secs = 10`, above the ~3 s per-evaluator turnaround, so evicted evaluators are never cached. |
+| job 12845138 | Threshold lowered to 0.2 s → **no change** (360.6 s vs 368.0 s; cache directory static at 3 entries / 376 MB). **Hypothesis refuted.** |
+| conclusion | The eviction tax is **Python trace + lower** of the 116 per-pulsar terms, not XLA backend compilation. No executable cache can remove it. |
+
+Consequence, declared: at ~330 s/E-step a 5-rung ladder buys ~3 realisations (~350 rows
+per rung) inside the budget; a 3-rung ladder buys ~7 (~800 rows per rung). Since the
+pre-registered readout is a **rate with a confidence interval**, rows are worth more than
+rungs, so the ladder was trimmed to three and the declared sub-fringe-to-few-fringe band
+is still spanned. The threshold knob is kept in the code and documented as *ineffective*,
+so the next person does not re-derive it.
+
+Measured cadence: venue 278 s; realisation 1 complete at 3494 s of the 25200 s budget.
+
+### V4 VERDICT: **HARMFUL** — not merely no-gain. Sigma-point averaging moves `q_max` **away** from calibration, monotonically and by a large margin. Job 12845398 COMPLETED (7h42m), 8/120 realisations, all 8 skies, 928 rows per rung.
+
+Bank `reports/sieve_v4_sigma_c1.npz`.
+
+| belief (fringes) | n_eval | mean `q_max` | n(`q>0.9`) | **P(on_true \| q>0.9)** | 95% CI | gap vs 0.9 | on_true, all rows |
+|---:|---:|---:|---:|---:|---|---:|---:|
+| **0.00** (incumbent) | 1 | 0.9435 | 784 | **0.7997** | [0.7703, 0.8263] | −0.100 | 0.7381 |
+| 0.50 (sub-fringe) | 5 | 0.9204 | 730 | **0.5041** | [0.4679, 0.5403] | −0.396 | 0.4461 |
+| 2.00 (few-fringe) | 5 | 0.9190 | 710 | **0.2789** | [0.2471, 0.3130] | −0.621 | 0.2522 |
+
+The intervals are disjoint and far apart. Against the decision rule fixed above, this is
+the **HARMFUL** branch. The reliability curves say the same thing in more detail: at 2
+fringes over-confidence grows in *every* bin (e.g. `q ∈ [0.90,0.95)`: mean q 0.932 vs
+P(on_true) 0.095 — over-confident by 0.84, against 0.44 for the incumbent).
+
+**Independent confirmation of T3 along the way.** The incumbent rung is the point E-step,
+and it returns **0.7997 [0.7703, 0.8263]** — reproducing T3's 0.786 ± 0.011 on the same
+substrate from a separate code path. The calibration gap is real and is now measured twice.
+
+### The mechanism, and it is the interesting part
+
+**`q_max` barely moves while accuracy collapses.** Mean `q_max` falls only 0.9435 → 0.9190
+(−2.6%) while `on_true` falls 0.738 → 0.252 (−66%). So belief-averaging does **not widen**
+the fringe posterior, which is what LEDGER-A1's diagnosis predicted it would do — it
+**relocates** it. The rule therefore fails in the worst available way: it destroys the
+fringe identification *without* lowering the confidence that is charged against the bar.
+It is over-confident in a new way rather than a cured way.
+
+Why: the fringe likelihood is **periodic with period one fringe**. The scaled UT places its
+side points at ±√(m+λ) = **±1.73 SD** with **2/3 of the total weight off-centre** (m = 2,
+w0 = 1/3, λ = 1; four points at 1/6 each). At the 0.5- and 2-fringe rungs those excursions
+are ±0.87 and ±3.46 fringes — a full period or more — so two thirds of the likelihood
+weight sits at essentially scrambled fringe phase. Averaging over a belief comparable to
+the ambiguity spacing cannot resolve the ambiguity; it erases it.
+
+### Scope — what this does and does not establish
+
+- It does establish that on a **truth-anchored** template the rule is harmful at
+  working-regime widths. Averaging around a *correct* centre can only dilute it, and
+  A-SKY's centre is correct by construction (`generalise.py:376`).
+- It does **not** establish what the rule does with the belief centred **off-truth**,
+  where marginalisation could in principle cover the truth. That complementary arm is the
+  natural follow-up and is **not** done here. The periodicity argument above suggests it
+  will also scramble — a full-period average is phase-blind wherever it is centred — but
+  that is an argument, not a measurement, and it is flagged as such.
+- The finest non-zero rung measured is 0.5 fringes. The deep-sub-fringe regime (0.1) was
+  in the 5-rung design that the cost wall removed, so the "nearly inert" end of the ladder
+  is inferred from the structural collapse at 0 rather than measured at 0.1.
+- One believed axis (fgw), 2 believed members, 8 of 120 realisations. Every one of those
+  is a *conservative* limitation for a remedy — less averaging, not more — so none of them
+  can explain away a harmful result.
+
+**KILL / PROMOTE: KILL** the sigma-point E-step as a calibration remedy for `q_max`; do
+not carry it into the belief arm on this evidence. **The `q_max` miscalibration itself
+stays OPEN** — T3 found it, V4 confirms it, and the remedy LEDGER-A1 proposed for it does
+not work at the widths that matter. That is the bars-class item with no fix in hand.
