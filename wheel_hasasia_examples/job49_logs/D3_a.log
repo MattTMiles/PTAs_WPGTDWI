@@ -1,0 +1,34 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+<v4-cell-3>:344: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-7>:53: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-9>:171: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-11>:142: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 58 s
+[rate0.33] REPRODUCTION OK: booked 42.35 @ 0.9974 gate 58.84; reproduced 42.350 [40.94,43.77] @ 0.9974 [0.996,0.998] gate 58.84
+[rate0.33] switch(incumbent) bit-identical to booked collector: True (n=14402)
+[rate0.33]      inc: ungated 0.7973 |  42.35 [40.94,43.77] @ 0.9974 [0.996,0.998] gate 58.8% | old thr:  42.35 @ 0.9974
+[rate0.33]   p1_inc: ungated 0.8113 |  42.45 [41.06,43.87] @ 0.9998 [1.000,1.000] gate 58.8% | old thr:  42.45 @ 0.9998
+[rate0.33]    p1_mf: ungated 0.8075 |  42.44 [41.05,43.87] @ 0.9995 [0.999,1.000] gate 58.8% | old thr:  42.44 @ 0.9995
+[rate0.33]   p2_inc: ungated 0.7834 |  41.91 [40.50,43.31] @ 0.9870 [0.985,0.989] gate 58.8% | old thr:  41.91 @ 0.9870
+[rate0.33]    p2_mf: ungated 0.7907 |  42.24 [40.84,43.64] @ 0.9948 [0.994,0.996] gate 58.8% | old thr:  42.24 @ 0.9948
+[rate0.33]  p2g_inc: ungated 0.7846 |  41.81 [40.41,43.26] @ 0.9847 [0.982,0.987] gate 58.8% | old thr:  41.81 @ 0.9847
+[rate0.33]   p2g_mf: ungated 0.7919 |  42.16 [40.75,43.59] @ 0.9929 [0.991,0.995] gate 58.8% | old thr:  42.16 @ 0.9929
+[rate0.33] done 71 s
+[rate0.60] REPRODUCTION OK: booked 40.99 @ 0.9709 gate 58.77; reproduced 40.990 [39.57,42.50] @ 0.9709 [0.967,0.974] gate 58.77
+[rate0.60] switch(incumbent) bit-identical to booked collector: True (n=14267)
+[rate0.60]      inc: ungated 0.7669 |  40.99 [39.57,42.50] @ 0.9709 [0.967,0.974] gate 58.8% | old thr:  40.99 @ 0.9709
+[rate0.60]   p1_inc: ungated 0.7960 |  41.93 [40.51,43.47] @ 0.9922 [0.990,0.994] gate 58.8% | old thr:  41.89 @ 0.9922
+[rate0.60]    p1_mf: ungated 0.8006 |  42.12 [40.68,43.69] @ 0.9967 [0.995,0.998] gate 58.8% | old thr:  42.08 @ 0.9967
+[rate0.60]   p2_inc: ungated 0.7287 |  38.97 [37.56,40.43] @ 0.9259 [0.921,0.931] gate 58.6% | old thr:  39.09 @ 0.9259
+[rate0.60]    p2_mf: ungated 0.7602 |  40.64 [39.20,42.19] @ 0.9630 [0.960,0.967] gate 58.7% | old thr:  40.66 @ 0.9631
+[rate0.60]  p2g_inc: ungated 0.7297 |  39.25 [37.93,40.73] @ 0.9319 [0.927,0.937] gate 58.6% | old thr:  39.33 @ 0.9315
+[rate0.60]   p2g_mf: ungated 0.7562 |  40.60 [39.22,42.10] @ 0.9621 [0.959,0.965] gate 58.7% | old thr:  40.62 @ 0.9621
+[rate0.60] done 71 s
+TOTAL 199 s

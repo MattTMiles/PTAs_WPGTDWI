@@ -165,6 +165,14 @@ in `N_psr` with no saturation through 200 pulsars**: `knee/N* = 0.40 · N_psr^1.
 0.008, b = 1.0263 ± 0.005, RMS 0.007 dex). Forecasting law: **`N_knee ≈ 0.40 · N_psr · T · Δf`**.
 [MEASURED: project_progress P2-C — knee/N* = 6.47/12.92/26.73/52.75/91.45 at N_psr = 15/30/60/116/200;
 gate: 116 → 52.75 reproduces Stage A's ~52]
+[REFINED → PRONG2-N (`CW_transition/stagec_p2n_arraylaw.py`, 2026-08-06) reran the law at
+N_psr = 30/58/116/232 with a genuine per-seed error bar (P2-C had none: its
+`bootstrap_knee_scatter` re-ran the *same* seed batch each iteration and always returned ~0)
+and a noise-robust knee estimator. knee/N* = **12.98 / 25.46 / 51.99 / 104.33**, fit
+**`knee/N* = 0.410 · N_psr^1.017`** (slope error 0.004 after χ²/dof = 4.5 inflation).
+Gate: 116 → 53.13 on P2-C's own first-crossing estimator vs P2-C's 52.75, 0.7 %. The
+no-saturation claim survives to 232. The **exponent is 1.017 ± 0.004, i.e. 4.6σ above 1** —
+the boost is *slightly* super-linear, so there is no single coefficient (see S2.1.3).]
 
 **S2.1.3** **The measured law CALIBRATES Boyle & Pen (2012).** Identifying `T·Δf ≡ F` (their bin count),
 the two laws share the form `∝ N_psr · F`. Our coefficient **0.40 = 2/5** is their **2/7** with their two
@@ -174,6 +182,20 @@ The residual ~14 % in the raw count at 116 psr is the soft (half-information) vs
 threshold definition plus finite-F `(1 − 1/2F)`.
 [MEASURED: ABACUS §3–§5 — RECONCILED; ledger: BP known-dist 266.8, BP unknown-dist 250.2, mapped
 known-sky 373.5, measured knee 424.6]
+[SUPERSEDED → PRONG2-N (2026-08-06). The `0.40 = 2/5` identification uses the power-law
+**amplitude** `A`, which equals the coefficient only if the exponent is exactly 1. It is not
+(b = 1.017 ± 0.004). The physically meaningful quantity is the LOCAL coefficient
+`c(N_psr) = knee/(N*·N_psr)`, and it **rises**: 0.4328 / 0.4389 / 0.4482 / 0.4497 at
+N_psr = 30/58/116/232 — already 12 % above 2/5 at 116, and still climbing. At N_psr = 232,
+where the candidate laws finally separate, the measurement is **knee/N* = 104.33 ± 3.54**
+(seed SE 0.15 + knee-estimator systematic 3.50 + 3-sky-realisation spread 0.55, in
+quadrature), which **rejects 2N_p/5 = 92.8 at +3.3σ (+12.4 %)** along with `N_p/2` = 116.0
+(−3.3σ) and raw `2N_p/7` = 66.3 (+10.7σ); the closest survivor is `3N_p/7` = 99.4 (+1.4σ,
++4.9 %). But `3N_p/7` is a **crossing, not a law**: `c(N_psr)` passes 3/7 at N_psr ≈ 13 and
+keeps rising (it would reach 1/2 only at N_psr ≈ 10^5). **No fixed-coefficient parameter
+count fits the measured law** — the 7→5 sky-parameter arithmetic should be read as a
+coincidence at one array size, not a calibration. The BP *scaling* (linear in N_psr·F, no
+saturation) is confirmed; the *normalisation* is not 2/5.]
 
 **S2.1.4** **Mode-independence of `marg/cond` is an equal-amplitude artifact.** Fixed-per-source and
 fixed-total power give identical `marg/cond` to machine precision (max |Δ| = 0.000 at every N). But under

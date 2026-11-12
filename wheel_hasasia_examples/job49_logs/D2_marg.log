@@ -1,0 +1,24 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+<v4-cell-3>:344: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-7>:53: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-9>:171: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-11>:142: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 58 s
+[marg] REPRODUCTION OK: booked 36.27 @ 0.9009 gate 58.59; reproduced 36.270 [34.02,38.75] @ 0.9009 [0.890,0.912] gate 58.59
+[marg] switch(incumbent) bit-identical to booked collector: True (n=13923)
+[marg]      inc: ungated 0.6797 |  36.27 [34.02,38.75] @ 0.9009 [0.890,0.912] gate 58.6% | old thr:  36.27 @ 0.9009
+[marg]   p1_inc: ungated 0.7496 |  38.72 [36.41,41.17] @ 0.9579 [0.952,0.963] gate 58.7% | old thr:  38.60 @ 0.9588
+[marg]    p1_mf: ungated 0.7717 |  39.69 [37.35,42.27] @ 0.9805 [0.976,0.984] gate 58.8% | old thr:  39.50 @ 0.9811
+[marg]   p2_inc: ungated 0.6477 |  27.13 [24.91,29.71] @ 0.8863 [0.874,0.897] gate 46.8% | old thr:  34.37 @ 0.8537
+[marg]    p2_mf: ungated 0.6908 |  36.56 [34.29,38.92] @ 0.9083 [0.897,0.918] gate 58.6% | old thr:  36.57 @ 0.9083
+[marg]  p2g_inc: ungated 0.6491 |  30.45 [28.13,33.00] @ 0.8878 [0.875,0.899] gate 51.0% | old thr:  34.81 @ 0.8646
+[marg]   p2g_mf: ungated 0.6890 |  36.48 [34.28,38.91] @ 0.9057 [0.895,0.915] gate 58.6% | old thr:  36.46 @ 0.9056
+[marg] done 66 s
+TOTAL 124 s

@@ -1,0 +1,79 @@
+
+==============================================================================
+JOB 48 -- STEP 0: booked config and reproduction
+==============================================================================
+  N_psr=116  T=15.0 yr  cadence=7.0 d  sigma=100 ns  band=[ 3. 20.] nHz  skies=30  rcond=1e-10  log10 h=-14.3
+  n_toa per pulsar = 782   1/T = 2.1125 nHz   T*Df(3-20 nHz) = 8.047 bins
+  booked knee = 422.6  (0.45 N_psr T*Df -> n = 52.5 per bin)
+  Fisher params: 116 distances + (phase0, log10 h) per source; sky, f, psi, cos i fixed
+  pulsars: build_array(116, seed=777) isotropic synthetic, all L = 1 kpc
+
+==============================================================================
+STEP 0b: equivalence of the chunked assembly and the draw to the booked code
+==============================================================================
+  draw('log') vs P.draw_sources, booked seed: max |diff| = 0.0e+00
+  chunked vs booked fisher_blocks+marg_from_blocks (N=300): cond rel 0.0e+00, marg rel 7.5e-16
+
+==============================================================================
+STEP 0c: reproduce the booked ratios (booked seeds, 30 skies, tiered path)
+==============================================================================
+  N=    1  ratio reproduced 0.9905  booked 0.9905  |diff| 0.0e+00
+  N=  100  ratio reproduced 0.8739  booked 0.8739  |diff| 2.2e-16
+  N=  398  ratio reproduced 0.5310  booked 0.5310  |diff| 6.7e-16
+  N= 1000  ratio reproduced 0.0845  booked 0.0845  |diff| 3.0e-12
+  reproduction PASS
+
+==============================================================================
+BANDS (bin edges k/T, 1/T = 2.1125 nHz)
+==============================================================================
+  A_B1    N_psr=116 B= 1.00 lin    6.338-8.450 nHz  mode=fixed_persource
+  A_SF    N_psr=116 B= 1.00 single all at 7.394 nHz  mode=fixed_persource
+  A_B2    N_psr=116 B= 2.00 lin    6.338-10.563 nHz  mode=fixed_persource
+  A_B4    N_psr=116 B= 4.00 lin    4.225-12.675 nHz  mode=fixed_persource
+  A_B8    N_psr=116 B= 8.05 log    3.000-20.000 nHz  mode=fixed_persource
+  A_B1hi  N_psr=116 B= 1.00 lin    14.788-16.900 nHz  mode=fixed_persource
+  B_58    N_psr= 58 B= 1.00 lin    6.338-8.450 nHz  mode=fixed_persource
+  B_232   N_psr=232 B= 1.00 lin    6.338-8.450 nHz  mode=fixed_persource
+  C_tot   N_psr=116 B= 1.00 lin    6.338-8.450 nHz  mode=fixed_total
+  [A_B1] checkpoint exists -- skipped
+  [A_SF] checkpoint exists -- skipped
+  [A_B2] checkpoint exists -- skipped
+  [A_B4] checkpoint exists -- skipped
+  [A_B8] checkpoint exists -- skipped
+  [A_B1hi] checkpoint exists -- skipped
+  [B_58] checkpoint exists -- skipped
+  [B_232] checkpoint exists -- skipped
+
+==============================================================================
+ARM C_tot: N_psr=116  B=1.0  f=('lin', 6.33761756280579e-09, 8.45015675040772e-09)  mode=fixed_total
+  N grid (26 pts): [1, 2, 4, 6, 9, 11, 14, 15, 19, 21, 25, 32, 42, 50, 55, 71, 77, 92, 119, 120, 156, 183, 283, 436, 674, 1040]
+==============================================================================
+  N=    1 n=    1.00 skies=20  booked 0.9902 [0.986,0.998]  full 0.9774  (  5.5 s)
+  N=    2 n=    2.00 skies=20  booked 0.9817 [0.979,0.993]  full 0.9722  (  5.4 s)
+  N=    4 n=    4.00 skies=20  booked 0.9694 [0.961,0.985]  full 0.9617  (  5.1 s)
+  N=    6 n=    6.00 skies=20  booked 0.9645 [0.953,0.974]  full 0.9408  (  4.8 s)
+  N=    9 n=    9.00 skies=20  booked 0.9391 [0.938,0.965]  full 0.9208  (  7.2 s)
+  N=   11 n=   11.00 skies=20  booked 0.9587 [0.930,0.960]  full 0.9218  (  5.0 s)
+  N=   14 n=   14.00 skies=20  booked 0.9337 [0.898,0.951]  full 0.8943  (  5.2 s)
+  N=   15 n=   15.00 skies=20  booked 0.9253 [0.902,0.950]  full 0.8853  (  5.0 s)
+  N=   19 n=   19.00 skies=20  booked 0.8749 [0.876,0.919]  full 0.8480  ( 10.2 s)
+  N=   21 n=   21.00 skies=20  booked 0.8736 [0.866,0.908]  full 0.8524  (  5.2 s)
+  N=   25 n=   25.00 skies=20  booked 0.8756 [0.855,0.888]  full 0.8097  (  5.7 s)
+  N=   32 n=   32.00 skies=20  booked 0.8459 [0.809,0.860]  full 0.7653  (  5.3 s)
+  N=   42 n=   42.00 skies=20  booked 0.7906 [0.765,0.800]  full 0.6977  (  9.6 s)
+  N=   50 n=   50.00 skies=20  booked 0.7445 [0.715,0.774]  full 0.6308  (  5.1 s)
+  N=   55 n=   55.00 skies=20  booked 0.7392 [0.710,0.756]  full 0.6355  (  5.1 s)
+  N=   71 n=   71.00 skies=20  booked 0.6661 [0.624,0.672]  full 0.5348  (  5.2 s)
+  N=   77 n=   77.00 skies=20  booked 0.6271 [0.603,0.636]  full 0.4974  (  5.3 s)
+  N=   92 n=   92.00 skies=20  booked 0.5563 [0.533,0.561]  full 0.4146  (  5.2 s)
+  N=  119 n=  119.00 skies=20  booked 0.4208 [0.410,0.454]  full 0.2826  (  5.7 s)
+  N=  120 n=  120.00 skies=20  booked 0.4257 [0.416,0.452]  full 0.2881  (  5.4 s)
+  N=  156 n=  156.00 skies=20  booked 0.2845 [0.267,0.315]  full 0.1561  ( 11.8 s)
+  N=  183 n=  183.00 skies=20  booked 0.1935 [0.184,0.212]  full 0.0909  (  7.9 s)
+  N=  283 n=  283.00 skies=20  booked 0.0264 [0.024,0.029]  full 0.0070  (  8.7 s)
+  N=  436 n=  436.00 skies=20  booked 0.0003 [0.000,0.000]  full 0.0000  (  8.5 s)
+  N=  674 n=  674.00 skies=20  booked 0.0000 [0.000,0.000]  full 0.0000  ( 21.1 s)
+  N= 1040 n= 1040.00 skies=20  booked 0.0000 [0.000,0.000]  full 0.0000  ( 46.5 s)
+  [C_tot] saved (3.7 min; wall 5.1 min)
+
+  TOTAL COMPUTE RUNTIME: 5.1 min

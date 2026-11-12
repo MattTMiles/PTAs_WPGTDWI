@@ -1,0 +1,182 @@
+
+============================================================================================================
+DELIVERABLE 8 -- THE DECISIVE TEST: ARRAY vs PRIORS, AT 40 REALISATIONS
+============================================================================================================
+  Exposure per arm-cell = 40 realisations x 116 pulsars = 4640 pulsar-certifications.
+  The certification floor's design false-alarm rate is alpha = 0.05 PER PULSAR, further
+  tightened by the per-pulsar trials bar ln K_i. A calibrated gate should
+  therefore sit WELL BELOW 5 %, and how far below is the question.
+
+   arm                    configuration   K  sig ev  null ev  null FPR %          95 % CI %   f_SCRAM    f_cert  med lnK
+    C0         real array + REAL priors   8      34        3       0.065     [0.013, 0.189]   0.00222   0.02459     8.36
+    C0         real array + REAL priors  16      51        9       0.194     [0.089, 0.368]   0.00631   0.03205     8.57
+    C1       real array + uniform 10 pc   8       4        2       0.043     [0.005, 0.156]   0.00136   0.00290     5.24
+    C1       real array + uniform 10 pc  16     184       14       0.302     [0.165, 0.506]   0.00986   0.12714     5.43
+    C2  synthetic array + uniform 10 pc   8       3        1       0.022     [0.001, 0.120]   0.00395   0.00338     5.26
+    C2  synthetic array + uniform 10 pc  16     110        3       0.065     [0.013, 0.189]   0.00769   0.11642     5.42
+
+  PAIRWISE TESTS (exact conditional binomial on the null counts):
+    K= 8  C2 ( 1 ev) vs C1 ( 2 ev):  p = 1.000
+    K= 8  C1 ( 2 ev) vs C0 ( 3 ev):  p = 1.000
+    K= 8  C2 ( 1 ev) vs C0 ( 3 ev):  p = 0.625
+    K=16  C2 ( 3 ev) vs C1 (14 ev):  p = 0.013   <- significant
+    K=16  C1 (14 ev) vs C0 ( 9 ev):  p = 0.405
+    K=16  C2 ( 3 ev) vs C0 ( 9 ev):  p = 0.146
+
+============================================================================================================
+DELIVERABLE 9 -- IS THE LEAK K-DEPENDENT? (32 realisations per K)
+============================================================================================================
+    K  sig ev  null ev  exposure  null FPR %          95 % CI %  null/sig  med lnK
+    2      23       17      3712       0.458     [0.267, 0.733]     0.739     7.51
+    4      14        3      3712       0.081     [0.017, 0.236]     0.214     7.97
+    8      26        3      3712       0.081     [0.017, 0.236]     0.115     8.37
+   12      40        4      3712       0.108     [0.029, 0.276]     0.100     8.51
+   16      42        9      3712       0.242     [0.111, 0.460]     0.214     8.56
+
+  Pooled null rate over all K: 36 events in 18560 pulsar-certifications = 0.194 %
+  Chi-square for a CONSTANT null rate across K: chi2 = 20.11 on 4 dof, p = 0.000
+  Spearman(null events, K) = -0.100; Spearman(signal events, K) = +0.900
+
+============================================================================================================
+DELIVERABLE 10 -- THE RIDER: VERNIER-28's C20 CELL, RNG-MATCHED
+============================================================================================================
+  C20 = gamma 0.87 + 10 seeds, K_available ~ 19, ladder R1. Replayed with
+  V28's own seeds: array W.make_array(2500 + r), universe seed 28000+977r+26,
+  noise seed 880000+7919r+202, certification rng 880000+7919r+202+610000+1009.
+
+  CONFIGURATION FACTS, BY INSPECTION, BEFORE ANY RUN:
+    C20's priors are UNIFORM 10 pc for every pulsar (vernier28_lib.PRIOR_PC = vernier24.PRIOR_PC).
+    Its array is V24 SYNTHETIC (isotropic directions, log-normal weights,
+    log-uniform 0.3-5 kpc distances). There is no J0437, no sub-lambda anchor,
+    and no heterogeneous prior of any kind.
+    ==> H1 (sub-fringe priors trivialise) and H3 (scramble too small to
+        displace) are DEAD FOR C20 BY CONSTRUCTION: every window is +-30 pc,
+        the scramble is U(-500, 500) pc, and no pulsar is anywhere near a
+        sub-fringe prior. Whatever opened C20 is not a real-prior mechanism.
+
+  12 realisations, 121 certification steps, 5.9 combs per step (COMB_CAP = 16).
+  exposure = 14036 pulsar-certifications
+  SIGNAL certs 36 (of which true 36); SCRAMBLED-null certs 6
+  null FPR = 0.043 %  95 % CI [0.016, 0.093] %
+  null/signal ratio = 0.167   (V28's banked C20-R1 row: scrambled cert 0.50 per run on 1.42 phantom/run)
+
+  STEP 1 -- per-pulsar leak table
+    6 distinct pulsars fire in the null across all 121 steps; 17 fire on signal.
+     pulsar idx  null fires  sig fires       K_i       w
+              5           1          0     174.3    0.78
+             27           1          0     175.6    0.57
+             53           1          0     173.0    0.44
+             67           1          0     167.5    1.71
+             73           1          4     177.0    1.38
+             90           1          0     166.7    0.15
+    median K_i of null-firing pulsars = 173.6 vs 170.8 for the rest
+    K_i range across the array = 146 - 192 (UNIFORM 10 pc priors -- the spread is pure geometry, dL = c/(f(1-cos mu)))
+    pulsars at K_i <= 3 (the Anchor-Census sub-fringe class): 0  <-- H1 has nothing to bite on
+
+  STEP 2 -- null-validity audit
+    median scramble displacement = 714 fringes (range 607 - 798); pulsars below 3 fringes: 0
+    window is +-30 pc, scramble is U(-500, 500) pc, so per comb P(displaced INTO the window) = 0.060
+    with 5.9 combs per step, P(at least one comb in window) = 0.304
+    ==> metric A (fringes) says the control is VALID; metric B (in-window)
+        says a comb lands back inside the searched window in a sizeable
+        minority of steps, and that probability GROWS with comb count.
+
+  STEP 3 -- floor recut
+      n_null  sig certs  null certs  null FPR %
+          32          9           1       0.020
+         128          6           0       0.000
+    ==> H4 dead for C20 too: the floor is recut inside every `certify` call
+        and quadrupling the nulls does not close it.
+
+============================================================================================================
+DELIVERABLE 11 -- WERE VERNIER-25's K = 16 NULLS CLEAN, OR MERELY STARVED?
+============================================================================================================
+  VERNIER-25 Arm K, as banked (reports/vernier25.npz):
+    K  CERT/run    true   wrong    null   turns  total known  med lnK
+    0     0.000   0.000   0.000   0.000    11.0          1.3     4.66
+    2     0.000   0.000   0.000   0.000    12.0          2.2     4.61
+    3     0.000   0.000   0.000   0.000    13.0          2.1     4.59
+    5     0.000   0.000   0.000   0.000    12.5          3.5     4.75
+    8     0.000   0.000   0.000   0.000    16.0          5.3     5.16
+   12     0.000   0.000   0.000   0.000    16.0          7.1     5.32
+   16     0.100   0.100   0.000   0.000    16.0          7.9     5.32
+
+  K = 16 exposure: 10 realisations x 7.9 certifying turns x 116 pulsars = 9164 pulsar-certifications,
+  with 1 SIGNAL certification(s) in total and 0 null certifications.
+  Poisson 95 % upper bound on V25's null FPR: 0.0403 %
+
+  ANSWER, PLAINLY: **STARVED ON SIGNAL, AND ITS NULL NEVER TESTED THE HIGH-
+  COMB REGIME AT ALL.** Both halves matter and they are different failures:
+    - STARVED on signal: 0.1 certifications per run is ONE event in the
+      whole 10-realisation cell. Nothing about the channel's POWER can be
+      read off it, and V25's 'every one of them on the correct fringe' is a
+      statement about a single event.
+    - The NULL arm's raw exposure looks large (~9164 pulsar-
+      certifications) but it is a CHAIN: turn t certifies against t accumulated
+      combs, capped at 8. With 7.9 certifying turns the comb count runs
+      1, 2, 3, ... 8, so the exposure is spread across comb counts and only a
+      small tail of it sits at 8, none at 16. V25 NEVER RAN A 16-COMB NULL.
+
+  IS V25's ZERO EVEN IN TENSION WITH THIS RUN? Compare like with like -- the
+  matched arm is C2 (synthetic array + uniform 10 pc priors), which IS V25's
+  configuration:
+    expected V25 null certs at the   C2 at 8 combs rate (0.022 %):   2.0   P(observe 0) = 0.139
+    expected V25 null certs at the  C2 at 16 combs rate (0.065 %):   5.9   P(observe 0) = 0.003
+  So V25's zero is CONSISTENT with this run's low-comb rate and says nothing
+  about the high-comb rate. The premise 'V25 was clean at K = 16, V29 opened
+  it' does not survive: V25 has no 16-comb null to be clean.
+
+============================================================================================================
+DELIVERABLE 12 -- THE MECHANISM: THE NULL-CALIBRATED FLOOR IS DEAD CODE
+============================================================================================================
+  The certification bar is  bar = max( ln K_i , floor_i + err_i )  where floor_i
+  is the incoherent-comb floor recut at alpha = 0.05. Which term actually binds?
+
+               arm   K   bar == lnK   med lnK   med floor  gap (nat)
+      C0 real+real   2        99.7%      7.61        0.00      +7.61
+      C0 real+real   8        98.9%      8.35        0.23      +8.11
+      C0 real+real  16        96.0%      8.57        0.47      +8.10
+   C1 real+uniform   2       100.0%      4.57        0.00      +4.57
+   C1 real+uniform   8        98.9%      5.21        0.22      +4.99
+   C1 real+uniform  16        94.7%      5.42        0.46      +4.96
+  C2 synth+uniform   2       100.0%      4.55        0.00      +4.55
+  C2 synth+uniform   8        99.1%      5.25        0.08      +5.18
+  C2 synth+uniform  16        97.3%      5.44        0.21      +5.22
+
+  ==> In EVERY arm and at EVERY comb count the trials term ln K_i exceeds the
+      null-calibrated floor for 95-100 % of pulsars, by 5-8 nat. `recut_floor`
+      and its alpha = 0.05 are therefore NEVER the operative gate in this
+      regime: certification is decided by a pure Bonferroni-style trials bar
+      whose realised false-alarm rate is NOT calibrated to anything. It is
+      whatever the contrast statistic's tail happens to give, which depends on
+      array geometry (C1 vs C2) and on comb count NON-monotonically.
+      THAT is the shared defect, and it lives in vernier24.certify -- inherited
+      unchanged by V25, V27, V28 and V29.
+
+============================================================================================================
+DELIVERABLE 13 -- WHAT IS ACTUALLY EXPOSED (the quarantine list)
+============================================================================================================
+  VERNIER-27's OWN banked scrambled-null column, which is the measurement --
+  no prediction needed where the run already reports it:
+    cell  CER/step     TRUE    WRONG     NULL  NULL/CER  WRONG/CER  units
+  P12        0.075    0.081    0.006    0.000     0.000      0.083    160
+  P16        0.181    0.113    0.087    0.006     0.034      0.483    160
+  P20        0.181    0.181    0.019    0.000     0.000      0.103    160
+  P24        0.094    0.106    0.019    0.013     0.133      0.200    160
+  P28        0.106    0.131    0.000    0.000     0.000      0.000    160
+  P32        0.075    0.094    0.013    0.000     0.000      0.167    160
+
+  PREDICTION UNDER THE SURVIVING MECHANISM. V27 runs the SYNTHETIC array with
+  UNIFORM 10 pc priors, i.e. arm C2, whose measured null FPR here is
+  0.022 % (8 combs) to 0.065 % (16 combs) per pulsar-certification. With 116
+  pulsars that is 0.026 to 0.075 false certifications per step -- against a
+  V27 signal rate of 0.075-0.181 per step. So the predicted contamination of
+  V27's high-K certification counts is 15-100 %, and V27's own NULL column
+  (0.000-0.013 per step) sits at or below the LOW end of that band.
+
+  THE BIGGER NUMBER V27 ALREADY REPORTS AND THIS DIAGNOSIS DOES NOT TOUCH:
+  the WRONG-fringe rate. At P16, WRONG/CER = 0.48 -- roughly half of V27's
+  certifications at that cell are on the wrong fringe, which is an order of
+  magnitude larger than any scrambled-null leak and is already banked.
+
+[V29-DIAG2] wrote /home/mattm/projects/HSYMT/reports/vernier29_diag2.npz

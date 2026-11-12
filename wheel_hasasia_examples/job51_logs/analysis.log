@@ -1,0 +1,124 @@
+== Rule 3: Job 50 references (job50_data/run_harness.pkl, run_census.pkl; collect50, uncommitted 2026-11-11)
+   harness  p2r every candidate oracle fine grid, 7900 pulsars: K>=60 0.236  K>=600 0.133  all 0.651
+   census   p2r every candidate oracle fine grid, 7900 pulsars: K>=60 0.224  K>=600 0.124  all 0.277
+   census, skies 100-119 only (1580 pulsars): K>=60 0.202  K>=600 0.096  all 0.253
+
+== Part 2: joint oracle fit, retardation on, fixed amplitude (rate 1), redshifted masses
+   harness priors, skies 100-199 | timing x  1 | stack, own noise per candidate (Job 50 method) | K>=60 0.184 [0.165, 0.203] (n=1516) | K>=600 0.081 [0.045, 0.120] (n=223) | all 0.631 [0.618, 0.643]
+   harness priors, skies 100-199 | timing x  1 | stack on the shared bins                       | K>=60 0.020 [0.013, 0.028] (n=1516) | K>=600 0.009 [0.000, 0.023] (n=223) | all 0.547 [0.536, 0.558]
+   harness priors, skies 100-199 | timing x  1 | JOINT FIT on the shared bins                   | K>=60 0.238 [0.216, 0.260] (n=1516) | K>=600 0.076 [0.037, 0.122] (n=223) | all 0.803 [0.794, 0.812]
+      candidates' share of each bin's GW power, median over bins (2-30 nHz) and pulsars: 0.046; bins <= 10 nHz: 0.457; summed over the band: 0.444; candidates/pulsar 1127; timing share of unmodelled power (median bin) 0.071; grid cap binds for 5 of 7900 pulsars (max step 41.330 pc)
+   harness priors, skies 100-199 | timing x  3 | stack, own noise per candidate (Job 50 method) | K>=60 0.214 [0.192, 0.235] (n=1516) | K>=600 0.126 [0.080, 0.174] (n=223) | all 0.655 [0.643, 0.666]
+   harness priors, skies 100-199 | timing x  3 | stack on the shared bins                       | K>=60 0.026 [0.019, 0.034] (n=1516) | K>=600 0.009 [0.000, 0.023] (n=223) | all 0.548 [0.537, 0.559]
+   harness priors, skies 100-199 | timing x  3 | JOINT FIT on the shared bins                   | K>=60 0.268 [0.244, 0.291] (n=1516) | K>=600 0.108 [0.060, 0.152] (n=223) | all 0.813 [0.804, 0.822]
+      candidates' share of each bin's GW power, median over bins (2-30 nHz) and pulsars: 0.058; bins <= 10 nHz: 0.475; summed over the band: 0.462; candidates/pulsar 1300; timing share of unmodelled power (median bin) 0.009; grid cap binds for 5 of 7900 pulsars (max step 41.330 pc)
+   harness priors, skies 100-199 | timing x 10 | stack, own noise per candidate (Job 50 method) | K>=60 0.214 [0.192, 0.235] (n=1516) | K>=600 0.126 [0.080, 0.174] (n=223) | all 0.655 [0.643, 0.666]
+   harness priors, skies 100-199 | timing x 10 | stack on the shared bins                       | K>=60 0.026 [0.019, 0.034] (n=1516) | K>=600 0.009 [0.000, 0.023] (n=223) | all 0.548 [0.537, 0.559]
+   harness priors, skies 100-199 | timing x 10 | JOINT FIT on the shared bins                   | K>=60 0.270 [0.245, 0.294] (n=1516) | K>=600 0.108 [0.060, 0.152] (n=223) | all 0.814 [0.804, 0.823]
+      candidates' share of each bin's GW power, median over bins (2-30 nHz) and pulsars: 0.058; bins <= 10 nHz: 0.475; summed over the band: 0.462; candidates/pulsar 1300; timing share of unmodelled power (median bin) 0.001; grid cap binds for 5 of 7900 pulsars (max step 41.330 pc)
+   census priors, skies 100-119 | timing x  1 | stack, own noise per candidate (Job 50 method) | K>=60 0.174 [0.148, 0.200] (n=1318) | K>=600 0.064 [0.040, 0.086] (n=452) | all 0.225 [0.195, 0.253]
+   census priors, skies 100-119 | timing x  1 | stack on the shared bins                       | K>=60 0.022 [0.014, 0.031] (n=1318) | K>=600 0.004 [0.000, 0.011] (n=452) | all 0.049 [0.039, 0.060]
+   census priors, skies 100-119 | timing x  1 | JOINT FIT on the shared bins                   | K>=60 0.188 [0.162, 0.218] (n=1318) | K>=600 0.080 [0.049, 0.110] (n=452) | all 0.271 [0.241, 0.308]
+      candidates' share of each bin's GW power, median over bins (2-30 nHz) and pulsars: 0.054; bins <= 10 nHz: 0.463; summed over the band: 0.447; candidates/pulsar 1156; timing share of unmodelled power (median bin) 0.070; grid cap binds for 0 of 1580 pulsars (max step 0.050 pc)
+   census priors, skies 100-119 | timing x  3 | stack, own noise per candidate (Job 50 method) | K>=60 0.178 [0.154, 0.202] (n=1318) | K>=600 0.077 [0.054, 0.101] (n=452) | all 0.233 [0.206, 0.259]
+   census priors, skies 100-119 | timing x  3 | stack on the shared bins                       | K>=60 0.023 [0.016, 0.031] (n=1318) | K>=600 0.007 [0.000, 0.014] (n=452) | all 0.051 [0.039, 0.062]
+   census priors, skies 100-119 | timing x  3 | JOINT FIT on the shared bins                   | K>=60 0.228 [0.197, 0.259] (n=1318) | K>=600 0.095 [0.070, 0.122] (n=452) | all 0.300 [0.270, 0.332]
+      candidates' share of each bin's GW power, median over bins (2-30 nHz) and pulsars: 0.057; bins <= 10 nHz: 0.479; summed over the band: 0.459; candidates/pulsar 1300; timing share of unmodelled power (median bin) 0.008; grid cap binds for 0 of 1580 pulsars (max step 0.050 pc)
+   census priors, skies 100-119 | timing x 10 | stack, own noise per candidate (Job 50 method) | K>=60 0.178 [0.154, 0.202] (n=1318) | K>=600 0.077 [0.054, 0.101] (n=452) | all 0.233 [0.206, 0.259]
+   census priors, skies 100-119 | timing x 10 | stack on the shared bins                       | K>=60 0.022 [0.015, 0.030] (n=1318) | K>=600 0.004 [0.000, 0.011] (n=452) | all 0.050 [0.038, 0.061]
+   census priors, skies 100-119 | timing x 10 | JOINT FIT on the shared bins                   | K>=60 0.229 [0.198, 0.260] (n=1318) | K>=600 0.095 [0.071, 0.121] (n=452) | all 0.301 [0.272, 0.332]
+      candidates' share of each bin's GW power, median over bins (2-30 nHz) and pulsars: 0.057; bins <= 10 nHz: 0.479; summed over the band: 0.459; candidates/pulsar 1300; timing share of unmodelled power (median bin) 0.001; grid cap binds for 0 of 1580 pulsars (max step 0.050 pc)
+
+== Part 3: array SNR of each candidate's Earth term (x1 candidate list), harness priors, marginalised amplitude, skies 100-199
+   timing   x1 | arr_noise | booked top 12   | array SNR median      35.1, 90th       428 | dkappa*L 10/50/90%:     6.72 /      178 /      926 rad | pairs < 1 rad 0.0092, < pi 0.0519
+   timing   x1 | arr_noise | every candidate | array SNR median      26.7, 90th      54.3 | dkappa*L 10/50/90%:     23.7 /     86.6 /      279 rad | pairs < 1 rad 0.0001, < pi 0.0018
+   timing   x1 | arr_bg    | booked top 12   | array SNR median      3.89, 90th      7.59 | dkappa*L 10/50/90%:      393 / 1.81e+03 / 6.21e+03 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing   x1 | arr_bg    | every candidate | array SNR median     0.127, 90th     0.417 | dkappa*L 10/50/90%: 4.56e+03 /  1.7e+04 / 4.98e+04 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing   x1 | arr_opt   | booked top 12   | array SNR median      6.12, 90th      11.5 | dkappa*L 10/50/90%:      268 / 1.18e+03 / 3.97e+03 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing   x1 | arr_opt   | every candidate | array SNR median     0.188, 90th     0.633 | dkappa*L 10/50/90%: 3.05e+03 / 1.15e+04 /  3.4e+04 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing  x10 | arr_noise | booked top 12   | array SNR median       351, 90th  4.28e+03 | dkappa*L 10/50/90%:    0.672 /     17.8 /     92.6 rad | pairs < 1 rad 0.1264, < pi 0.2237
+   timing  x10 | arr_noise | every candidate | array SNR median       267, 90th       543 | dkappa*L 10/50/90%:     2.37 /     8.66 /     27.9 rad | pairs < 1 rad 0.0204, < pi 0.1552
+   timing  x10 | arr_bg    | booked top 12   | array SNR median      3.92, 90th      7.72 | dkappa*L 10/50/90%:      387 / 1.77e+03 / 6.13e+03 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing  x10 | arr_bg    | every candidate | array SNR median     0.127, 90th     0.417 | dkappa*L 10/50/90%: 4.56e+03 /  1.7e+04 / 4.98e+04 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing  x10 | arr_opt   | booked top 12   | array SNR median      6.28, 90th      12.2 | dkappa*L 10/50/90%:      259 / 1.12e+03 / 3.85e+03 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing  x10 | arr_opt   | every candidate | array SNR median     0.188, 90th     0.633 | dkappa*L 10/50/90%: 3.05e+03 / 1.15e+04 /  3.4e+04 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing x100 | arr_noise | booked top 12   | array SNR median  3.51e+03, 90th  4.28e+04 | dkappa*L 10/50/90%:   0.0672 /     1.78 /     9.26 rad | pairs < 1 rad 0.3830, < pi 0.6423/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/lib/_function_base_impl.py:4596: RuntimeWarning: invalid value encountered in scalar subtract
+  diff_b_a = b - a
+
+   timing x100 | arr_noise | every candidate | array SNR median  2.67e+03, 90th  5.43e+03 | dkappa*L 10/50/90%:    0.237 /    0.866 /     2.79 rad | pairs < 1 rad 0.5602, < pi 0.9227
+   timing x100 | arr_bg    | booked top 12   | array SNR median      3.92, 90th      7.73 | dkappa*L 10/50/90%:      387 / 1.77e+03 / 6.13e+03 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing x100 | arr_bg    | every candidate | array SNR median     0.127, 90th     0.417 | dkappa*L 10/50/90%: 4.56e+03 /  1.7e+04 / 4.98e+04 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing x100 | arr_opt   | booked top 12   | array SNR median      6.28, 90th      12.2 | dkappa*L 10/50/90%:      259 / 1.12e+03 / 3.85e+03 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing x100 | arr_opt   | every candidate | array SNR median     0.188, 90th     0.633 | dkappa*L 10/50/90%: 3.05e+03 / 1.15e+04 /  3.4e+04 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing zero | arr_noise | booked top 12   | array SNR median       inf, 90th       nan | dkappa*L 10/50/90%:        0 /        0 /        0 rad | pairs < 1 rad 1.0000, < pi 1.0000
+   timing zero | arr_noise | every candidate | array SNR median       inf, 90th       nan | dkappa*L 10/50/90%:        0 /        0 /        0 rad | pairs < 1 rad 1.0000, < pi 1.0000
+   timing zero | arr_bg    | booked top 12   | array SNR median      3.92, 90th      7.73 | dkappa*L 10/50/90%:      387 / 1.77e+03 / 6.13e+03 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing zero | arr_bg    | every candidate | array SNR median     0.127, 90th     0.417 | dkappa*L 10/50/90%: 4.56e+03 /  1.7e+04 / 4.98e+04 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing zero | arr_opt   | booked top 12   | array SNR median      6.28, 90th      12.2 | dkappa*L 10/50/90%:      259 / 1.12e+03 / 3.85e+03 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   timing zero | arr_opt   | every candidate | array SNR median     0.188, 90th     0.633 | dkappa*L 10/50/90%: 3.05e+03 / 1.15e+04 /  3.4e+04 rad | pairs < 1 rad 0.0000, < pi 0.0000
+   array SNR needed for the median (pulsar, source) pair to reach 1 rad, booked top 12: 6931  (85478 pairs: 855 per sky)
+   array SNR needed for the median (pulsar, source) pair to reach 1 rad, every candidate: 2431  (9169214 pairs: 91692 per sky)
+
+   Part D row rerun: every candidate, FULL template term (dkappa*L_true), retardation on, fine grid, marginalised amplitude
+   Job 50, arr as coded, timing x1                : K>=60 0.001 [0.000, 0.002] | K>=600 0.000 [0.000, 0.000] | all 0.135 [0.127, 0.144]
+   prior only (decode = prior centre)             : all 0.131
+   dkappa from arr_bg , timing   x1                  : K>=60 0.002 [0.000, 0.004] | K>=600 0.000 [0.000, 0.000] | all 0.131 [0.123, 0.138] | candidates/pulsar 1127
+   dkappa from arr_opt, timing   x1                  : K>=60 0.002 [0.000, 0.004] | K>=600 0.000 [0.000, 0.000] | all 0.131 [0.123, 0.138] | candidates/pulsar 1127
+   dkappa from arr_bg , timing  x10                  : K>=60 0.002 [0.000, 0.004] | K>=600 0.000 [0.000, 0.000] | all 0.131 [0.123, 0.138] | candidates/pulsar 1300
+   dkappa from arr_opt, timing  x10                  : K>=60 0.002 [0.000, 0.004] | K>=600 0.000 [0.000, 0.000] | all 0.131 [0.123, 0.138] | candidates/pulsar 1300
+   dkappa from arr_bg , timing zero                  : K>=60 0.002 [0.000, 0.004] | K>=600 0.000 [0.000, 0.000] | all 0.131 [0.123, 0.138] | candidates/pulsar 1300
+   dkappa from arr_opt, timing zero                  : K>=60 0.002 [0.000, 0.004] | K>=600 0.000 [0.000, 0.000] | all 0.131 [0.123, 0.138] | candidates/pulsar 1300
+
+== Part 4 [harness priors]: pulsars (of 79.0 red-noise-clean per sky) in which a source's pulsar term holds a share > threshold of its bin; retardation on; 100 skies
+   share of GW power (mac | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 0.48, >=10: 0.25, >=30: 0.14
+   share of GW power (mac | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.2: pulsars per source median 0, 90th 34, max 79 | sources per sky with >=4: 3.27, >=10: 2.29, >=30: 1.18
+   share of GW power (mac | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.1: pulsars per source median 8, 90th 76, max 79 | sources per sky with >=4: 6.48, >=10: 5.00, >=30: 2.97
+   share of GW power (mac | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 0.48, >=10: 0.25, >=30: 0.14
+   share of GW power (mac | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 3.37, >=10: 2.35, >=30: 1.20
+   share of GW power (mac | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 7.48, >=10: 5.81, >=30: 3.35
+   share of GW power (mac | pulsars with K < 1 for that source | booked top 12   (  10.8 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 17 | sources per sky with >=4: 0.22, >=10: 0.06, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | booked top 12   (  10.8 sources/sky) | share > 0.2: pulsars per source median 0, 90th 5, max 28 | sources per sky with >=4: 1.45, >=10: 0.44, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | booked top 12   (  10.8 sources/sky) | share > 0.1: pulsars per source median 0, 90th 8, max 38 | sources per sky with >=4: 2.62, >=10: 0.86, >=30: 0.05
+   share of GW power (mac | pulsars with K < 1 for that source | every candidate (1160.7 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 17 | sources per sky with >=4: 0.22, >=10: 0.06, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | every candidate (1160.7 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 28 | sources per sky with >=4: 1.46, >=10: 0.44, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | every candidate (1160.7 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 38 | sources per sky with >=4: 2.94, >=10: 0.89, >=30: 0.05
+   share of GW power (mac | pulsars with K < 10 for that source | booked top 12   (  10.8 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 49 | sources per sky with >=4: 0.42, >=10: 0.19, >=30: 0.05
+   share of GW power (mac | pulsars with K < 10 for that source | booked top 12   (  10.8 sources/sky) | share > 0.2: pulsars per source median 0, 90th 21, max 64 | sources per sky with >=4: 3.01, >=10: 1.90, >=30: 0.83
+   share of GW power (mac | pulsars with K < 10 for that source | booked top 12   (  10.8 sources/sky) | share > 0.1: pulsars per source median 6, 90th 45, max 68 | sources per sky with >=4: 6.18, >=10: 4.39, >=30: 2.12
+   share of GW power (mac | pulsars with K < 10 for that source | every candidate (1160.7 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 49 | sources per sky with >=4: 0.42, >=10: 0.19, >=30: 0.05
+   share of GW power (mac | pulsars with K < 10 for that source | every candidate (1160.7 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 64 | sources per sky with >=4: 3.09, >=10: 1.94, >=30: 0.84
+   share of GW power (mac | pulsars with K < 10 for that source | every candidate (1160.7 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 68 | sources per sky with >=4: 7.09, >=10: 5.08, >=30: 2.40
+   share of GW + timing p | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 0.46, >=10: 0.24, >=30: 0.13
+   share of GW + timing p | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.2: pulsars per source median 0, 90th 34, max 79 | sources per sky with >=4: 3.26, >=10: 2.27, >=30: 1.17
+   share of GW + timing p | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.1: pulsars per source median 8, 90th 76, max 79 | sources per sky with >=4: 6.47, >=10: 4.99, >=30: 2.96
+   share of GW + timing p | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 0.46, >=10: 0.24, >=30: 0.13
+   share of GW + timing p | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 3.36, >=10: 2.33, >=30: 1.19
+   share of GW + timing p | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 7.46, >=10: 5.80, >=30: 3.34
+
+== Part 4 [census priors]: pulsars (of 79.0 red-noise-clean per sky) in which a source's pulsar term holds a share > threshold of its bin; retardation on; 100 skies
+   share of GW power (mac | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 77 | sources per sky with >=4: 0.66, >=10: 0.42, >=30: 0.17
+   share of GW power (mac | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.2: pulsars per source median 0, 90th 40, max 79 | sources per sky with >=4: 3.84, >=10: 2.83, >=30: 1.42
+   share of GW power (mac | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.1: pulsars per source median 12, 90th 73, max 79 | sources per sky with >=4: 7.12, >=10: 5.87, >=30: 3.34
+   share of GW power (mac | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 77 | sources per sky with >=4: 0.66, >=10: 0.42, >=30: 0.17
+   share of GW power (mac | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 3.94, >=10: 2.90, >=30: 1.44
+   share of GW power (mac | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 8.26, >=10: 6.72, >=30: 3.81
+   share of GW power (mac | pulsars with K < 1 for that source | booked top 12   (  10.8 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 2 | sources per sky with >=4: 0.00, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | booked top 12   (  10.8 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 3 | sources per sky with >=4: 0.00, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | booked top 12   (  10.8 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 3 | sources per sky with >=4: 0.00, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | every candidate (1160.7 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 2 | sources per sky with >=4: 0.00, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | every candidate (1160.7 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 3 | sources per sky with >=4: 0.00, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 1 for that source | every candidate (1160.7 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 3 | sources per sky with >=4: 0.00, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 10 for that source | booked top 12   (  10.8 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 6 | sources per sky with >=4: 0.04, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 10 for that source | booked top 12   (  10.8 sources/sky) | share > 0.2: pulsars per source median 0, 90th 2, max 8 | sources per sky with >=4: 0.38, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 10 for that source | booked top 12   (  10.8 sources/sky) | share > 0.1: pulsars per source median 1, 90th 3, max 8 | sources per sky with >=4: 0.69, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 10 for that source | every candidate (1160.7 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 6 | sources per sky with >=4: 0.04, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 10 for that source | every candidate (1160.7 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 8 | sources per sky with >=4: 0.38, >=10: 0.00, >=30: 0.00
+   share of GW power (mac | pulsars with K < 10 for that source | every candidate (1160.7 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 8 | sources per sky with >=4: 0.69, >=10: 0.00, >=30: 0.00
+   share of GW + timing p | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 77 | sources per sky with >=4: 0.63, >=10: 0.38, >=30: 0.16
+   share of GW + timing p | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.2: pulsars per source median 0, 90th 40, max 79 | sources per sky with >=4: 3.79, >=10: 2.80, >=30: 1.39
+   share of GW + timing p | all pulsars                        | booked top 12   (  10.8 sources/sky) | share > 0.1: pulsars per source median 12, 90th 73, max 79 | sources per sky with >=4: 7.09, >=10: 5.83, >=30: 3.31
+   share of GW + timing p | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.5: pulsars per source median 0, 90th 0, max 77 | sources per sky with >=4: 0.63, >=10: 0.38, >=30: 0.16
+   share of GW + timing p | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.2: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 3.89, >=10: 2.86, >=30: 1.41
+   share of GW + timing p | all pulsars                        | every candidate (1160.7 sources/sky) | share > 0.1: pulsars per source median 0, 90th 0, max 79 | sources per sky with >=4: 8.20, >=10: 6.66, >=30: 3.77
+
+wrote job51_data/analysis.json

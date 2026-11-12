@@ -345,6 +345,13 @@ def confusion_onset(T, f_band):
     return T * (f_band[1] - f_band[0])
 
 
+# Measured array-resolution offset of the confusion knee, PER PULSAR:
+#   knee ~ KNEE_COEF_PER_PSR * n_psr * N*
+# The knee is NOT at a universal "~52 N*" -- 52 is only that law's value at n_psr=116.
+# Calibrated in stagec_p2n_arraylaw.py (PRONG2-N); see also stagec_p2c.py.
+KNEE_COEF_PER_PSR = 52.75 / 116.0
+
+
 # ----------------------------------------------------------------------
 # Sweep (padded: single compiled shape for all N)
 # ----------------------------------------------------------------------
@@ -964,7 +971,11 @@ def run_ntc_map(n_psr=116, T=15 * YR, cadence_days=7.0, sigma=1e-7,
     p_hats = build_array(n_psr); L_arr = jnp.ones(n_psr)
     toas = build_toas(T, cadence_days)
     N_star = confusion_onset(T, f_band)
-    print(f"[ntc] band {f_band}, N*={N_star:.2f}, knee~{52*N_star:.0f}", flush=True)
+    # array-resolution offset is ~KNEE_COEF_PER_PSR * n_psr, NOT the fixed "~52" that was
+    # hardcoded here (that is just its N_psr=116 value). See stagec_p2n_arraylaw.py.
+    print(f"[ntc] band {f_band}, N*={N_star:.2f}, "
+          f"knee~{KNEE_COEF_PER_PSR*n_psr*N_star:.0f} "
+          f"(offset {KNEE_COEF_PER_PSR*n_psr:.0f}x for {n_psr} psr)", flush=True)
 
     # ---- GATE: structured vs dense at N=8 (same analytic F) ----
     srcs8 = jnp.array(draw_sources(8, np.random.default_rng(1), f_band, log10_h))

@@ -1,0 +1,147 @@
+
+============================================================================================================
+DELIVERABLE 0 -- RNG IDENTITY: are we on the banked VERNIER-29 cells?
+============================================================================================================
+  K= 8 scramble=False : diag kernel reproduces vernier29.cert_rows exactly -> True
+  K= 8 scramble=True  : diag kernel reproduces vernier29.cert_rows exactly -> True
+  K=16 scramble=False : diag kernel reproduces vernier29.cert_rows exactly -> True
+  K=16 scramble=True  : diag kernel reproduces vernier29.cert_rows exactly -> True
+
+  BANKED VERNIER-29 D6 ROW (anchor 0.11 pc), reproduced here:
+    K    f_cert  f_cert_true  f_cert SCRAM   n_cert  n_SCRAM
+    8   0.02101      0.02101       0.00000     0.75     0.00
+   16   0.03574      0.03318       0.01574     1.12     0.50
+
+============================================================================================================
+DELIVERABLE 1 -- PER-PULSAR LEAK TABLE AT K = 16
+============================================================================================================
+  3 of 116 pulsars fire in the SCRAMBLED null in at least one of 8 realisations.
+  3 fire on SIGNAL. Power-weighted null rate 0.01384 vs signal 0.03366.
+
+        pulsar         cat  null fire  sig fire  pw share        K_i   sigma_d    window   dL_fr   disp/fr  disp pc  f_inwin  peak@Ls      w
+    J0437-4715        VLBI      0.250     0.875  3.54e-02        2.5      0.11       0.3    0.35     378.3    240.0     0.01     0.00   1.86
+    J1630+3734  DM-default      0.125     0.000  2.16e-02      530.6     24.00      72.0    0.26     262.9    244.7     0.13     0.00   1.75
+    J2124-3358   timing-PX      0.125     0.125  1.82e-02     1225.1     57.23     171.7    0.44     334.1    254.8     0.34     0.00   1.45
+
+  ANCHOR CHECK -- J0437-4715: null fire 0.250, signal fire 0.875, K_i = 2.54, window 0.330 pc, pinned no
+  J2222-0137 (the other sub-pc pulsar): null fire 0.000
+
+  H1 TEST -- are leakers LOW-K_i (sub-fringe priors trivialising)?
+    pulsars with K_i <= 3 : 1 of 116; of those, 1 leak
+    pulsars with K_i >  3 : 115 of 116; of those, 2 leak
+    median K_i of leakers = 530.6 vs 5433.7 for non-leakers
+    Spearman(null-fire rate, K_i) over all 116 pulsars = -0.138
+
+============================================================================================================
+DELIVERABLE 2 -- NULL-VALIDITY AUDIT (both metrics)
+============================================================================================================
+  METRIC A (the brief's H3): scramble displacement in FRINGES.
+    median over the array = 299.2 fringes; range 195.6 - 444.5
+    pulsars with displacement < 3 fringes (NULL-INVALID by metric A): 0 of 116
+
+  METRIC B (not in the brief): is the displaced comb still INSIDE the
+  searched window? The scramble is U(-500, 500) pc but the window is
+  +-min(3 sigma_a, 0.9 L_a), which for the real priors is often WIDER.
+    pulsars whose window exceeds the scramble half-range (500 pc): 76 of 116
+    array-mean fraction of combs landing INSIDE the window = 0.827
+    pulsars with ANY comb inside the window (NULL-INVALID by metric B): 116 of 116
+
+  WHICH METRIC SELECTS THE LEAKERS?
+     A: displacement < 3 fringes: flags   0 pulsars, captures 0/3 leakers, Spearman(fire, flag) = +0.936
+       B: any comb inside window: flags 116 pulsars, captures 3/3 leakers, Spearman(fire, flag) = +0.936
+    peak sits ON a displaced comb: mean over leakers = 0.000 (1.0 = the null certified a REAL comb it merely moved)
+
+  RECOMPUTED K = 16 NULL RATE, EXCLUDING NULL-INVALID PULSARS:
+       all pulsars (as banked): power-weighted null rate 0.01384  (100.0 % of the banked leak), 3 leakers remain
+        excl. metric A invalid: power-weighted null rate 0.01384  (100.0 % of the banked leak), 3 leakers remain
+        excl. metric B invalid: power-weighted null rate 0.00000  (  0.0 % of the banked leak), 0 leakers remain
+          excl. A or B invalid: power-weighted null rate 0.00000  (  0.0 % of the banked leak), 0 leakers remain
+
+============================================================================================================
+DELIVERABLE 3 -- H4: IS THE FLOOR REUSED FROM K = 8?
+============================================================================================================
+  BY CONSTRUCTION: `cert_rows` builds `n_inc` inside the per-pulsar loop from
+  the comps IN SCOPE, and calls `recut_floor` on it in the same iteration.
+  There is no floor cache and no cross-K state -- `vernier25.floor_for`'s
+  _FLOOR_CACHE is for the DETECTION F-floor and is never touched here.
+  Empirical confirmation: recut with a different floor RNG stream and with
+  4x and 12x the nulls; a reused floor would not move, a genuine one will
+  move only inside its own bootstrap error.
+
+    n_null    f_cert   f_SCRAM  median floor  median bar  n_SCRAM
+        32   0.04452   0.02359         0.431       8.565     0.75
+       128   0.04452   0.01498         0.421       8.559     0.50
+       384   0.05042   0.02359         0.402       8.557     0.75
+
+  H4 VERDICT: the floor is recut every call and the leak is flat in n_null.
+  H4 is DEAD -- both by construction and empirically.
+
+============================================================================================================
+DELIVERABLE 4 -- H2: DOES THE LEAK GROW WITH SOURCE COUNT?
+============================================================================================================
+    K    f_cert    f_true   f_SCRAM  SCRAM/sig   n_cert  n_SCRAM  med lnK  med bar   med dL
+    2   0.01369   0.01369   0.00473      0.345     0.88     0.62     7.59     7.59    0.601
+    4   0.01375   0.01375   0.00000      0.000     0.38     0.00     7.94     7.96    0.462
+    8   0.02101   0.02101   0.00000      0.000     0.75     0.00     8.33     8.35    0.325
+   12   0.04127   0.03307   0.00994      0.241     1.38     0.25     8.46     8.50    0.277
+   16   0.03574   0.03318   0.01574      0.441     1.12     0.50     8.55     8.59    0.266
+
+  H2 asks whether the BAR is mis-scaled: it would be if `lnK` were a global
+  or median value rather than per-pulsar. It is not -- `lnK` is computed
+  from each pulsar's own window and its own dL_min. The columns above show
+  the bar RISING with K (dL_min falls as the minimum over more combs), which
+  is the opposite of a bar that fails to keep up.
+
+============================================================================================================
+DELIVERABLE 5 -- CONTROL ARM: VERNIER-25's UNIFORM-PRIOR CONFIGURATION
+============================================================================================================
+  Same machinery, same seeds, same K = 16. Three arms isolate configuration
+  from machinery:
+    C0  V29 real array + REAL per-pulsar priors      (the banked cell)
+    C1  V29 real array + UNIFORM 10 pc priors        (isolates prior width)
+    C2  V24/25 SYNTHETIC array + UNIFORM 10 pc priors (VERNIER-25's own cell)
+
+   arm        array           priors   K    f_cert    f_true   f_SCRAM  n_SCRAM  med window pc  med disp/fr  mean f_inwin
+    C0         real  REAL per-pulsar   8   0.02101   0.02101   0.00000     0.00         681.70        303.6         0.824
+    C0         real  REAL per-pulsar  16   0.03574   0.03318   0.01574     0.50         681.70        291.9         0.827
+    C1         real    uniform 10 pc   8   0.00256   0.00256   0.00000     0.00          30.00        303.6         0.062
+    C1         real    uniform 10 pc  16   0.15908   0.15908   0.00749     0.25          30.00        291.9         0.063
+    C2    synthetic    uniform 10 pc   8   0.00000   0.00000   0.00000     0.00          30.00        291.8         0.062
+    C2    synthetic    uniform 10 pc  16   0.07652   0.07652   0.00000     0.00          30.00        294.3         0.063
+
+============================================================================================================
+DELIVERABLE 6 -- THE REPAIR, AND THE CORRECTED K = 16 COLUMN
+============================================================================================================
+  The control is repaired, not the gate: the scramble must displace the comb
+  OUT of the searched window and by at least a few fringes. Per pulsar the
+  displacement is drawn from U(w_a, w_a + 500 pc) in magnitude with a random
+  sign, where w_a = max(window half-width, 3 fringes) -- so the null tests
+  'no comb in this window' for every pulsar, uniformly, instead of testing it
+  only for the pulsars whose priors happen to be tighter than 500 pc.
+
+                             variant   K    f_cert    f_true   f_SCRAM  SCRAM/sig  n_SCRAM
+      banked scramble U(-500,500) pc   8   0.02101   0.02101   0.00000      0.000     0.00
+    window-aware scramble (REPAIRED)   8   0.02101   0.02101   0.00862      0.410     0.25
+      banked scramble U(-500,500) pc  16   0.03574   0.03318   0.01574      0.441     0.50
+    window-aware scramble (REPAIRED)  16   0.03574   0.03318   0.00395      0.111     0.12
+
+  SUB-FRINGE RULE (the brief's item 6, reported for completeness). The
+  Anchor-Census convention is K <= 3 = 'anchor'. Applying it as an exclusion
+  to the CERTIFICATION column at K = 16:
+    pulsars at K_i <= 3 in this cell: 1; their share of the leak: 64.0 %
+    -- so the sub-fringe rule does NOT address this leak (see the verdict).
+
+============================================================================================================
+DELIVERABLE 7 -- DOES THE DISTANCE-FILE DISCREPANCY COUPLE TO THIS?
+============================================================================================================
+  Scope check only (the feather-vs-get_distance discrepancy is a separate
+  task): does ANY leaker's K_i change by more than 2x between the two files?
+        pulsar  sigma used  sigma getdist   K_i used  K_i getdist   ratio
+    J0437-4715        0.11           1.30        2.5         22.6    8.90
+    J1630+3734       24.00       (absent)      530.6            -       -
+    J2124-3358       57.23          57.20     1225.1        784.6    1.56
+
+  leakers whose K_i moves by >2x between the two distance files: 1
+  COUPLED -- the two problems must be resolved together.
+
+[V29-DIAG] wrote /home/mattm/projects/HSYMT/reports/vernier29_diag.npz

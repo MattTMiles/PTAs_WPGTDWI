@@ -1,0 +1,7 @@
+world,purity,median_margin_nats,sigma_phi,N_eff,r,beats_false_alarm_bar
+1 clean,1.0000,40.482,0.300,8.000,1.7557,True
+2 + red noise,0.9650,7.589,0.600,8.000,1.3402,True
+3 + GWB,0.5150,1.393,1.000,8.000,0.7067,False
+4 + realistic loudness,0.0000,0.146,0.065,1.000,0.2391,False
+5 THE REAL WORLD,0.0000,0.043,0.603,1.000,0.1668,False
+6 RESCUE (narrow prior),0.9200,0.451,0.603,1.000,0.3842,False

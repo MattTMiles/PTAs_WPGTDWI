@@ -1,0 +1,42 @@
+E0915 21:59:23.283779 2148198 cuda_executor.cc:1348] [0] Failed to allocate device memory of 17.73GiB (19033751552 bytes): RESOURCE_EXHAUSTED: : CUDA_ERROR_OUT_OF_MEMORY: out of memory
+=== Source Location Trace: === 
+external/xla+/xla/stream_executor/cuda/cuda_status.cc:45
+external/xla+/xla/stream_executor/cuda/cuda_device_allocator.cc:226
+external/xla+/xla/stream_executor/cuda/cuda_device_allocator.cc:389
+
+E0915 21:59:23.283879 2148198 cuda_executor.cc:1348] [0] Failed to allocate device memory of 15.95GiB (17130376192 bytes): RESOURCE_EXHAUSTED: : CUDA_ERROR_OUT_OF_MEMORY: out of memory
+=== Source Location Trace: === 
+external/xla+/xla/stream_executor/cuda/cuda_status.cc:45
+external/xla+/xla/stream_executor/cuda/cuda_device_allocator.cc:226
+external/xla+/xla/stream_executor/cuda/cuda_device_allocator.cc:389
+
+E0915 21:59:23.283944 2148198 cuda_executor.cc:1348] [0] Failed to allocate device memory of 14.36GiB (15417337856 bytes): RESOURCE_EXHAUSTED: : CUDA_ERROR_OUT_OF_MEMORY: out of memory
+=== Source Location Trace: === 
+external/xla+/xla/stream_executor/cuda/cuda_status.cc:45
+external/xla+/xla/stream_executor/cuda/cuda_device_allocator.cc:226
+external/xla+/xla/stream_executor/cuda/cuda_device_allocator.cc:389
+
+=== BOOKED CONFIG (prong2_results.npz) ===
+N_psr=116  T=15.0 yr  cadence=7.0 d  sigma_white=100 ns  band=[ 3. 20.] nHz  n_seeds(sky realisations)=30  n_max=1000  rcond=1e-10
+N grid: [1, 2, 3, 4, 6, 10, 16, 25, 40, 63, 100, 158, 251, 398, 631, 1000]
+T*Df = 8.047   knee(first 0.5 crossing) = 422.6
+pulsar sky: build_array(116, seed=777) -> isotropic SYNTHETIC directions, all L = 1 kpc (not a catalogue)
+n_toa per pulsar = 782
+  [fixed_persource] N=    1  cond=1.940e+09  marg=1.922e+09  (marg/cond 0.991)
+  [fixed_persource] N=  100  cond=2.095e+11  marg=1.831e+11  (marg/cond 0.874)
+  [fixed_persource] N=  398  cond=8.348e+11  marg=4.433e+11  (marg/cond 0.531)
+  [fixed_persource] N= 1000  cond=2.095e+12  marg=1.770e+11  (marg/cond 0.084)
+  [fixed_total] N=    1  cond=1.931e+11  marg=1.913e+11  (marg/cond 0.991)
+  [fixed_total] N=  100  cond=2.085e+11  marg=1.822e+11  (marg/cond 0.874)
+  [fixed_total] N=  398  cond=2.088e+11  marg=1.109e+11  (marg/cond 0.531)
+  [fixed_total] N= 1000  cond=2.085e+11  marg=1.762e+10  (marg/cond 0.084)
+[timing] 2 modes x 4 N x 30 skies: 204.3s
+=== REPRODUCTION vs BOOKED ===
+  [fixed_persource] N=   1  cond new/booked = 1.9403e+09/1.9403e+09  marg new/booked = 1.9220e+09/1.9220e+09  ratio new/booked = 0.991/0.991
+  [fixed_persource] N= 100  cond new/booked = 2.0947e+11/2.0947e+11  marg new/booked = 1.8305e+11/1.8305e+11  ratio new/booked = 0.874/0.874
+  [fixed_persource] N= 398  cond new/booked = 8.3485e+11/8.3485e+11  marg new/booked = 4.4328e+11/4.4328e+11  ratio new/booked = 0.531/0.531
+  [fixed_persource] N=1000  cond new/booked = 2.0948e+12/2.0948e+12  marg new/booked = 1.7699e+11/1.7699e+11  ratio new/booked = 0.084/0.084
+  [fixed_total    ] N=   1  cond new/booked = 1.9312e+11/1.9312e+11  marg new/booked = 1.9129e+11/1.9129e+11  ratio new/booked = 0.991/0.991
+  [fixed_total    ] N= 100  cond new/booked = 2.0848e+11/2.0848e+11  marg new/booked = 1.8219e+11/1.8219e+11  ratio new/booked = 0.874/0.874
+  [fixed_total    ] N= 398  cond new/booked = 2.0877e+11/2.0877e+11  marg new/booked = 1.1085e+11/1.1085e+11  ratio new/booked = 0.531/0.531
+  [fixed_total    ] N=1000  cond new/booked = 2.0849e+11/2.0849e+11  marg new/booked = 1.7615e+10/1.7615e+10  ratio new/booked = 0.084/0.084

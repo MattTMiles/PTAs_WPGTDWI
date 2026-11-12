@@ -1,0 +1,29 @@
+/home/mattm/projects/HSYMT/PAPER_figures/job48b_plot.py:104: RuntimeWarning: divide by zero encountered in divide
+  sec = a.secondary_yaxis("right", functions=(lambda I: 1e3/np.sqrt(I), lambda s: (1e3/s)**2))
+Figure 1 axes: x 0.708-1.41e+03, y 4.54e+08-3.26e+12
+
+KNEES (median-over-skies ratio crosses 0.5; bootstrap over skies, 1000 reps)
+  arm    N_knee         boot 16-84      boot 2.5-97.5 | Job 48 [boot 16-84]      (N_psr/2)(B+0.74)
+  B8      428.8 [  427.1,  430.4] [  425.6,  432.5] |  415.7 [411.4,429.0]    509.6
+  B4      274.2 [  272.6,  274.9] [  271.0,  276.1] |  274.0 [269.3,274.4]    274.9
+  B2      158.4 [  157.7,  159.0] [  156.7,  159.6] |  158.4 [156.2,159.4]    158.9
+  B1      102.0 [  100.7,  102.6] [   99.0,  103.4] |  102.4 [101.2,105.1]    100.9
+  SF       56.9 [   56.8,   57.5] [   56.4,   58.1] |   57.7 [55.4,58.6]     58.0
+
+CHOLESKY BREAKDOWN (sources factored before the first non-positive pivot)
+  B8: all 1000 in 200/200 skies
+  B4: all 1000 in 200/200 skies
+  B2: all 1000 in 200/200 skies
+  B1: all 1000 in 0/200 skies; breakdown at N = 816-865 (median 835); ratio at the last factored grid point: median 1.9e-11, max 2.7e-10
+  SF: all 1000 in 0/200 skies; breakdown at N = 116-119 (median 116); ratio at the last factored grid point: median 6.4e-16, max 1.1e-11
+  plot floor as a ratio at N=800: 3.3e-04
+
+OVERLAY vs Figure 1 (16 grid points): marginal max |rel diff| = 0.091 (at N=6), median |rel diff| 0.011; 16/16 new medians inside Figure 1's 16-84 band
+   N   :      1      2      3      4      6     10     16     25     40     63    100    158    251    398    631   1000
+   rel : -0.073 +0.087 -0.071 +0.004 -0.091 -0.009 -0.013 -0.001 +0.009 +0.028 +0.004 +0.029 -0.026 +0.008 -0.004 -0.001
+   conditional max |rel diff| = 0.084
+   conditional: max spread of the arm medians across all 5 arms at Figure 1's N = 0.281
+
+COLLAPSE on N/(B+0.74): largest deviation from 1 - x/N_psr below the knee: B8 -0.079, B4 -0.016, B2 -0.018, B1 -0.026, SF -0.013
+
+plotting + analysis wall: 2.8 s

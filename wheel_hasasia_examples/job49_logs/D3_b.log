@@ -1,0 +1,44 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+<v4-cell-3>:344: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-7>:53: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-9>:171: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-11>:142: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 58 s
+[rate1.00] REPRODUCTION OK: booked 31.57 @ 0.9035 gate 50.32; reproduced 31.570 [29.80,33.41] @ 0.9035 [0.896,0.910] gate 50.32
+[rate1.00] switch(incumbent) bit-identical to booked collector: True (n=14012)
+[rate1.00]      inc: ungated 0.6951 |  31.57 [29.80,33.41] @ 0.9035 [0.896,0.910] gate 50.3% | old thr:  31.57 @ 0.9035
+[rate1.00]   p1_inc: ungated 0.7622 |  39.15 [37.57,40.87] @ 0.9553 [0.951,0.960] gate 58.7% | old thr:  33.53 @ 0.9596
+[rate1.00]    p1_mf: ungated 0.7888 |  40.06 [38.46,41.78] @ 0.9766 [0.973,0.980] gate 58.8% | old thr:  34.15 @ 0.9774
+[rate1.00]   p2_inc: ungated 0.6446 |   2.84 [2.24,3.52] @ 0.8632 [0.840,0.885] gate 4.7% | old thr:  29.02 @ 0.8306
+[rate1.00]    p2_mf: ungated 0.6960 |  27.97 [26.23,29.78] @ 0.8928 [0.886,0.900] gate 45.0% | old thr:  31.14 @ 0.8912
+[rate1.00]  p2g_inc: ungated 0.6492 | no 0.90 crossing (max train 0.8956) | old thr:  29.33 @ 0.8394
+[rate1.00]   p2g_mf: ungated 0.6976 |  27.14 [25.51,29.01] @ 0.8984 [0.891,0.905] gate 43.1% | old thr:  31.10 @ 0.8901
+[rate1.00] done 67 s
+[rate1.70] REPRODUCTION OK: booked: no 0.90 crossing; reproduced: no crossing
+[rate1.70] switch(incumbent) bit-identical to booked collector: True (n=13545)
+[rate1.70]      inc: ungated 0.5801 | no 0.90 crossing (max train 0.8977)
+[rate1.70]   p1_inc: ungated 0.6867 |  10.45 [8.91,11.92] @ 0.9127 [0.901,0.922] gate 17.0%
+[rate1.70]    p1_mf: ungated 0.7311 |  36.48 [34.61,38.38] @ 0.9093 [0.902,0.916] gate 58.5%
+[rate1.70]   p2_inc: ungated 0.5363 | no 0.90 crossing (max train 0.8373)
+[rate1.70]    p2_mf: ungated 0.5911 | no 0.90 crossing (max train 0.8634)
+[rate1.70]  p2g_inc: ungated 0.5395 | no 0.90 crossing (max train 0.7793)
+[rate1.70]   p2g_mf: ungated 0.5915 | no 0.90 crossing (max train 0.8761)
+[rate1.70] done 64 s
+[rate2.70] REPRODUCTION OK: booked: no 0.90 crossing; reproduced: no crossing
+[rate2.70] switch(incumbent) bit-identical to booked collector: True (n=13071)
+[rate2.70]      inc: ungated 0.4488 | no 0.90 crossing (max train 0.7092)
+[rate2.70]   p1_inc: ungated 0.5926 | no 0.90 crossing (max train 0.8401)
+[rate2.70]    p1_mf: ungated 0.6446 | no 0.90 crossing (max train 0.8843)
+[rate2.70]   p2_inc: ungated 0.4384 | no 0.90 crossing (max train 0.6564)
+[rate2.70]    p2_mf: ungated 0.4862 | no 0.90 crossing (max train 0.7355)
+[rate2.70]  p2g_inc: ungated 0.4521 | no 0.90 crossing (max train 0.6442)
+[rate2.70]   p2g_mf: ungated 0.4977 | no 0.90 crossing (max train 0.7221)
+[rate2.70] done 60 s
+TOTAL 250 s

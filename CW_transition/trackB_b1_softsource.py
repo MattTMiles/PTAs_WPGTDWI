@@ -101,9 +101,16 @@ class SoftComponent:
                  generalisation of the mean (hook; the Gaussian mean is the fed value in the MVP).
     is_reservoir whether this component is a faint reservoir source (started at prior width).
     label        human tag.
+    belief       optional trackB_b1_belief.Belief -- the RUNNING BELIEF (FORGE-B, the third
+                 M-step arm): a PERSISTENT centre + width that the M-step UPDATES rather than
+                 re-maximises, initialised at feed time from the frontier evidence and
+                 tightened only on new information. DEFAULT None -> every pre-FORGE-B caller
+                 (FORGE-G/G2, SPARK, GLACIER live/frozen) is unaffected; the belief travels
+                 in the component state, so it copies and checkpoints with it.
     """
 
-    def __init__(self, mean, sigma=None, pin=None, is_reservoir=False, label="", grid=None):
+    def __init__(self, mean, sigma=None, pin=None, is_reservoir=False, label="", grid=None,
+                 belief=None):
         self.mean = np.asarray(mean, float).copy()
         assert self.mean.shape == (NP_SRC,), f"mean must be length {NP_SRC}"
         self.sigma = (PRIOR_SIGMA.copy() if sigma is None
@@ -112,6 +119,7 @@ class SoftComponent:
         self.is_reservoir = bool(is_reservoir)
         self.label = label
         self.grid = grid or {}
+        self.belief = belief                   # FORGE-B running belief; None -> inert
         self.sigma[self.pin] = 0.0             # a pinned axis is known exactly
 
     @classmethod
@@ -149,9 +157,32 @@ class SoftComponent:
         self.pin[PERIOD_AXIS] = True
         self.sigma[PERIOD_AXIS] = 0.0
 
+    # ---- FORGE-B: the running belief travels in the component state ----
+    def set_belief(self, belief):
+        """Attach a running belief (trackB_b1_belief.Belief). The component's fed template
+        value becomes the belief CENTRE while a belief is live -- that is the whole point of
+        the arm: the template is fed the belief, not a fresh re-maximisation."""
+        self.belief = belief
+        if belief is not None:
+            self.mean = np.asarray(belief.centre, float).copy()
+        return self
+
+    def sync_from_belief(self):
+        """Pull the belief's centre/width into the (mean, sigma) the gate and the joint read.
+        No-op without a belief, so the gate's concentration statistic is unchanged for every
+        pre-FORGE-B caller."""
+        if self.belief is None:
+            return self
+        self.mean = np.asarray(self.belief.centre, float).copy()
+        w = np.asarray(self.belief.width, float).copy()
+        self.sigma = np.where(np.isfinite(w), w, PRIOR_SIGMA)
+        self.sigma[self.pin] = 0.0
+        return self
+
     def copy(self):
         c = SoftComponent(self.mean, self.sigma, self.pin, self.is_reservoir, self.label,
-                          dict(self.grid))
+                          dict(self.grid),
+                          belief=None if self.belief is None else self.belief.copy())
         return c
 
 
@@ -218,6 +249,34 @@ class SoftSourceState:
                 rec["fed"] = bool(gate.feeds(c))
             out.append(rec)
         return out
+
+    # ---- FORGE-B: the running-belief view of the set ----
+    def attach_beliefs(self, book):
+        """Bind a `trackB_b1_belief.BeliefBook` (slot-indexed) into the component state, so
+        the belief checkpoints and travels WITH the components rather than beside them."""
+        for i, c in enumerate(self.comps):
+            b = book.get(i) if book is not None else None
+            if b is not None:
+                c.set_belief(b)
+        return self
+
+    def sync_from_beliefs(self):
+        """Refresh (mean, sigma) from every live belief. Components with no belief are
+        untouched -- default-inert."""
+        for c in self.comps:
+            c.sync_from_belief()
+        return self
+
+    def belief_widths(self):
+        """(ncw, NP_SRC) belief widths; NaN rows for components carrying no belief."""
+        out = np.full((self.ncw, NP_SRC), np.nan)
+        for i, c in enumerate(self.comps):
+            if c.belief is not None:
+                out[i] = c.belief.width
+        return out
+
+    def n_belief(self):
+        return int(sum(c.belief is not None for c in self.comps))
 
     def copy(self):
         return SoftSourceState([c.copy() for c in self.comps])

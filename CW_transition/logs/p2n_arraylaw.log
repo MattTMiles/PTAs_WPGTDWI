@@ -1,0 +1,246 @@
+=== PRONG2-N: knee offset vs N_psr ===
+config: T=15 yr, band 3-20 nHz, sigma=100 ns, cadence 7 d, n_toa=782, mode=fixed_persource, rcond=1e-10, n_seeds=30
+N* = T*Delta_f = 8.0472
+
+[G1 chunk-vs-monolithic] cond/F_Ls/F_ss rel = 0.0e+00/0.0e+00/1.1e-15, marg rel = 8.7e-16
+[G2 n_max independence] N= 100: R(743)=0.872857 R(1486)=0.872857  rel=1.27e-16
+[G2 n_max independence] N= 400: R(743)=0.513632 R(1486)=0.513632  rel=1.73e-15
+[G2 n_max independence] N= 700: R(743)=0.248871 R(1486)=0.248871  rel=2.93e-14
+
+
+=== N_psr=30  n_max=193  chunk=30  n_seeds=30 ===
+    [30] N=    1  R(med over seeds)=0.978 [0.933,0.997]  (4.1s)
+    [30] N=    2  R(med over seeds)=0.970 [0.943,0.983]  (0.4s)
+    [30] N=    3  R(med over seeds)=0.968 [0.948,0.980]  (0.4s)
+    [30] N=    5  R(med over seeds)=0.953 [0.921,0.966]  (0.4s)
+    [30] N=    8  R(med over seeds)=0.943 [0.908,0.969]  (0.4s)
+    [30] N=   11  R(med over seeds)=0.925 [0.899,0.946]  (0.4s)
+    [30] N=   17  R(med over seeds)=0.901 [0.868,0.921]  (0.4s)
+    [30] N=   25  R(med over seeds)=0.855 [0.827,0.868]  (0.4s)
+    [30] N=   38  R(med over seeds)=0.797 [0.773,0.833]  (0.4s)
+    [30] N=   57  R(med over seeds)=0.719 [0.670,0.742]  (0.4s)
+    [30] N=   86  R(med over seeds)=0.596 [0.555,0.637]  (0.5s)
+    [30] N=  129  R(med over seeds)=0.405 [0.379,0.429]  (0.5s)
+    [30] N=  193  R(med over seeds)=0.201 [0.165,0.223]  (0.5s)
+    -> coarse knee = 105.4
+    [30] N=   63  R(med over seeds)=0.694 [0.646,0.733]  (0.4s)
+    [30] N=   67  R(med over seeds)=0.682 [0.620,0.702]  (0.4s)
+    [30] N=   72  R(med over seeds)=0.654 [0.623,0.689]  (0.5s)
+    [30] N=   76  R(med over seeds)=0.629 [0.582,0.668]  (0.5s)
+    [30] N=   81  R(med over seeds)=0.621 [0.578,0.650]  (0.5s)
+    [30] N=   91  R(med over seeds)=0.567 [0.530,0.614]  (0.5s)
+    [30] N=   97  R(med over seeds)=0.564 [0.524,0.590]  (0.5s)
+    [30] N=  103  R(med over seeds)=0.514 [0.462,0.574]  (0.5s)
+    [30] N=  110  R(med over seeds)=0.491 [0.439,0.530]  (0.5s)
+    [30] N=  117  R(med over seeds)=0.476 [0.418,0.503]  (0.5s)
+    [30] N=  124  R(med over seeds)=0.427 [0.384,0.451]  (0.5s)
+    [30] N=  132  R(med over seeds)=0.410 [0.357,0.454]  (0.5s)
+    [30] N=  140  R(med over seeds)=0.378 [0.325,0.425]  (0.5s)
+    [30] N=  149  R(med over seeds)=0.338 [0.301,0.390]  (0.5s)
+    [30] N=  159  R(med over seeds)=0.299 [0.258,0.343]  (0.5s)
+    [30] N=  169  R(med over seeds)=0.283 [0.243,0.320]  (0.5s)
+    [30] N=  179  R(med over seeds)=0.239 [0.218,0.263]  (0.5s)
+    -> knee(median curve, first-crossing) =   107.2   knee/N* =   13.32
+    -> knee(median curve, local fit)      =   104.5   knee/N* =   12.98
+    -> per-seed local fit =   103.4 [16,84] = [101.6,106.2]  (30/30 ok; first-crossing 30/30, 15 re-crossed)
+    -> fine-grid log step = 0.0620 (6.4%)
+
+=== N_psr=58  n_max=372  chunk=29  n_seeds=30 ===
+    [58] N=    1  R(med over seeds)=0.984 [0.969,0.998]  (4.3s)
+    [58] N=    2  R(med over seeds)=0.987 [0.969,0.996]  (1.8s)
+    [58] N=    4  R(med over seeds)=0.977 [0.967,0.984]  (1.8s)
+    [58] N=    6  R(med over seeds)=0.974 [0.963,0.985]  (1.7s)
+    [58] N=   10  R(med over seeds)=0.968 [0.957,0.979]  (1.8s)
+    [58] N=   15  R(med over seeds)=0.953 [0.940,0.963]  (1.8s)
+    [58] N=   24  R(med over seeds)=0.925 [0.907,0.942]  (1.8s)
+    [58] N=   38  R(med over seeds)=0.896 [0.879,0.905]  (1.8s)
+    [58] N=   60  R(med over seeds)=0.850 [0.828,0.875]  (1.8s)
+    [58] N=   95  R(med over seeds)=0.767 [0.736,0.789]  (1.8s)
+    [58] N=  150  R(med over seeds)=0.638 [0.588,0.664]  (1.8s)
+    [58] N=  236  R(med over seeds)=0.447 [0.415,0.474]  (1.8s)
+    [58] N=  372  R(med over seeds)=0.211 [0.198,0.232]  (1.9s)
+    -> coarse knee = 208.2
+    [58] N=  125  R(med over seeds)=0.690 [0.646,0.724]  (1.8s)
+    [58] N=  133  R(med over seeds)=0.682 [0.667,0.713]  (1.8s)
+    [58] N=  141  R(med over seeds)=0.667 [0.643,0.690]  (1.8s)
+    [58] N=  160  R(med over seeds)=0.606 [0.577,0.632]  (1.8s)
+    [58] N=  170  R(med over seeds)=0.596 [0.572,0.622]  (1.8s)
+    [58] N=  180  R(med over seeds)=0.569 [0.549,0.607]  (1.8s)
+    [58] N=  192  R(med over seeds)=0.546 [0.509,0.573]  (1.8s)
+    [58] N=  204  R(med over seeds)=0.511 [0.492,0.545]  (1.8s)
+    [58] N=  217  R(med over seeds)=0.480 [0.453,0.513]  (1.8s)
+    [58] N=  230  R(med over seeds)=0.444 [0.430,0.479]  (1.9s)
+    [58] N=  245  R(med over seeds)=0.423 [0.396,0.462]  (1.9s)
+    [58] N=  261  R(med over seeds)=0.402 [0.361,0.445]  (1.9s)
+    [58] N=  277  R(med over seeds)=0.365 [0.346,0.395]  (1.9s)
+    [58] N=  294  R(med over seeds)=0.336 [0.304,0.357]  (1.9s)
+    [58] N=  313  R(med over seeds)=0.303 [0.277,0.320]  (1.9s)
+    [58] N=  333  R(med over seeds)=0.267 [0.242,0.282]  (1.9s)
+    [58] N=  354  R(med over seeds)=0.236 [0.219,0.260]  (1.9s)
+    -> knee(median curve, first-crossing) =   208.6   knee/N* =   25.92
+    -> knee(median curve, local fit)      =   204.9   knee/N* =   25.46
+    -> per-seed local fit =   204.2 [16,84] = [201.9,206.8]  (30/30 ok; first-crossing 30/30, 5 re-crossed)
+    -> fine-grid log step = 0.0615 (6.3%)
+
+=== N_psr=116  n_max=743  chunk=29  n_seeds=30 ===
+    [116] N=    1  R(med over seeds)=0.993 [0.986,0.999]  (10.7s)
+    [116] N=    2  R(med over seeds)=0.992 [0.985,0.996]  (10.7s)
+    [116] N=    3  R(med over seeds)=0.991 [0.984,0.995]  (10.7s)
+    [116] N=    5  R(med over seeds)=0.987 [0.983,0.993]  (10.7s)
+    [116] N=    8  R(med over seeds)=0.983 [0.978,0.989]  (10.7s)
+    [116] N=   13  R(med over seeds)=0.978 [0.971,0.985]  (10.8s)
+    [116] N=   21  R(med over seeds)=0.974 [0.963,0.978]  (10.8s)
+    [116] N=   35  R(med over seeds)=0.955 [0.942,0.963]  (10.8s)
+    [116] N=   58  R(med over seeds)=0.926 [0.914,0.934]  (10.8s)
+    [116] N=   97  R(med over seeds)=0.886 [0.873,0.894]  (10.8s)
+    [116] N=  162  R(med over seeds)=0.808 [0.795,0.825]  (10.8s)
+    [116] N=  269  R(med over seeds)=0.692 [0.655,0.710]  (10.9s)
+    [116] N=  447  R(med over seeds)=0.484 [0.463,0.503]  (10.9s)
+    [116] N=  743  R(med over seeds)=0.208 [0.194,0.224]  (11.1s)
+    -> coarse knee = 430.3
+    [116] N=  258  R(med over seeds)=0.692 [0.670,0.711]  (10.9s)
+    [116] N=  274  R(med over seeds)=0.667 [0.651,0.690]  (10.9s)
+    [116] N=  292  R(med over seeds)=0.650 [0.637,0.667]  (10.9s)
+    [116] N=  310  R(med over seeds)=0.629 [0.612,0.651]  (10.9s)
+    [116] N=  330  R(med over seeds)=0.609 [0.591,0.622]  (10.9s)
+    [116] N=  351  R(med over seeds)=0.597 [0.570,0.623]  (10.9s)
+    [116] N=  373  R(med over seeds)=0.564 [0.544,0.585]  (10.9s)
+    [116] N=  396  R(med over seeds)=0.538 [0.518,0.558]  (11.0s)
+    [116] N=  421  R(med over seeds)=0.505 [0.486,0.525]  (10.9s)
+    [116] N=  448  R(med over seeds)=0.482 [0.460,0.501]  (11.0s)
+    [116] N=  476  R(med over seeds)=0.449 [0.424,0.472]  (11.0s)
+    [116] N=  506  R(med over seeds)=0.424 [0.406,0.434]  (11.0s)
+    [116] N=  538  R(med over seeds)=0.392 [0.371,0.408]  (11.1s)
+    [116] N=  572  R(med over seeds)=0.350 [0.335,0.368]  (11.0s)
+    [116] N=  609  R(med over seeds)=0.317 [0.306,0.339]  (11.1s)
+    [116] N=  647  R(med over seeds)=0.290 [0.275,0.312]  (11.1s)
+    [116] N=  688  R(med over seeds)=0.246 [0.233,0.265]  (11.1s)
+    [116] N=  731  R(med over seeds)=0.216 [0.200,0.232]  (11.2s)
+    -> knee(median curve, first-crossing) =   427.6   knee/N* =   53.13
+    -> knee(median curve, local fit)      =   418.3   knee/N* =   51.99
+    -> per-seed local fit =   417.3 [16,84] = [410.7,423.5]  (30/30 ok; first-crossing 30/30, 8 re-crossed)
+    -> fine-grid log step = 0.0612 (6.3%)
+
+=== N_psr=232  n_max=1486  chunk=29  n_seeds=30 ===
+    [232] N=    1  R(med over seeds)=0.997 [0.993,0.999]  (81.5s)
+    [232] N=    2  R(med over seeds)=0.997 [0.994,0.999]  (79.9s)
+    [232] N=    3  R(med over seeds)=0.995 [0.993,0.997]  (79.9s)
+    [232] N=    5  R(med over seeds)=0.994 [0.990,0.996]  (79.9s)
+    [232] N=    9  R(med over seeds)=0.992 [0.990,0.995]  (79.9s)
+    [232] N=   17  R(med over seeds)=0.988 [0.984,0.990]  (79.9s)
+    [232] N=   29  R(med over seeds)=0.981 [0.977,0.985]  (79.9s)
+    [232] N=   51  R(med over seeds)=0.968 [0.962,0.971]  (79.9s)
+    [232] N=   90  R(med over seeds)=0.945 [0.935,0.953]  (79.9s)
+    [232] N=  157  R(med over seeds)=0.906 [0.899,0.915]  (79.9s)
+    [232] N=  275  R(med over seeds)=0.835 [0.824,0.851]  (80.0s)
+    [232] N=  483  R(med over seeds)=0.717 [0.699,0.731]  (80.0s)
+    [232] N=  847  R(med over seeds)=0.513 [0.499,0.522]  (80.3s)
+    [232] N= 1486  R(med over seeds)=0.213 [0.205,0.222]  (81.0s)
+    -> coarse knee = 867.2
+    [232] N=  520  R(med over seeds)=0.696 [0.680,0.713]  (80.1s)
+    [232] N=  553  R(med over seeds)=0.675 [0.665,0.689]  (80.0s)
+    [232] N=  588  R(med over seeds)=0.655 [0.633,0.664]  (80.0s)
+    [232] N=  625  R(med over seeds)=0.630 [0.619,0.652]  (80.0s)
+    [232] N=  665  R(med over seeds)=0.612 [0.595,0.621]  (80.0s)
+    [232] N=  707  R(med over seeds)=0.595 [0.567,0.603]  (80.1s)
+    [232] N=  751  R(med over seeds)=0.558 [0.542,0.575]  (80.1s)
+    [232] N=  799  R(med over seeds)=0.537 [0.522,0.553]  (80.1s)
+    [232] N=  849  R(med over seeds)=0.513 [0.501,0.521]  (80.2s)
+    [232] N=  903  R(med over seeds)=0.475 [0.460,0.494]  (80.2s)
+    [232] N=  960  R(med over seeds)=0.456 [0.427,0.468]  (80.2s)
+    [232] N= 1021  R(med over seeds)=0.414 [0.397,0.433]  (80.3s)
+    [232] N= 1085  R(med over seeds)=0.378 [0.366,0.394]  (80.4s)
+    [232] N= 1154  R(med over seeds)=0.349 [0.341,0.363]  (80.5s)
+    [232] N= 1227  R(med over seeds)=0.316 [0.305,0.321]  (80.5s)
+    [232] N= 1304  R(med over seeds)=0.285 [0.270,0.296]  (80.8s)
+    [232] N= 1387  R(med over seeds)=0.244 [0.238,0.255]  (81.0s)
+    [232] N= 1474  R(med over seeds)=0.216 [0.204,0.226]  (81.0s)
+    -> knee(median curve, first-crossing) =   867.7   knee/N* =  107.83
+    -> knee(median curve, local fit)      =   839.6   knee/N* =  104.33
+    -> per-seed local fit =   836.7 [16,84] = [831.3,844.2]  (30/30 ok; first-crossing 30/30, 4 re-crossed)
+    -> fine-grid log step = 0.0613 (6.3%)
+
+[G3 116-reproduction] knee/N* = 53.13 (first-crossing, P2-C convention) vs P2-C 52.75 (Stage A ~52): rel dev 0.7%, tol 5.0% -> PASS
+
+================ PRONG2-N SUMMARY ================
+ N_psr     knee   knee/N*        [16,84] seeds  c=off/N_psr  off(1st-x)      ok
+    30    104.5     12.98       [12.63, 13.20]       0.4328       13.32  30/30
+    58    204.9     25.46       [25.09, 25.70]       0.4389       25.92  30/30
+   116    418.3     51.99       [51.03, 52.63]       0.4482       53.13  30/30
+   232    839.6    104.33     [103.31, 104.91]       0.4497      107.83  30/30
+
+power law: knee/N* = 0.4101 * N_psr^1.0172  (slope err 0.0018; chi2/dof = 8.99/2)
+  counting-law prediction is slope = 1 (all three laws are linear): measured 1.017 +- 0.002  -> +9.7 sigma (INCONSISTENT with linear)
+
+---- coefficient test at N_psr = 232 ----
+measured knee/N* = 104.33   error budget: seed SE 0.15, estimator (local fit vs first crossing) 3.50; per-seed 16/84 = [103.3, 104.9]
+  (the per-seed spread is small because all seeds share ONE pulsar array; the sky-realisation term below is the dominant statistical error)
+
+---- sky-realisation check at N_psr = 232 (2 extra sky seeds, 10 source seeds) ----
+
+=== N_psr=232 sky778  n_max=1486  chunk=29  n_seeds=10 ===
+    [232 sky778] N=  504  R(med over seeds)=0.698 [0.692,0.704]  (26.7s)
+    [232 sky778] N=  554  R(med over seeds)=0.675 [0.666,0.680]  (26.7s)
+    [232 sky778] N=  609  R(med over seeds)=0.640 [0.628,0.651]  (26.7s)
+    [232 sky778] N=  669  R(med over seeds)=0.600 [0.590,0.619]  (26.7s)
+    [232 sky778] N=  736  R(med over seeds)=0.566 [0.556,0.577]  (26.7s)
+    [232 sky778] N=  809  R(med over seeds)=0.529 [0.513,0.536]  (26.7s)
+    [232 sky778] N=  889  R(med over seeds)=0.477 [0.474,0.489]  (26.7s)
+    [232 sky778] N=  977  R(med over seeds)=0.437 [0.431,0.449]  (26.8s)
+    [232 sky778] N= 1074  R(med over seeds)=0.401 [0.381,0.405]  (26.8s)
+    [232 sky778] N= 1181  R(med over seeds)=0.334 [0.328,0.345]  (26.9s)
+    [232 sky778] N= 1298  R(med over seeds)=0.285 [0.279,0.301]  (26.9s)
+    [232 sky778] N= 1427  R(med over seeds)=0.239 [0.228,0.246]  (27.0s)
+    -> knee(median curve, first-crossing) =   852.2   knee/N* =  105.90
+    -> knee(median curve, local fit)      =   832.7   knee/N* =  103.48
+    -> per-seed local fit =   834.0 [16,84] = [827.1,837.7]  (10/10 ok; first-crossing 10/10, 0 re-crossed)
+    -> fine-grid log step = 0.0946 (9.9%)
+
+=== N_psr=232 sky779  n_max=1486  chunk=29  n_seeds=10 ===
+    [232 sky779] N=  504  R(med over seeds)=0.704 [0.695,0.716]  (26.7s)
+    [232 sky779] N=  554  R(med over seeds)=0.664 [0.644,0.680]  (26.7s)
+    [232 sky779] N=  609  R(med over seeds)=0.644 [0.633,0.650]  (26.7s)
+    [232 sky779] N=  669  R(med over seeds)=0.606 [0.593,0.620]  (26.7s)
+    [232 sky779] N=  736  R(med over seeds)=0.566 [0.544,0.576]  (26.7s)
+    [232 sky779] N=  809  R(med over seeds)=0.529 [0.512,0.534]  (26.7s)
+    [232 sky779] N=  889  R(med over seeds)=0.483 [0.473,0.494]  (26.7s)
+    [232 sky779] N=  977  R(med over seeds)=0.425 [0.418,0.454]  (26.8s)
+    [232 sky779] N= 1074  R(med over seeds)=0.394 [0.381,0.401]  (26.8s)
+    [232 sky779] N= 1181  R(med over seeds)=0.335 [0.329,0.349]  (26.9s)
+    [232 sky779] N= 1298  R(med over seeds)=0.285 [0.272,0.291]  (26.9s)
+    [232 sky779] N= 1427  R(med over seeds)=0.234 [0.219,0.237]  (27.0s)
+    -> knee(median curve, first-crossing) =   858.4   knee/N* =  106.67
+    -> knee(median curve, local fit)      =   831.3   knee/N* =  103.31
+    -> per-seed local fit =   828.5 [16,84] = [823.3,840.9]  (10/10 ok; first-crossing 10/10, 0 re-crossed)
+    -> fine-grid log step = 0.0946 (9.9%)
+[sky] knee/N* over sky seeds 777,778,779 = [104.33, 103.48, 103.31]  -> spread (sd) 0.55 (0.5%)
+
+---- N_psr = 232 VERDICT ----
+knee/N* = 104.33 +- 3.54  (seed 0.15 + estimator 3.50 + sky 0.55, in quadrature)
+    N_p/2   (p=2, d-m=1): predicts  116.00  -> measured is  -10.1% (-3.3 sigma)
+       3N_p/7  (7-param): predicts   99.43  -> measured is   +4.9% (+1.4 sigma)
+  2N_p/5  (ABACUS/BP-sky-fixed): predicts   92.80  -> measured is  +12.4% (+3.3 sigma)
+  2N_p/7  (Boyle&Pen raw): predicts   66.29  -> measured is  +57.4% (+10.7 sigma)
+  VERDICT: SUPPORTS 3N_p/7  (7-param) (|z|=1.4); rejects N_p/2   (p=2, d-m=1), 2N_p/5  (ABACUS/BP-sky-fixed), 2N_p/7  (Boyle&Pen raw)
+
+saved /home/mattm/projects/HSYMT/CW_transition/stagec_p2n_results.npz
+Traceback (most recent call last):
+  File "/home/mattm/projects/HSYMT/CW_transition/stagec_p2n_arraylaw.py", line 529, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/home/mattm/projects/HSYMT/CW_transition/stagec_p2n_arraylaw.py", line 469, in main
+    _figure(npsr, off_med, off_seed_lo, off_seed_hi, A, b, sb, results, N_star, off232,
+  File "/home/mattm/projects/HSYMT/CW_transition/stagec_p2n_arraylaw.py", line 507, in _figure
+    a.plot(xs, c * xs, ls, color=col, lw=1.2, alpha=.85, label=nm)
+  File "/home/mattm/miniforge3/envs/jug-gpu/lib/python3.12/site-packages/matplotlib/axes/_axes.py", line 1777, in plot
+    lines = [*self._get_lines(self, *args, data=data, **kwargs)]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/mattm/miniforge3/envs/jug-gpu/lib/python3.12/site-packages/matplotlib/axes/_base.py", line 297, in __call__
+    yield from self._plot_args(
+               ^^^^^^^^^^^^^^^^
+  File "/home/mattm/miniforge3/envs/jug-gpu/lib/python3.12/site-packages/matplotlib/axes/_base.py", line 486, in _plot_args
+    x, y = index_of(xy[-1])
+           ^^^^^^^^^^^^^^^^
+  File "/home/mattm/miniforge3/envs/jug-gpu/lib/python3.12/site-packages/matplotlib/cbook.py", line 1682, in index_of
+    raise ValueError('Input could not be cast to an at-least-1D NumPy array')
+ValueError: Input could not be cast to an at-least-1D NumPy array

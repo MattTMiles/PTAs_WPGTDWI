@@ -1,0 +1,7 @@
+harness,A_1e-15,count_scale,gate_pct,purity,psr_per_sky,q10,q90
+banked_adjudicated,3.7,0.33,58.84,0.9974,42.350,40.940,43.770
+banked_adjudicated,5.0,0.6,58.77,0.9709,40.990,39.566,42.497
+banked_adjudicated,6.4,1.0,50.32,0.9035,31.570,29.798,33.406
+banked_adjudicated,8.3,1.7,nan,nan,nan,nan,nan
+banked_adjudicated,10.6,2.7,nan,nan,nan,nan,nan
+banked_adjudicated,MARGINAL,,58.59,0.9009,36.270,34.019,38.753

@@ -1,0 +1,37 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+<v4-cell-3>:344: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-7>:53: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-9>:171: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-11>:142: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 54 s
+  comb sets: 50/50 skies
+  grid done 18 s
+  REPRO 47c: max |switch - job47c_grid.csv| = 0.00e+00; max |switch - booked fn| = 0.00e+00
+  refinement: 106 cells at 1000 (15 s)
+  REPRO 47d: max |incumbent refined - job47d_grid.csv| = 0.00e+00; n_real mismatches 0
+
+  0.9-CROSSING sigma_d [pc], dedicated rows, 1000 real./cell (40 log cells):
+   beta sigma_phi |  incumbent  phys D-inc  phys D-mf | incumbent at sigma_phi/sqrt2
+   0.80     0.500 |      1.120       2.328      2.942 | 3.107
+   0.50     1.000 |      0.226       0.223      0.343 | 0.519
+   0.30     1.528 |      0.144       0.158      0.176 | 0.178
+   0.20     2.000 |      0.141       0.147      0.157 | 0.143
+
+  RECOVERED FRACTION along beta = 0.2 (sigma_phi = 2.0), 4000 real./cell:
+    sigma_d    0.1 pc: incumbent 0.982+-0.002  physical D-inc 0.986+-0.002  physical D-mf 0.980+-0.002
+    sigma_d    0.3 pc: incumbent 0.595+-0.008  physical D-inc 0.707+-0.007  physical D-mf 0.749+-0.007
+    sigma_d    1.0 pc: incumbent 0.243+-0.007  physical D-inc 0.393+-0.008  physical D-mf 0.443+-0.008
+    sigma_d    3.0 pc: incumbent 0.096+-0.005  physical D-inc 0.206+-0.006  physical D-mf 0.231+-0.007
+    sigma_d   10.0 pc: incumbent 0.030+-0.003  physical D-inc 0.088+-0.004  physical D-mf 0.102+-0.005
+    sigma_d   30.0 pc: incumbent 0.010+-0.002  physical D-inc 0.035+-0.003  physical D-mf 0.035+-0.003
+    sigma_d  100.0 pc: incumbent 0.006+-0.001  physical D-inc 0.010+-0.002  physical D-mf 0.010+-0.002
+  wrote job49_D1_grid.csv, job49_data/D1_rows.json, job49_data/D1_grid.npz
+  wrote job49_D1_heatmaps.png
+TOTAL 143 s

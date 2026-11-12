@@ -1,0 +1,6 @@
+span_yr,n_combs,K_measured,purity,median_margin_nats,bar_nats,certifies,step1_margin_nats
+5,2,7.4,0.2800,-0.518,1.192,FAILS,11.640
+10,5,7.1,0.2850,-0.622,1.142,FAILS,456.580
+15,5,7.2,0.2750,-0.623,1.167,FAILS,612.210
+20,5,7.2,0.2700,-0.624,1.166,FAILS,745.320
+25,5,7.2,0.2600,-0.628,1.164,FAILS,838.470

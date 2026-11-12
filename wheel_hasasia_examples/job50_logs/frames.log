@@ -1,0 +1,10 @@
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+(1) SRC_AMP == KH (Mc(1+z))^(5/3)/d_L : True | == KH Mc^(5/3)/d_L : False
+(2) mc_src drawn from SRC_MC (intrinsic): 1.0 | h_src == KH (mc_src(1+z))^(5/3) f_obs^(2/3)/d_L : True
+(3) presentation sky N=18727: z median 0.61 [16,84%: 0.20,1.23]; (1+z)^(5/3) median 2.20; loudest 200: z 0.35, factor 1.65
+(4) harness skies 0-19: amp->(Mc,z) lookup relative mismatch (as used, searchsorted): median 0.00e+00, 99% 1.25e-05; nearest-entry exact (<1e-9) fraction 0.7853
+    booked 12 sources/sky: z median 0.57, (1+z)^(5/3) median 2.12
+(5) booked 12 sources/sky, 20 skies, rate 1: array SNR white-only median 35; with per-pulsar confusion ledger 3.1; ratio median 12 [16,84%: 6,48]

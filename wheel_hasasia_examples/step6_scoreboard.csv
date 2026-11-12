@@ -1,0 +1,5 @@
+sigma_d_pc,n_combs,K_measured,purity,median_margin_nats,bar_nats,certifies,combs_star
+2.0,30,20.7,1.0000,838.472,741.164,CERTIFIES,6.3
+10.0,30,85.2,1.0000,765.700,768.775,FAILS,7.8
+50.0,30,194.8,1.0000,761.057,766.368,FAILS,9.3
+242.0,30,271.1,1.0000,761.057,619.771,CERTIFIES,10.8

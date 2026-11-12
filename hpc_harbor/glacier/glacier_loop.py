@@ -34,7 +34,14 @@ ONE SOFT-JOINT ITERATION (everything posterior-weighted, nothing hard-committed)
   (e) M-STEP: batched quadratic sweeps of lnL_marg over the fed members' (log10_fgw,
       log10_mc) scaled offsets (the TargetedMarg surface with DYNAMIC slots -- slot
       selection is numpy-side, so a frontier change recompiles nothing). Fed widths
-      re-measured (Laplace) from the same curvatures.
+      re-measured (Laplace) from the same curvatures. THREE ARMS (`--mstep-policy`,
+      FORGE-B 2026-07-29): `live` (this, the DEFAULT and the byte-identical incumbent),
+      `frozen` (fed members never move from their feed point), and `belief` -- the
+      RUNNING-BELIEF arm, where each fed member carries a persistent belief born at feed
+      time from the frontier evidence, refits are MAP against it with the wander bounded
+      by the belief width by construction, and the width tightens ONLY on a new-information
+      event. live and frozen are the belief arm's two limits (width -> inf / 0), gated
+      bit-comparably in `CW_transition/trackB_b1_belief.py` (g1-g5).
   (f) END-OF-CYCLE SCOREBOARD (criterion v2.2, NEVER inside the loop): per-pulsar
       cert = (dlnL_det > max(lnK, floor)) & (q_max > 0.9); trials cost restored
       (+0.578 nat, saturating, SPARK-2 SS2) via lnK over the CARRIED census.
@@ -78,6 +85,7 @@ for p in ("CW_lnL_check", "CW_transition", "hpc_harbor/forge", "hpc_harbor/ignit
           "hpc_harbor/atlas", "hpc_harbor/spark", "hpc_harbor/glacier"):
     sys.path.insert(0, f"{HSYMT}/{p}")
 
+import trackB_b1_belief as BEL          # FORGE-B: the RUNNING-BELIEF M-step (numpy-only import)
 from glacier_pop import (draw_population, draw_population_conditional, LADDER_RUNGS,
                          source_band_power, a_eff_projection,
                          PromoteLedger, BackgroundFit, CampaignStop, bank_npz, lane_tag,
@@ -114,6 +122,20 @@ FISHER_AXES = (I_COSGT, I_GWPHI, I_COSINC, I_MC, I_FGW, I_H, I_PH0, I_PSI)
 MSTEP_AXES = (I_FGW, I_MC)           # the TargetedMarg surface, per fed member
 SEED_NOISE_BASE = 9_500_000
 SEED_SCRAM_BASE = 9_800_000
+
+# ---- THE M-STEP POLICY ARM (FORGE-B, 2026-07-29). Three arms, pre-registered:
+#   live    the incumbent: every iteration re-maximises lnL_marg from the current template.
+#           DEFAULT -- `mstep_policy="live"` runs the byte-identical incumbent path (nothing
+#           in the belief module is called, no bank key changes, no behaviour change).
+#   frozen  fed members never move from their feed point (the M-step costs nothing).
+#   belief  the RUNNING-BELIEF arm: each fed member carries a persistent belief initialised
+#           at feed time from the frontier evidence; refits are MAP against it, the wander is
+#           bounded by the belief width by construction, and the width tightens ONLY on a
+#           new-information event (trackB_b1_belief; gates g1-g5 there).
+# `live` and `frozen` are the belief arm's two LIMITS (belief width -> inf and -> 0), gated
+# bit-comparably in trackB_b1_belief g1.
+MSTEP_POLICIES = ("live", "frozen", "belief")
+MSTEP_POLICY_DEFAULT = "live"
 
 
 def cell_stem(arm, sky, kind="cell"):
@@ -267,6 +289,28 @@ def theta_with_absent(theta, nd, carried_idx):
     return t
 
 
+def data_support(amo, jnp, theta_rec, nd, carried, members, data, pmask):
+    """FORGE-B: the per-member DATA-SUPPORT delta-lnL at the feed point -- how much the data
+    actually prefers member k PRESENT over member k ABSENT, at the current joint state, with
+    the other carried members absent (the same own-term-live convention as
+    `fisher_conditional`, S4.14). This is the evidence half of the feed-time belief: the
+    curvature says how tight k's width WOULD be, the support says whether the data has yet
+    earned that tightness. Two evaluations per member. Returns {k: dlnL}."""
+    lb = amo["logL_batch_theta"]
+    carried = set(int(x) for x in carried)
+    members = [int(k) for k in members]
+    rows, key = [], []
+    for k in members:
+        others = np.array(sorted(carried - {k}), dtype=int)
+        rows.append(theta_with_absent(theta_rec, nd, others))                 # k PRESENT
+        rows.append(theta_with_absent(theta_rec, nd, np.append(others, k)))   # k ABSENT
+        key.append(k)
+    if not rows:
+        return {}
+    v = np.asarray(lb(jnp.asarray(np.stack(rows)), data, pmask)).reshape(-1, 2)
+    return {k: float(v[i, 0] - v[i, 1]) for i, k in enumerate(key)}
+
+
 def mstep_quadratic(marg_fn, src0, fed_idx, scale, n_sweep=2, step0=0.3, bmax=64):
     """Batched coordinate-quadratic ascent of lnL_marg over the fed members' MSTEP_AXES.
     All slot selection is numpy-side (no recompile on frontier change). Returns
@@ -306,7 +350,8 @@ def localisation_area_deg2(F_ii_sky):
 # THE CELL -- one (arm, sky), all iterations in-process
 # ============================================================
 def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_ITER,
-             full_floors=None, verbose=True, rung=None, t_label=None, wscale=1.0):
+             full_floors=None, verbose=True, rung=None, t_label=None, wscale=1.0,
+             mstep_policy=MSTEP_POLICY_DEFAULT):
     """The campaign cell. Checkpointed per iteration; resume = skip-on-exist readback.
     scrambled=True: the counterpart-scrambled null arm (igniter sky scrambled in the
     RECOVERY template; data at truth) -- the manufacturing control, run through the FULL
@@ -316,8 +361,13 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
     2026-07-24): the census is the conditional draw for (rung, sky); the igniter arm is
     a PROPERTY OF THE CONDITIONED LOUDEST MEMBER (e07 ties it into the eccentric comb --
     at the feasible rung this doubles as the probe of structure-assisted onset below the
-    measured box); stems gl2_<rung>_*; the conditioning record is banked per iteration."""
+    measured box); stems gl2_<rung>_*; the conditioning record is banked per iteration.
+    mstep_policy: one of MSTEP_POLICIES. "live" (default) is the byte-identical incumbent
+    path -- the belief machinery is never called and no banked key changes."""
     check_affinity()
+    if mstep_policy not in MSTEP_POLICIES:
+        raise CampaignStop(f"unknown mstep_policy {mstep_policy!r} "
+                           f"(expected one of {MSTEP_POLICIES})")
     p = print if verbose else (lambda *a, **k: None)
     if full_floors is None:
         full_floors = scrambled or (sky in FULL_FLOOR_SKIES)
@@ -332,8 +382,12 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
     kind = f"null{real}" if scrambled else "cell"
     stem = cell_stem(arm, sky, kind) if rung is None else \
         f"gl2_{rung}{wtag}_{kind}_{arm}_s{sky}_T{T}_{TIER}"
+    # the M-step arm is a VENUE AXIS of the stem: a non-live arm never collides with, or
+    # resumes from, an incumbent bank. "live" appends nothing -- incumbent stems bit-for-bit.
+    if mstep_policy != MSTEP_POLICY_DEFAULT:
+        stem = f"{stem}_m{mstep_policy}"
     p(f"[GLACIER-{'1' if rung is None else '2'}] cell {stem} full_floors={full_floors} "
-      f"wscale={wscale:g} lane={lane_tag()}")
+      f"wscale={wscale:g} mstep={mstep_policy} lane={lane_tag()}")
 
     # ---- census + igniter embedding (paired arms share the census seed) ----
     if rung is None:
@@ -398,6 +452,27 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
     carried_floor = None
     prev_cert_idx, prev_q = np.zeros(0, int), np.zeros(amo["npsr"])
 
+    # ---- FORGE-B: the running-belief state (None on the live/frozen arms) ----
+    # The ladder's prior widths MUST be this driver's box, or the belief's width ratio and
+    # the frontier's ratio stop meaning the same thing and the ladder silently drifts off the
+    # gate it extends. With them equal, a belief born at support >= DLNL_SUPPORT_REF reads
+    # EXACTLY the frontier's own ratio at feed time (measured on b1: 0.0828 and 0.9482 for a
+    # loud and a reservoir member, identical to sig_opt/sig_pes). Asserted, not assumed.
+    if mstep_policy == "belief" and not np.allclose(box_sigma, BEL.PRIOR_SIGMA):
+        raise CampaignStop(
+            "belief arm: this driver's box_sigma differs from trackB_b1_belief.PRIOR_SIGMA "
+            f"({box_sigma} vs {BEL.PRIOR_SIGMA}) -- the graduation ladder would no longer "
+            "read the same ratio as the frontier it extends.")
+    book = BEL.BeliefBook(n_slot) if mstep_policy == "belief" else None
+    infoled = BEL.InformationLedger() if book is not None else None
+    # the ladder keys on ALL axes (the frontier's own worst-axis reduction, SPARK-3 SS5.0).
+    # The M-step-axis ratio is banked as a DIAGNOSTIC column, never as the stage: a member
+    # believed to 1e-5 in frequency with a box-width sky is not a resolved source.
+    ladder = BEL.GraduationLadder() if book is not None else None
+    gradled = (BEL.GraduationLedger(n_slot, ladder, diag_axes=MSTEP_AXES)
+               if book is not None else None)
+    bstep = BEL.BeliefMStep(mstep_axes=MSTEP_AXES) if book is not None else None
+
     for it in range(n_iter):
         ck = f"{OUT}/{stem}_i{it}__{lane_tag()}.npz"
         if os.path.exists(ck):
@@ -407,6 +482,24 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
             carried_floor = (float(z["floor"]), float(z["floor_err"]), str(z["floor_est"]))
             prev_cert_idx = np.asarray(z["cert_idx"], int)
             prev_q = np.asarray(z["q_of_psr"], float)
+            # the belief RESUMES; it is never re-derived. Re-deriving a belief on resume
+            # would tighten it at unchanged information -- exactly the double-counting the
+            # B2 guard forbids -- and would make a resumed cell differ from a straight one.
+            if book is not None:
+                rb = BEL.BeliefBook.unpack(z, n_slot)
+                if rb is None:
+                    raise CampaignStop(f"iter {it}: mstep_policy='belief' resuming from a "
+                                       f"checkpoint with NO belief block ({ck}). A belief "
+                                       f"cannot be re-derived without double-counting; "
+                                       f"start a fresh stem instead.")
+                book = rb
+                # bring the information record up to date, then DISCARD the licences: the
+                # tightens those events licensed are already baked into the resumed belief.
+                # Replaying them would license a second tighten for the same information.
+                infoled.observe(it, fed=led.fed, cert=prev_cert_idx,
+                                a_bg=float(z["a_bg"]), a_bg_sig=float(z["a_bg_sig"]))
+                infoled.spend()
+                gradled.record(it, book, tightened=False)
             p(f"  iter {it}: checkpoint exists -- resumed"); continue
         t_it = time.time()
 
@@ -427,6 +520,20 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
             led.promote(k, slots[k], iteration=it)      # AT DRAWN TRUTH -- the frozen census
         fed_idx = np.where(led.fed)[0]
 
+        # FORGE-B: a promoted member is BORN WITH A BELIEF, once, from the frontier's own
+        # evidence about it -- the curvature at the feed point (sig_opt's F_ii, own-term-live)
+        # and the data-support delta-lnL (present vs absent, 2 evals). Idempotent: an already
+        # believed slot is never re-initialised (that would be a free tighten).
+        if book is not None and new:
+            supp = data_support(amo, jnp, theta_rec, nd, carried, new, data, ones)
+            for k in new:
+                F_axis = np.full(NP_SRC, np.nan)
+                F_axis[list(FISHER_AXES)] = F_ii[k]
+                bel = book.feed(k, theta_rec[nd + NP_SRC*k: nd + NP_SRC*(k+1)], F_axis,
+                                box_sigma, supp[k], it, label=f"slot{k}")
+                p(f"    belief born: slot {k} iter {it} dlnL_support {supp[k]:+.3f} "
+                  f"width_ratio {ladder.ratio(bel):.4f} stage {ladder.stage_name(bel)}")
+
         # (c) THE DRAIN: refit the background at the new feed state
         smask = led.fed.astype(float)
         prof = bf.profile(theta_rec, data, ones, smask, a_grid)
@@ -434,7 +541,13 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
         # (d)+(e) E-step + M-step on the fed set (skipped while nothing is fed: the joint
         # template is empty and the fringe machinery has no live slot -- banked as such)
         n_eval = 0
-        if len(fed_idx):
+        mlog = None
+        if len(fed_idx) and mstep_policy == "frozen":
+            # the FROZEN arm: fed members never move from their feed point, and the M-step
+            # costs nothing. theta_rec's fed slots stay at the promote values by construction.
+            _, _, n_eval, mlog = BEL.frozen_step(theta_rec[nd:], fed_idx,
+                                                 mstep_axes=MSTEP_AXES)
+        elif len(fed_idx):
             # M-step surface at the SOFT-JOINT state: carried sources are ABSENT from the
             # template (they live in the fitted GP -- tiling theta_rec directly would
             # double-count them against the background). Only fed-slot values are written
@@ -447,8 +560,24 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
                 ths = np.tile(th_eval, (len(srcs), 1))
                 ths[:, nd:] = srcs
                 return np.asarray(amo["logL_batch_theta"](jnp.asarray(ths), data, ones))
-            src_hat, widths, n_eval = mstep_quadratic(marg_fn, th_eval[nd:].copy(),
-                                                      fed_idx, scale)
+            if book is None:
+                # the LIVE arm -- the incumbent, called exactly as before
+                src_hat, widths, n_eval = mstep_quadratic(marg_fn, th_eval[nd:].copy(),
+                                                          fed_idx, scale)
+            else:
+                # the RUNNING-BELIEF arm. The information record is read BEFORE the refit:
+                # this iteration's fed set, the PREVIOUS iteration's certified set (this
+                # one is not cut yet), and the drain's new background state. Any of those
+                # moving is new information and licenses ONE tighten; nothing else does.
+                ev = infoled.observe(it, fed=led.fed, cert=prev_cert_idx,
+                                     a_bg=float(prof["ahat"]), a_bg_sig=float(prof["sig"]))
+                lic = infoled.spend()
+                src_hat, widths, n_eval, mlog = bstep.step(
+                    marg_fn, th_eval[nd:].copy(), fed_idx, scale, book=book,
+                    licensed=bool(lic), iteration=it, events=lic)
+                if lic:
+                    p(f"    belief TIGHTEN licensed by {sorted({e['kind'] for e in lic})}: "
+                      f"{'; '.join(e['detail'] for e in lic)}")
             theta_rec = theta_rec.copy()
             for k in fed_idx:
                 theta_rec[nd + NP_SRC*k : nd + NP_SRC*(k+1)] = \
@@ -493,7 +622,31 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
 
         # (g) BANK
         areas = np.array([localisation_area_deg2(F_ii[k, [0, 1]]) for k in range(n_slot)])
+        # FORGE-B: the belief block. EMPTY on the live arm, so a live-arm bank has exactly
+        # the incumbent key set -- the default-inert convention, at the bank as well as the
+        # code. The belief-width trajectories are banked as a first-class readout (the
+        # sources-resolving-confidently curve), not derived later from the widths.
+        bel_bank = {}
+        if book is not None:
+            gradled.record(it, book, tightened=bool(mlog and mlog.get("tightened")))
+            bel_bank = dict(book.pack())
+            bel_bank.update(gradled.bank())
+            ec = infoled.event_counts()
+            bel_bank.update(
+                mstep_policy=mstep_policy,
+                belief_event_kinds=np.array([e["kind"] for e in infoled.history], dtype="U16"),
+                belief_event_iters=np.array([e["iteration"] for e in infoled.history], int),
+                belief_event_counts=np.array([ec[k] for k in BEL.EVENT_KINDS], int),
+                belief_event_names=np.array(BEL.EVENT_KINDS, dtype="U16"),
+                belief_tightened=bool(mlog and mlog.get("tightened")),
+                belief_n_clipped=int(mlog["n_clipped"]) if mlog else 0,
+                belief_ladder=np.array(ladder.thresh),
+                belief_wander_k=BEL.WANDER_K, belief_support_ref=BEL.DLNL_SUPPORT_REF,
+                belief_bg_band_k=BEL.BG_BAND_K)
+        elif mstep_policy != MSTEP_POLICY_DEFAULT:
+            bel_bank = dict(mstep_policy=mstep_policy)
         bank_npz(f"{stem}_i{it}",
+                 **bel_bank,
                  n_cert=int(cert.sum()), n_resolved=led.n_resolved(),
                  a_bg=prof["ahat"], a_bg_sig=prof["sig"], a_bg_grid=prof["grid"],
                  a_bg_lnl=prof["lnl"],
@@ -514,9 +667,15 @@ def run_cell(arm, sky, n_src=N_POP_DEFAULT, scrambled=False, real=0, n_iter=N_IT
                  orientation="row/col conventions: slot k == census rank k (brightest "
                              "first; harmonic slots appended after the census); psr "
                              "columns in P['names'] order; raw columns always banked")
+        btag = ""
+        if book is not None and len(book):
+            rr = np.array([ladder.ratio(book[k]) for k in book.keys()])
+            btag = (f" belief[n {len(book)} r_med {np.median(rr):.3f} "
+                    f"tight {sum(book[k].n_tighten for k in book.keys())}"
+                    f"{' TIGHTENED' if mlog and mlog.get('tightened') else ''}]")
         p(f"  iter {it}: N_res {led.n_resolved()} N_cert {int(cert.sum())} "
           f"A_bg {prof['ahat']:.3f}+-{prof['sig']:.3f} floor {fl:.2f}({est}) "
-          f"wrong {int(wrong.sum())} [{time.time()-t_it:.0f}s]")
+          f"wrong {int(wrong.sum())}{btag} [{time.time()-t_it:.0f}s]")
         prev_cert_idx, prev_q = cert_idx, q_of
     return 0
 
@@ -819,6 +978,10 @@ def main():
     ap.add_argument("--real", type=int, default=0)
     ap.add_argument("--n", type=int, default=N_POP_DEFAULT)
     ap.add_argument("--iters", type=int, default=N_ITER)
+    ap.add_argument("--mstep-policy", choices=list(MSTEP_POLICIES),
+                    default=MSTEP_POLICY_DEFAULT,
+                    help="M-step arm: live (incumbent, default) / frozen / belief "
+                         "(FORGE-B running belief). Non-live arms tag the stem _m<policy>.")
     ap.add_argument("--sub", default="drill_resume",
                     help="drill output subdirectory (drillcell/drillcmp)")
     ap.add_argument("--sub-b", default="drill_straight")
@@ -830,7 +993,8 @@ def main():
         # carried floors (32 nulls at refit iters), its own OUT subdir. Noisy T=30 --
         # run ONLY on the post-FORGE-G2 tree (the drill baseline must be the final tree).
         _redirect_out(a.sub)
-        return run_cell(a.arm, a.sky, n_src=a.n, n_iter=a.iters, full_floors=False)
+        return run_cell(a.arm, a.sky, n_src=a.n, n_iter=a.iters, full_floors=False,
+                        mstep_policy=a.mstep_policy)
     if a.mode == "drillcmp":
         return mode_drillcmp(a.sub, a.sub_b, n_iter=a.iters)
     if a.mode in ("cell", "null"):
@@ -851,7 +1015,8 @@ def main():
             return 3
         with open(marker) as fh:
             print(f"[GLACIER-1] holds cleared: {fh.read().strip()}", flush=True)
-        return run_cell(a.arm, a.sky, scrambled=(a.mode == "null"), real=a.real)
+        return run_cell(a.arm, a.sky, scrambled=(a.mode == "null"), real=a.real,
+                        mstep_policy=a.mstep_policy)
     if a.mode in ("cell2", "null2"):
         # STAGE-2a conditioning ladder (Option C, Matt 2026-07-24). Same evidence gate
         # as stage 1 (the marker), plus the ladder's own CPU gates must have passed
@@ -864,7 +1029,8 @@ def main():
                   "(glacier_pop.py gate2).", flush=True)
             return 3
         return run_cell(a.arm, a.sky, scrambled=(a.mode == "null2"), real=a.real,
-                        rung=a.rung, t_label=a.t, wscale=a.wscale)
+                        rung=a.rung, t_label=a.t, wscale=a.wscale,
+                        mstep_policy=a.mstep_policy)
     return 2
 
 

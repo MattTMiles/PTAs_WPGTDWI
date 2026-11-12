@@ -1,0 +1,15 @@
+figure,data_source,config_ids,job,naive_reader_sentence
+fig01_comb,regenerated,"K_plot=10.1, sigma_d=20.07pc, 12 combs, margin 7.32; joint n=3 combs",revision,one source gives a comb of teeth; stacking incommensurate combs kills the aliases until one tooth stands at the truth
+fig_supp_hard_case,regenerated,"sigma_d=12pc, truth 21% out along window",revision,some pulsars have a forest of equal teeth and cannot be certified at all
+fig05_gate,"banked, n=6319, 80 skies",cap1300 T=45; survival + ROC; persistence 2/3-epoch,revision,"the alias score separates right from wrong decodes, and temporal persistence beats it"
+fig05c_frontier,"banked, 200 skies, train/test split",cap1300 T=45; thresholds frozen on 100 train skies,39B,the ladder sampled a continuous frontier at five coarse rungs and missed half the catalogue
+fig06_movie,Job 34 T1,"10 skies, epochs 25-60",34,right certifications rise with span while total certifications saturate
+fig07_census,Job 35 T1b,VLBI 7/5/2/1%/sub-pc x fPb 5/10/20%,35,only sub-pc distances or a large Pbdot class produce a catalogue
+fig08_gwb_payoff,Job 33,"booked machine, fc=0.730",35,certified distances tighten the GWB amplitude by about 16%
+fig09_conformal,Job 36 T3a,"60 skies, alpha 0.10/0.01",36,"a 99%-valid distance statement is a set of ~14 teeth, not a point"
+fig10_frontier,Job 38 T2d,in-sample continuous frontier (superseded by fig05c),38,(superseded)
+fig11_reliability,Job 39B,"200 skies, corrected resampler",39B,the top-tooth posterior mass is a usable probability that the decode is right
+fig_calendar,Job 33 R1,"cap1300, T=34/45/60/75",35,purity rises with observing span
+fig_instrument_ladder,Jobs 32-35,12 operating points,35,successive instruments trade yield for purity
+fig_purity_vs_K,Job 35,cap1300 model census,35,purity falls as the number of candidate teeth K rises
+fig41_displaced_excess,regenerated (Job 41 T2),"20 booked skies, 60 psr, tau from L(1-cos mu)/c",41,the extra power in single-pulsar spectra piles up at 15-40 nHz even though the sources that cause it are spread across the band

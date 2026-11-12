@@ -1,0 +1,172 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 79 s
+  [dec_bg_s1 skies 104-107] 53 s
+[progress] 1/150 chunks, 133 s
+  [dec_bg_s1 skies 136-139] 61 s
+  [dec_bg_s1 skies 128-131] 64 s
+  [dec_bg_s1 skies 100-103] 79 s
+  [dec_bg_s1 skies 116-119] 81 s
+  [dec_bg_s1 skies 132-135] 82 s
+  [dec_bg_s1 skies 108-111] 84 s
+  [dec_bg_s1 skies 120-123] 86 s
+  [dec_bg_s1 skies 112-115] 86 s
+  [dec_bg_s1 skies 124-127] 87 s
+  [dec_bg_s1 skies 144-147] 66 s
+  [dec_bg_s1 skies 140-143] 81 s
+  [dec_bg_s1 skies 160-163] 60 s
+  [dec_bg_s1 skies 148-151] 78 s
+  [dec_bg_s1 skies 168-171] 70 s
+  [dec_bg_s1 skies 156-159] 83 s
+  [dec_bg_s1 skies 152-155] 86 s
+  [dec_bg_s1 skies 176-179] 78 s
+  [dec_bg_s1 skies 164-167] 94 s
+  [dec_bg_s1 skies 172-175] 92 s
+  [dec_bg_s1 skies 180-183] 62 s
+  [dec_bg_s1 skies 184-187] 68 s
+  [dec_bg_s1 skies 188-191] 64 s
+  [dec_opt_s1 skies 108-111] 53 s
+  [dec_bg_s1 skies 192-195] 83 s
+  [dec_bg_s1 skies 196-199] 71 s
+[progress] 26/150 chunks, 306 s
+  [dec_opt_s1 skies 100-103] 74 s
+  [dec_opt_s1 skies 112-115] 72 s
+  [dec_opt_s1 skies 116-119] 80 s
+  [dec_opt_s1 skies 104-107] 97 s
+  [dec_opt_s1 skies 124-127] 69 s
+  [dec_opt_s1 skies 120-123] 82 s
+  [dec_opt_s1 skies 132-135] 53 s
+  [dec_opt_s1 skies 140-143] 53 s
+  [dec_opt_s1 skies 128-131] 99 s
+  [dec_opt_s1 skies 144-147] 76 s
+  [dec_opt_s1 skies 148-151] 65 s
+  [dec_opt_s1 skies 156-159] 55 s
+  [dec_opt_s1 skies 136-139] 97 s
+  [dec_opt_s1 skies 172-175] 80 s
+  [dec_opt_s1 skies 160-163] 90 s
+  [dec_opt_s1 skies 164-167] 89 s
+  [dec_opt_s1 skies 152-155] 103 s
+  [dec_opt_s1 skies 168-171] 94 s
+  [dec_opt_s1 skies 180-183] 65 s
+  [dec_opt_s1 skies 176-179] 84 s
+  [dec_opt_s1 skies 188-191] 76 s
+  [dec_opt_s1 skies 192-195] 71 s
+  [dec_opt_s1 skies 196-199] 60 s
+  [dec_bg_s10 skies 108-111] 59 s
+  [dec_bg_s10 skies 100-103] 62 s
+[progress] 51/150 chunks, 501 s
+  [dec_opt_s1 skies 184-187] 108 s
+  [dec_bg_s10 skies 104-107] 86 s
+  [dec_bg_s10 skies 124-127] 61 s
+  [dec_bg_s10 skies 116-119] 77 s
+  [dec_bg_s10 skies 112-115] 94 s
+  [dec_bg_s10 skies 128-131] 77 s
+  [dec_bg_s10 skies 120-123] 87 s
+  [dec_bg_s10 skies 140-143] 68 s
+  [dec_bg_s10 skies 136-139] 78 s
+  [dec_bg_s10 skies 132-135] 93 s
+  [dec_bg_s10 skies 160-163] 60 s
+  [dec_bg_s10 skies 148-151] 80 s
+  [dec_bg_s10 skies 152-155] 80 s
+  [dec_bg_s10 skies 156-159] 80 s
+  [dec_bg_s10 skies 144-147] 116 s
+  [dec_bg_s10 skies 164-167] 76 s
+  [dec_bg_s10 skies 168-171] 95 s
+  [dec_bg_s10 skies 176-179] 73 s
+  [dec_bg_s10 skies 172-175] 90 s
+  [dec_bg_s10 skies 184-187] 62 s
+  [dec_bg_s10 skies 188-191] 63 s
+  [dec_bg_s10 skies 192-195] 60 s
+  [dec_bg_s10 skies 196-199] 63 s
+  [dec_opt_s10 skies 104-107] 58 s
+  [dec_bg_s10 skies 180-183] 93 s
+[progress] 76/150 chunks, 685 s
+  [dec_opt_s10 skies 100-103] 81 s
+  [dec_opt_s10 skies 112-115] 57 s
+  [dec_opt_s10 skies 108-111] 62 s
+  [dec_opt_s10 skies 116-119] 52 s
+  [dec_opt_s10 skies 120-123] 54 s
+  [dec_opt_s10 skies 132-135] 48 s
+  [dec_opt_s10 skies 140-143] 46 s
+  [dec_opt_s10 skies 136-139] 48 s
+  [dec_opt_s10 skies 128-131] 60 s
+  [dec_opt_s10 skies 148-151] 48 s
+  [dec_opt_s10 skies 124-127] 87 s
+  [dec_opt_s10 skies 156-159] 49 s
+  [dec_opt_s10 skies 160-163] 49 s
+  [dec_opt_s10 skies 152-155] 61 s
+  [dec_opt_s10 skies 164-167] 51 s
+  [dec_opt_s10 skies 144-147] 81 s
+  [dec_opt_s10 skies 168-171] 53 s
+  [dec_opt_s10 skies 172-175] 52 s
+  [dec_opt_s10 skies 176-179] 64 s
+  [dec_opt_s10 skies 180-183] 48 s
+  [dec_opt_s10 skies 188-191] 46 s
+  [dec_opt_s10 skies 184-187] 52 s
+  [dec_opt_s10 skies 192-195] 49 s
+  [dec_opt_s10 skies 196-199] 50 s
+  [dec_bg_sinf skies 100-103] 45 s
+[progress] 101/150 chunks, 821 s
+  [dec_bg_sinf skies 108-111] 42 s
+  [dec_bg_sinf skies 112-115] 46 s
+  [dec_bg_sinf skies 104-107] 58 s
+  [dec_bg_sinf skies 120-123] 46 s
+  [dec_bg_sinf skies 128-131] 45 s
+  [dec_bg_sinf skies 124-127] 48 s
+  [dec_bg_sinf skies 116-119] 57 s
+  [dec_bg_sinf skies 132-135] 43 s
+  [dec_bg_sinf skies 136-139] 40 s
+  [dec_bg_sinf skies 140-143] 41 s
+  [dec_bg_sinf skies 144-147] 40 s
+  [dec_bg_sinf skies 148-151] 40 s
+  [dec_bg_sinf skies 156-159] 40 s
+  [dec_bg_sinf skies 160-163] 39 s
+  [dec_bg_sinf skies 152-155] 55 s
+  [dec_bg_sinf skies 164-167] 42 s
+  [dec_bg_sinf skies 172-175] 45 s
+  [dec_bg_sinf skies 176-179] 42 s
+  [dec_bg_sinf skies 180-183] 42 s
+  [dec_bg_sinf skies 184-187] 42 s
+  [dec_bg_sinf skies 168-171] 55 s
+  [dec_bg_sinf skies 188-191] 39 s
+  [dec_bg_sinf skies 196-199] 41 s
+  [dec_bg_sinf skies 192-195] 45 s
+  [dec_opt_sinf skies 104-107] 41 s
+[progress] 126/150 chunks, 936 s
+  [dec_opt_sinf skies 100-103] 44 s
+  [dec_opt_sinf skies 112-115] 41 s
+  [dec_opt_sinf skies 116-119] 40 s
+  [dec_opt_sinf skies 108-111] 44 s
+  [dec_opt_sinf skies 120-123] 42 s
+  [dec_opt_sinf skies 128-131] 41 s
+  [dec_opt_sinf skies 124-127] 57 s
+  [dec_opt_sinf skies 132-135] 38 s
+  [dec_opt_sinf skies 136-139] 38 s
+  [dec_opt_sinf skies 140-143] 38 s
+  [dec_opt_sinf skies 144-147] 40 s
+  [dec_opt_sinf skies 148-151] 36 s
+  [dec_opt_sinf skies 160-163] 36 s
+  [dec_opt_sinf skies 152-155] 44 s
+  [dec_opt_sinf skies 164-167] 38 s
+  [dec_opt_sinf skies 156-159] 50 s
+  [dec_opt_sinf skies 172-175] 38 s
+  [dec_opt_sinf skies 168-171] 43 s
+  [dec_opt_sinf skies 176-179] 37 s
+  [dec_opt_sinf skies 180-183] 36 s
+  [dec_opt_sinf skies 188-191] 31 s
+  [dec_opt_sinf skies 184-187] 34 s
+  [dec_opt_sinf skies 192-195] 30 s
+  [dec_opt_sinf skies 196-199] 28 s
+[dec_bg_s1] records 7900 skies 100
+[dec_opt_s1] records 7900 skies 100
+[dec_bg_s10] records 7900 skies 100
+[dec_opt_s10] records 7900 skies 100
+[dec_bg_sinf] records 7900 skies 100
+[dec_opt_sinf] records 7900 skies 100
+TOTAL 1017 s

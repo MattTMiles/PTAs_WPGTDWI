@@ -1,0 +1,25 @@
+{
+ "notebook masses (source frame; 232/44 convention)": {
+  "n_inband": 4153,
+  "med": 0.0003214595977494181,
+  "top20_med": 0.07007968756332811,
+  "n_gt_0p1": 6,
+  "n_gt_0p01": 104
+ },
+ "Job 41 masses (redshifted; used by p2r)": {
+  "n_inband": 3801,
+  "med": 0.0002738286677316541,
+  "top20_med": 0.0524798719021636,
+  "n_gt_0p1": 6,
+  "n_gt_0p01": 67
+ },
+ "F2": {
+  "snr_booked": 0.4699774803664582,
+  "sphi_booked": 2.1277634294262135,
+  "rho": 0.6646485267441802,
+  "sphi": 1.5045559497080192,
+  "coh": 0.3947210312814683,
+  "n_rho_gt1": 47,
+  "n_booked_gt1": 30
+ }
+}

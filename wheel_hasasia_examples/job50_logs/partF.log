@@ -1,0 +1,5 @@
+F1 [notebook masses (source frame; 232/44 convention)]: 15-40 nHz pulsar terms 4153; true share median 0.00032; median of top 20 0.070; with share > 0.1: 6, > 0.01: 104
+F1 [Job 41 masses (redshifted; used by p2r)]: 15-40 nHz pulsar terms 3801; true share median 0.00027; median of top 20 0.052; with share > 0.1: 6, > 0.01: 67
+wrote PAPER_figures/job50_share_vs_frequency_two_term.png (frozen sky, pulsar 41, L = 2105 pc)
+F2 (116 pulsars): booked medians SNR_pterm 0.470, sigma_phi 2.128 rad
+   corrected: pulsar-term SNR rho median 0.665; small-angle phase error 1/rho median 1.505 rad; exact coherence <cos dphi> median 0.395 (booked-formula coherence e^(-sigma^2/2) median 0.104); pulsars with rho > 1: 47 (booked SNR_pterm > 1: 30)

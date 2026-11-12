@@ -1,0 +1,55 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+<v4-cell-3>:344: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-7>:53: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-9>:171: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+<v4-cell-11>:142: UserWarning: FigureCanvasAgg is non-interactive, and thus cannot be shown
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+namespace has: {'SRC_AMP': True, 'SRC_MC': True, 'SRC_Z': True, 'mc_src': True, 'SRC_P': True, 'DET_A': False}
+
+== A1 harness paths, 10 headline skies (marg): share 10/50/90 pct  [per (pulsar,source) decode pair unless said]
+  (ii) inv_rate share, per sky-source (pre-depro):
+                                   booked: n=   106  [0.1337 0.4048 0.752 ]  identical to booked: True
+                         FP_ALL:=f_E only: n=   106  [0.1337 0.4048 0.752 ]  identical to booked: True
+       FP_ALL:=f_E + f_E table re-derived: n=   106  [0.1337 0.4048 0.752 ]  identical to booked: True
+  (iii) headline decode share 1/(1+sig^2):
+                                   booked: n=  6359  [0.1724 0.4397 0.7992]  identical to booked: True
+                         FP_ALL:=f_E only: n=  6359  [0.1724 0.4397 0.7992]  identical to booked: True
+       FP_ALL:=f_E + f_E table re-derived: n=  6371  [0.1797 0.4535 0.8039]  identical to booked: False
+  (vii) p2 true two-term share:
+                                   booked: n=  6359  [0.096  0.3272 0.6879]  identical to booked: True
+                         FP_ALL:=f_E only: n=  6359  [0.096  0.3272 0.6879]  identical to booked: True
+       FP_ALL:=f_E + f_E table re-derived: n=  6371  [0.1027 0.342  0.6889]  identical to booked: False
+  f_E table at 3/10/25 nHz: booked [0.495 0.477 0.455] -> tau=0 [0.5 0.5 0.5]
+  ungated purity inc/p2_mf: booked [0.6935725  0.72496263]  tau0+fE [0.69985141 0.7191679 ] (n 669 vs 673)
+
+  (iv) heatmap comb sets (10 skies, top-4 f_k) identical under tau=0: True; sigma_phi is set by hand (job47c:132), so the share axis cannot move.
+
+  (v) job46 figure, presentation sky, pulsar 41, 15-40 nHz: n terms ON 4153 / OFF 4145; share 10/50/90: ON [0.00023 0.00089 0.00949] OFF [0.00014 0.00057 0.00705]; median of top-20 shares ON 0.188 OFF 0.350
+
+  (i) notebook V4o audited ledger (60 loudest sources x pulsars 3,41,77; all-undetected variant): share 10/50/90 retarded [0.0073 0.0387 0.2323]  tau=0 [0.0075 0.0546 0.6189]
+      notebook sigma_phi() bin share (cell 3:262-276, no tau input): [0.0119 0.1019 0.7738]
+
+  (vi) Job 41 in-band/above-50 excess ratio, 10 skies: retarded 21.64  tau=0 2.19  (booked, 20 skies: 18.7 / 1.66)
+
+== A3 (200 headline skies, 132514 decode pairs)
+  median machine share 1/(1+sigma^2), sigma^2 = Xc + 1/rho^2 + sfz^2 : 0.4143  -> s/(2-s) = 0.2613
+  median 1/(1+Xc+1/rho^2) (no template term)                        : 0.4646  -> s/(2-s) = 0.3026
+  median 1/(1+Xc)  (confusion only)                                 : 0.4731  -> s/(2-s) = 0.3098
+  median Job-49 'true two-term share' 1/(1+2Xc+2/rho^2)             : 0.3026
+  variance budget medians: Xc 1.114, 1/rho^2 0.0179, sfz^2 0.0217; mean share of sigma^2 from the template term 0.098
+
+== A5 (200 headline skies, 132514 decode pairs; stream check vs rec_marg.pkl passed)
+                        dkappa*sigma_d [rad]: 10/50/90 pct = [0.006 0.147 0.687]
+                              dkappa*L [rad]: 10/50/90 pct = [  5.302 142.028 868.115]
+         frequency part 2pi(1-cos mu) df L/c: 10/50/90 pct = [ 1.064 12.032 57.402]
+     sky-position part 2pi f sin(mu) dmu L/c: 10/50/90 pct = [  4.898 139.65  866.596]
+                     array SNR of the source: 10/50/90 pct = [ 17.391  36.624 493.662]
+  fraction of decode pairs with dkappa*L < 1 rad: 0.0114; < pi: 0.0621
+
+wrote job50_data/partA.json

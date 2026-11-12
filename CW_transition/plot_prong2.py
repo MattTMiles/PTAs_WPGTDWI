@@ -7,7 +7,9 @@ Six panels (2x3):
   A. fixed per-source : conditional vs marginal info vs N, with population overlay (+∝N)
   B. fixed total power : conditional vs marginal info vs N
   C. marg/cond vs N    : uniform ps & tot overlap (mode-independent) + population departs
-  D. knee diagnostic   : marg/cond vs N/N* across (T,band) -> knee tracks N* (offset ~50x)
+  D. knee diagnostic   : marg/cond vs N/N* across (T,band) -> knee tracks N*; the array
+                         offset is read from the npz (production T15_b3-20 row), not
+                         hardcoded -- it is ~0.45*N_psr, so it moves with array size
   E. sigma_L (pc)      : J0437-like pulsar, fixed_total (degrades) + fixed_persource;
                          sub-parsec and EM-prior lines
   F. rcond sweep       : marg/cond for rcond in {1e-8,1e-10,1e-12} -> knee stability
@@ -91,6 +93,13 @@ kr = np.nan
 if labels:
     kr = float(np.median([float(d[f"diag_{l}_knee"]) / float(d[f"diag_{l}_Nstar"])
                           for l in labels]))
+# the array offset quoted in the title is the PRODUCTION row (T15_b3-20), not the median
+# over the T/band variants, which drift with bandwidth (60/51/41 across 3-12/3-20/3-40 nHz)
+kr_fid = np.nan
+if "diag_T15_b3-20_knee" in d.files:
+    kr_fid = float(d["diag_T15_b3-20_knee"]) / float(d["diag_T15_b3-20_Nstar"])
+kr_title = kr_fid if np.isfinite(kr_fid) else kr
+n_psr_title = int(d["ps_n_psr"]) if "ps_n_psr" in d.files else 116
 a.axvline(1.0, color="gray", ls=":", lw=1.2)
 if np.isfinite(kr):
     a.axvline(kr, color="crimson", ls="--", lw=1.3)
@@ -99,7 +108,9 @@ if np.isfinite(kr):
 a.axhline(0.5, color="k", lw=.6, alpha=.4)
 a.set_xscale("log"); a.set_xlabel(r"$N/N^*$ ($N^*=T\Delta f$)")
 a.set_ylabel("marginal / conditional")
-a.set_title(r"Knee $\propto N^*$ (T-scaling); array offset $\sim50\times$", fontsize=9.5)
+a.set_title(rf"Knee $\propto N^*$ (T-scaling); array offset "
+            rf"${kr_title:.0f}\times$ ({n_psr_title} psr)" if np.isfinite(kr_title)
+            else r"Knee $\propto N^*$ (T-scaling)", fontsize=9.5)
 a.set_ylim(0, 1.05); a.grid(alpha=.25, which="both"); a.legend(fontsize=6.5, loc="lower left")
 
 # ---- E: sigma_L in pc for J0437-like ----

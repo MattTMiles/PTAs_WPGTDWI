@@ -1,0 +1,589 @@
+
+########################################################################################################################
+# VERNIER-27 -- FIRM THE K* NUMBER.  EXPLORATORY, NOT PRE-REGISTERED
+########################################################################################################################
+  arm P band 10.00-24.26 nHz, 10 bins of 1/T = 1.584 nHz; array 116 pulsars
+  seeds at array SNR 12; Mc 10^8.5-10^9.5; gamma = 1.56 (corrected sky, audited counts)
+  COMB_CAP 32 (V25 used 8); max_turn = 2K + 16 (V25 used 16)
+
+  V25 Arm K DEFECT: BAND holds 10 bins and chain() placed one seed in
+  bins b < n_seed, so K = 12 and K = 16 both placed TEN seeds and are the
+  same cell. The V25 extrapolation to K* ~ 20-25 ran off a tail that had
+  stopped moving for that reason. V25 results at K <= 10 are unaffected.
+
+========================================================================================================================
+DELIVERABLE 1P -- ARM P: PACKED  -- K seeds in the ten bins of 10-25 nHz, several per bin
+========================================================================================================================
+  20 realisations x 8 chains per K, K in (12, 16, 20, 24, 28, 32), gamma = 1.56, COMB_CAP = 32
+
+    [P K=12] real  1/20  S_end med   5.841  bar  5.32  combs  9.0  cert    5  (  53.4s, eta 1014.9s)
+    [P K=12] real  2/20  S_end med   4.011  bar  5.31  combs  9.0  cert    2  (  71.4s, eta  642.5s)
+    [P K=12] real  3/20  S_end med   1.994  bar  5.24  combs  7.0  cert    0  (  84.8s, eta  480.3s)
+    [P K=12] real  4/20  S_end med   1.033  bar  5.10  combs  5.0  cert    0  (  95.0s, eta  379.9s)
+    [P K=12] real  5/20  S_end med   1.203  bar  5.28  combs  6.0  cert    0  ( 117.7s, eta  353.0s)
+    [P K=12] real  6/20  S_end med   1.886  bar  5.34  combs  9.0  cert    0  ( 160.9s, eta  375.5s)
+    [P K=12] real  7/20  S_end med   3.283  bar  5.39  combs  9.0  cert    1  ( 177.0s, eta  328.6s)
+    [P K=12] real  8/20  S_end med   0.955  bar  5.27  combs  5.0  cert    0  ( 202.9s, eta  304.4s)
+    [P K=12] real  9/20  S_end med   2.331  bar  5.37  combs  6.0  cert    0  ( 236.0s, eta  288.4s)
+    [P K=12] real 10/20  S_end med   0.570  bar  5.38  combs  6.0  cert    0  ( 284.9s, eta  284.9s)
+    [P K=12] real 11/20  S_end med   0.826  bar  5.30  combs  5.0  cert    0  ( 322.9s, eta  264.2s)
+    [P K=12] real 12/20  S_end med   1.728  bar  5.36  combs  6.5  cert    0  ( 335.5s, eta  223.6s)
+    [P K=12] real 13/20  S_end med   1.233  bar  5.27  combs  7.0  cert    0  ( 350.8s, eta  188.9s)
+    [P K=12] real 14/20  S_end med   1.409  bar  5.26  combs  5.5  cert    1  ( 381.4s, eta  163.5s)
+    [P K=12] real 15/20  S_end med   2.586  bar  5.44  combs  7.0  cert    0  ( 417.9s, eta  139.3s)
+    [P K=12] real 16/20  S_end med   0.343  bar  5.18  combs  5.5  cert    0  ( 449.5s, eta  112.4s)
+    [P K=12] real 17/20  S_end med   4.654  bar  5.22  combs  7.0  cert    0  ( 490.0s, eta   86.5s)
+    [P K=12] real 18/20  S_end med   1.868  bar  5.27  combs  7.0  cert    1  ( 536.3s, eta   59.6s)
+    [P K=12] real 19/20  S_end med   1.552  bar  5.31  combs  6.5  cert    0  ( 573.4s, eta   30.2s)
+    [P K=12] real 20/20  S_end med   3.971  bar  5.22  combs  8.0  cert    2  ( 611.3s, eta    0.0s)
+    [P K=16] real  1/20  S_end med   2.179  bar  5.36  combs  7.0  cert    1  (  37.9s, eta  720.6s)
+    [P K=16] real  2/20  S_end med   2.461  bar  5.34  combs  9.5  cert    1  (  87.1s, eta  783.7s)
+    [P K=16] real  3/20  S_end med   2.035  bar  5.31  combs  7.5  cert    0  ( 129.7s, eta  734.9s)
+    [P K=16] real  4/20  S_end med   6.494  bar  5.40  combs 11.0  cert    6  ( 174.8s, eta  699.4s)
+    [P K=16] real  5/20  S_end med   2.067  bar  5.29  combs  8.0  cert    0  ( 213.6s, eta  640.7s)
+    [P K=16] real  6/20  S_end med   1.181  bar  5.26  combs  7.0  cert    0  ( 250.9s, eta  585.4s)
+    [P K=16] real  7/20  S_end med   2.364  bar  5.35  combs  8.0  cert    0  ( 294.0s, eta  545.9s)
+    [P K=16] real  8/20  S_end med   6.427  bar  5.36  combs  9.5  cert    4  ( 329.8s, eta  494.7s)
+    [P K=16] real  9/20  S_end med   5.976  bar  5.27  combs  9.0  cert    1  ( 366.2s, eta  447.6s)
+    [P K=16] real 10/20  S_end med   0.605  bar  5.26  combs  7.0  cert    0  ( 394.2s, eta  394.2s)
+    [P K=16] real 11/20  S_end med   3.881  bar  5.24  combs  9.0  cert    1  ( 411.9s, eta  337.0s)
+    [P K=16] real 12/20  S_end med   6.361  bar  5.16  combs  6.5  cert    2  ( 424.9s, eta  283.2s)
+    [P K=16] real 13/20  S_end med   1.121  bar  5.16  combs  6.5  cert    0  ( 454.5s, eta  244.7s)
+    [P K=16] real 14/20  S_end med   3.494  bar  5.35  combs  8.0  cert    2  ( 494.0s, eta  211.7s)
+    [P K=16] real 15/20  S_end med   2.240  bar  5.41  combs  7.0  cert    0  ( 530.4s, eta  176.8s)
+    [P K=16] real 16/20  S_end med   0.615  bar  5.17  combs  4.0  cert    0  ( 554.8s, eta  138.7s)
+    [P K=16] real 17/20  S_end med   2.561  bar  5.29  combs  7.0  cert    2  ( 595.1s, eta  105.0s)
+    [P K=16] real 18/20  S_end med   4.267  bar  5.28  combs  8.0  cert    2  ( 641.6s, eta   71.3s)
+    [P K=16] real 19/20  S_end med   0.622  bar  5.24  combs  4.0  cert    0  ( 688.8s, eta   36.3s)
+    [P K=16] real 20/20  S_end med   8.529  bar  5.24  combs 10.0  cert    7  ( 749.4s, eta    0.0s)
+    [P K=20] real  1/20  S_end med   4.640  bar  5.32  combs 10.5  cert    4  (  46.4s, eta  881.2s)
+    [P K=20] real  2/20  S_end med   2.223  bar  5.34  combs 11.0  cert    0  (  95.8s, eta  862.2s)
+    [P K=20] real  3/20  S_end med   2.878  bar  5.40  combs  7.5  cert    2  ( 142.7s, eta  808.5s)
+    [P K=20] real  4/20  S_end med   1.727  bar  5.23  combs  6.5  cert    0  ( 187.5s, eta  750.0s)
+    [P K=20] real  5/20  S_end med   2.139  bar  5.40  combs  9.0  cert    1  ( 231.6s, eta  694.8s)
+    [P K=20] real  6/20  S_end med   0.891  bar  5.22  combs  8.0  cert    0  ( 265.0s, eta  618.4s)
+    [P K=20] real  7/20  S_end med   3.931  bar  5.23  combs  8.0  cert    3  ( 281.3s, eta  522.4s)
+    [P K=20] real  8/20  S_end med   6.645  bar  5.37  combs 10.0  cert   11  ( 304.9s, eta  457.3s)
+    [P K=20] real  9/20  S_end med   5.134  bar  5.45  combs  8.0  cert    3  ( 319.9s, eta  391.0s)
+    [P K=20] real 10/20  S_end med   2.627  bar  5.20  combs 10.5  cert    0  ( 343.9s, eta  343.9s)
+    [P K=20] real 11/20  S_end med   1.448  bar  5.28  combs  7.0  cert    0  ( 386.6s, eta  316.3s)
+    [P K=20] real 12/20  S_end med   1.403  bar  5.16  combs  6.0  cert    0  ( 422.9s, eta  281.9s)
+    [P K=20] real 13/20  S_end med   1.662  bar  5.16  combs  7.5  cert    2  ( 463.9s, eta  249.8s)
+    [P K=20] real 14/20  S_end med   0.629  bar  5.20  combs  6.0  cert    0  ( 501.8s, eta  215.0s)
+    [P K=20] real 15/20  S_end med   0.610  bar  5.06  combs  6.5  cert    1  ( 538.0s, eta  179.3s)
+    [P K=20] real 16/20  S_end med   0.035  bar  5.01  combs  3.0  cert    0  ( 570.7s, eta  142.7s)
+    [P K=20] real 17/20  S_end med   0.435  bar  5.25  combs  4.0  cert    0  ( 604.0s, eta  106.6s)
+    [P K=20] real 18/20  S_end med   1.907  bar  5.25  combs  8.5  cert    2  ( 648.6s, eta   72.1s)
+    [P K=20] real 19/20  S_end med   1.250  bar  5.22  combs  8.0  cert    0  ( 685.0s, eta   36.1s)
+    [P K=20] real 20/20  S_end med   1.467  bar  5.31  combs  8.0  cert    0  ( 725.1s, eta    0.0s)
+    [P K=24] real  1/20  S_end med   2.325  bar  5.21  combs  9.0  cert    1  (  50.3s, eta  954.9s)
+    [P K=24] real  2/20  S_end med   1.242  bar  5.40  combs  8.5  cert    0  (  94.5s, eta  850.9s)
+    [P K=24] real  3/20  S_end med   2.294  bar  5.14  combs  8.5  cert    0  ( 142.1s, eta  805.5s)
+    [P K=24] real  4/20  S_end med   0.882  bar  5.21  combs  6.0  cert    0  ( 169.0s, eta  676.2s)
+    [P K=24] real  5/20  S_end med   4.067  bar  5.33  combs  9.0  cert    1  ( 187.5s, eta  562.5s)
+    [P K=24] real  6/20  S_end med   2.549  bar  5.34  combs 10.0  cert    1  ( 208.6s, eta  486.7s)
+    [P K=24] real  7/20  S_end med   2.056  bar  5.35  combs  8.0  cert    0  ( 226.1s, eta  419.9s)
+    [P K=24] real  8/20  S_end med   3.273  bar  5.42  combs 10.5  cert    0  ( 248.1s, eta  372.1s)
+    [P K=24] real  9/20  S_end med   4.008  bar  5.31  combs  8.0  cert    1  ( 266.2s, eta  325.4s)
+    [P K=24] real 10/20  S_end med   0.130  bar  4.91  combs  5.0  cert    0  ( 275.7s, eta  275.7s)
+    [P K=24] real 11/20  S_end med   1.194  bar  5.32  combs  7.0  cert    1  ( 291.3s, eta  238.4s)
+    [P K=24] real 12/20  S_end med   1.236  bar  5.21  combs  5.5  cert    0  ( 303.6s, eta  202.4s)
+    [P K=24] real 13/20  S_end med   0.728  bar  5.19  combs  5.0  cert    0  ( 315.4s, eta  169.8s)
+    [P K=24] real 14/20  S_end med   0.845  bar  5.25  combs  5.5  cert    1  ( 328.8s, eta  140.9s)
+    [P K=24] real 15/20  S_end med   1.388  bar  5.20  combs  5.5  cert    0  ( 340.6s, eta  113.5s)
+    [P K=24] real 16/20  S_end med   0.173  bar  5.10  combs  4.5  cert    0  ( 349.9s, eta   87.5s)
+    [P K=24] real 17/20  S_end med   0.601  bar  5.19  combs  6.0  cert    0  ( 361.0s, eta   63.7s)
+    [P K=24] real 18/20  S_end med   3.705  bar  5.11  combs 10.5  cert    4  ( 385.0s, eta   42.8s)
+    [P K=24] real 19/20  S_end med   0.951  bar  5.33  combs  5.5  cert    0  ( 395.5s, eta   20.8s)
+    [P K=24] real 20/20  S_end med   5.444  bar  5.40  combs 11.0  cert    5  ( 421.4s, eta    0.0s)
+    [P K=28] real  1/20  S_end med   6.599  bar  5.27  combs 11.5  cert   10  (  27.6s, eta  524.7s)
+    [P K=28] real  2/20  S_end med   2.121  bar  5.20  combs  8.5  cert    0  (  45.6s, eta  410.4s)
+    [P K=28] real  3/20  S_end med   2.424  bar  5.18  combs  9.5  cert    0  (  65.4s, eta  370.8s)
+    [P K=28] real  4/20  S_end med   0.801  bar  5.17  combs  6.5  cert    0  (  80.4s, eta  321.7s)
+    [P K=28] real  5/20  S_end med   1.090  bar  5.28  combs  7.0  cert    0  (  96.5s, eta  289.4s)
+    [P K=28] real  6/20  S_end med   0.419  bar  4.94  combs  6.0  cert    0  ( 110.2s, eta  257.0s)
+    [P K=28] real  7/20  S_end med   1.911  bar  5.25  combs  7.5  cert    0  ( 125.8s, eta  233.6s)
+    [P K=28] real  8/20  S_end med   3.419  bar  5.19  combs 10.0  cert    1  ( 146.3s, eta  219.5s)
+    [P K=28] real  9/20  S_end med   0.617  bar  5.21  combs  4.5  cert    1  ( 159.3s, eta  194.8s)
+    [P K=28] real 10/20  S_end med   0.171  bar  5.23  combs  5.0  cert    0  ( 171.1s, eta  171.1s)
+    [P K=28] real 11/20  S_end med   1.159  bar  5.27  combs  6.0  cert    0  ( 184.4s, eta  150.9s)
+    [P K=28] real 12/20  S_end med   1.248  bar  5.19  combs  5.5  cert    0  ( 196.9s, eta  131.3s)
+    [P K=28] real 13/20  S_end med   0.578  bar  5.08  combs  5.5  cert    0  ( 209.1s, eta  112.6s)
+    [P K=28] real 14/20  S_end med   3.968  bar  5.41  combs 10.0  cert    3  ( 232.5s, eta   99.6s)
+    [P K=28] real 15/20  S_end med   2.638  bar  5.10  combs  8.0  cert    0  ( 249.9s, eta   83.3s)
+    [P K=28] real 16/20  S_end med   0.194  bar  5.08  combs  4.5  cert    0  ( 260.9s, eta   65.2s)
+    [P K=28] real 17/20  S_end med   0.761  bar  5.20  combs  5.0  cert    1  ( 273.3s, eta   48.2s)
+    [P K=28] real 18/20  S_end med   2.802  bar  5.44  combs  9.5  cert    1  ( 294.3s, eta   32.7s)
+    [P K=28] real 19/20  S_end med   0.145  bar  4.96  combs  4.0  cert    0  ( 306.2s, eta   16.1s)
+    [P K=28] real 20/20  S_end med   1.235  bar  5.22  combs  6.5  cert    0  ( 320.0s, eta    0.0s)
+    [P K=32] real  1/20  S_end med   3.275  bar  5.35  combs 11.0  cert    1  (  24.0s, eta  456.4s)
+    [P K=32] real  2/20  S_end med   1.642  bar  5.28  combs  9.5  cert    0  (  43.5s, eta  391.1s)
+    [P K=32] real  3/20  S_end med   0.731  bar  5.12  combs  5.5  cert    0  (  56.7s, eta  321.5s)
+    [P K=32] real  4/20  S_end med   0.795  bar  5.12  combs  6.0  cert    1  (  72.2s, eta  289.0s)
+    [P K=32] real  5/20  S_end med   0.949  bar  5.04  combs  7.0  cert    0  (  89.2s, eta  267.6s)
+    [P K=32] real  6/20  S_end med   0.600  bar  5.43  combs  7.0  cert    0  ( 105.8s, eta  246.9s)
+    [P K=32] real  7/20  S_end med   2.331  bar  5.45  combs  8.5  cert    1  ( 127.0s, eta  235.9s)
+    [P K=32] real  8/20  S_end med   4.713  bar  5.41  combs 13.0  cert    6  ( 160.3s, eta  240.4s)
+    [P K=32] real  9/20  S_end med   1.578  bar  5.39  combs  8.0  cert    1  ( 179.5s, eta  219.4s)
+    [P K=32] real 10/20  S_end med   0.160  bar  4.95  combs  4.0  cert    0  ( 190.9s, eta  190.9s)
+    [P K=32] real 11/20  S_end med   0.976  bar  5.29  combs  6.0  cert    0  ( 207.7s, eta  169.9s)
+    [P K=32] real 12/20  S_end med   0.671  bar  5.20  combs  6.0  cert    1  ( 230.7s, eta  153.8s)
+    [P K=32] real 13/20  S_end med   1.471  bar  5.28  combs  8.5  cert    0  ( 257.8s, eta  138.8s)
+    [P K=32] real 14/20  S_end med   0.663  bar  5.07  combs  6.0  cert    0  ( 272.4s, eta  116.7s)
+    [P K=32] real 15/20  S_end med   2.463  bar  5.32  combs  9.0  cert    0  ( 292.6s, eta   97.5s)
+    [P K=32] real 16/20  S_end med   0.280  bar  5.23  combs  5.5  cert    0  ( 304.6s, eta   76.1s)
+    [P K=32] real 17/20  S_end med   0.491  bar  5.07  combs  5.5  cert    0  ( 317.0s, eta   55.9s)
+    [P K=32] real 18/20  S_end med   1.208  bar  4.93  combs  7.5  cert    0  ( 333.8s, eta   37.1s)
+    [P K=32] real 19/20  S_end med   0.562  bar  5.10  combs  5.0  cert    0  ( 346.6s, eta   18.2s)
+    [P K=32] real 20/20  S_end med   4.838  bar  5.42  combs 11.5  cert    1  ( 373.9s, eta    0.0s)
+
+------------------------------------------------------------------------------------------------------------------------
+  ARM P PER-K SUMMARY.  S_end = end-state fringe contrast (max over
+  turns of a per-pulsar max); bar = median trials bar ln K over the turns.
+  x_real = fraction of REALISATIONS whose BEST chain reaches the bar.
+------------------------------------------------------------------------------------------------------------------------
+    K   A_eq  K_rec  combs    S_end   +-SE             IQR   bar  S/bar  x_real   +-SE  x_chain  CERT/run   true  WRONG   null
+   12   1.71    7.0    7.0    1.878  0.287    0.94-   3.72  5.29  0.355    0.50   0.11     0.14      0.07   0.08   0.01   0.00
+   16   1.59    8.0    8.0    2.538  0.489    1.20-   5.16  5.29  0.479    0.55   0.11     0.24      0.18   0.11   0.09   0.01
+   20   1.83    8.0    8.0    1.760  0.335    0.87-   3.19  5.26  0.335    0.45   0.11     0.12      0.18   0.18   0.02   0.00
+   24   1.77    8.0    8.0    1.458  0.353    0.64-   3.15  5.26  0.277    0.40   0.11     0.10      0.09   0.11   0.02   0.01
+   28   1.87    7.0    7.0    1.382  0.345    0.49-   2.66  5.21  0.265    0.30   0.10     0.07      0.11   0.13   0.00   0.00
+   32   1.49    7.0    7.0    1.151  0.231    0.50-   2.53  5.26  0.219    0.35   0.10     0.07      0.07   0.09   0.01   0.00
+
+  SE ADEQUACY -- is SE(median S_end) below half the gap to the nearest
+  neighbouring K median?  (the brief's sampling requirement)
+    K = 12: SE  0.287  vs  half-gap  0.330   OK
+    K = 16: SE  0.489  vs  half-gap  0.330   NOT MET
+    K = 20: SE  0.335  vs  half-gap  0.151   NOT MET
+    K = 24: SE  0.353  vs  half-gap  0.038   NOT MET
+    K = 28: SE  0.345  vs  half-gap  0.038   NOT MET
+    K = 32: SE  0.231  vs  half-gap  0.116   NOT MET
+  -> criterion NOT met in every cell
+
+========================================================================================================================
+DELIVERABLE 2P -- ARM P: K*_50 AND K*_90
+========================================================================================================================
+
+  criterion: best chain's end-state contrast reaches the trials bar
+    crossing fraction vs K:   K=12: 0.50+-0.11  K=16: 0.55+-0.11  K=20: 0.45+-0.11  K=24: 0.40+-0.11  K=28: 0.30+-0.10  K=32: 0.35+-0.10
+    K*_50 (contrast): grid K = 12;  interpolated 12.0 +- 2.7   95 % [12.0, 20.0];  unreached in 4 % of resamples
+    K*_90 (contrast): NOT REACHED at K <= 32  (unreached in 100 % of bootstrap resamples)
+    ** FLAG: nonzero crossing at K = [12] (< 16). That is MeerKAT-era territory, not SKA-era. **
+
+  criterion: best chain actually CERTIFIES at least one pulsar distance
+    crossing fraction vs K:   K=12: 0.30+-0.10  K=16: 0.55+-0.11  K=20: 0.45+-0.11  K=24: 0.40+-0.11  K=28: 0.30+-0.10  K=32: 0.35+-0.10
+    K*_50 (certification): grid K = 16;  interpolated 15.2 +- 3.0   95 % [12.0, 24.0];  unreached in 9 % of resamples
+    K*_90 (certification): NOT REACHED at K <= 32  (unreached in 100 % of bootstrap resamples)
+    ** FLAG: nonzero crossing at K = [12] (< 16). That is MeerKAT-era territory, not SKA-era. **
+
+========================================================================================================================
+DELIVERABLE 3P -- ARM P: SHAPE. IS CONTRAST STILL LINEAR IN COMBS?
+========================================================================================================================
+  V25 read ~2 nat/comb off six points and extrapolated to the bar at 10-11
+  combs. If the curve saturates BELOW the bar, the SKA-era claim is dead.
+
+    K  combs    S_end   +-SE  local dS/dcomb   within-K dS/dcomb  gap to bar
+   12    7.0    1.878  0.287           0.659               0.769      +3.411
+   16    8.0    2.538  0.489          -0.118               0.781      +2.757
+   20    8.0    1.760  0.335 -1079792426.848               0.594      +3.498
+   24    8.0    1.458  0.353  -377942819.056               0.617      +3.804
+   28    7.0    1.382  0.345  -306978895.537               0.634      +3.830
+   32    7.0    1.151  0.231  -231042790.299               0.572      +4.106
+
+  slope at low K (12-16): +0.270 nat/comb; at high K (28-32): -269010842.918 nat/comb
+  VERDICT (arm P): SATURATED / TURNED OVER BELOW THE BAR. The extrapolation is not supported and the SKA-era claim does not follow from this curve.
+  slope_verdict_P = [0.2705, -269010842.9176, bar 5.257, S_end(Kmax) 1.151]
+
+========================================================================================================================
+DELIVERABLE 1W -- ARM W: WIDE    -- one seed per 1/T bin, band widened to K bins
+========================================================================================================================
+  20 realisations x 6 chains per K, K in (12, 16, 20, 24, 28, 32), gamma = 1.56, COMB_CAP = 32
+    K = 12: 12 bins,  8.29-25.71 nHz
+    K = 16: 16 bins,  5.12-28.88 nHz
+    K = 20: 20 bins,  3.00-33.10 nHz
+    K = 24: 24 bins,  3.00-39.44 nHz
+    K = 28: 28 bins,  3.00-45.78 nHz
+    K = 32: 32 bins,  3.00-52.12 nHz
+
+    [W K=12] real  1/20  S_end med   3.081  bar  5.23  combs  7.0  cert    0  (  22.6s, eta  428.6s)
+    [W K=12] real  2/20  S_end med   1.962  bar  5.43  combs  8.0  cert    0  (  43.5s, eta  391.2s)
+    [W K=12] real  3/20  S_end med   2.430  bar  5.23  combs  9.5  cert    0  (  75.2s, eta  426.0s)
+    [W K=12] real  4/20  S_end med   3.318  bar  5.38  combs  7.0  cert    0  (  98.2s, eta  392.6s)
+    [W K=12] real  5/20  S_end med   2.737  bar  5.28  combs  6.5  cert    0  ( 118.4s, eta  355.3s)
+    [W K=12] real  6/20  S_end med   1.328  bar  5.40  combs  7.0  cert    0  ( 146.1s, eta  340.9s)
+    [W K=12] real  7/20  S_end med   3.410  bar  5.38  combs  7.0  cert    0  ( 172.5s, eta  320.4s)
+    [W K=12] real  8/20  S_end med   3.955  bar  5.50  combs  8.5  cert    0  ( 201.9s, eta  302.9s)
+    [W K=12] real  9/20  S_end med   3.215  bar  5.20  combs  7.5  cert    1  ( 232.4s, eta  284.0s)
+    [W K=12] real 10/20  S_end med   1.247  bar  5.29  combs  8.0  cert    0  ( 248.1s, eta  248.1s)
+    [W K=12] real 11/20  S_end med   2.275  bar  5.32  combs  7.5  cert    0  ( 260.0s, eta  212.7s)
+    [W K=12] real 12/20  S_end med   3.947  bar  5.34  combs  8.0  cert    2  ( 272.8s, eta  181.9s)
+    [W K=12] real 13/20  S_end med   5.917  bar  5.28  combs  9.5  cert    2  ( 288.3s, eta  155.3s)
+    [W K=12] real 14/20  S_end med   4.245  bar  5.31  combs  7.5  cert    1  ( 302.2s, eta  129.5s)
+    [W K=12] real 15/20  S_end med   3.380  bar  5.31  combs  7.5  cert    0  ( 314.1s, eta  104.7s)
+    [W K=12] real 16/20  S_end med   0.720  bar  5.19  combs  5.5  cert    0  ( 322.8s, eta   80.7s)
+    [W K=12] real 17/20  S_end med   0.319  bar  5.09  combs  5.0  cert    0  ( 330.9s, eta   58.4s)
+    [W K=12] real 18/20  S_end med   2.465  bar  5.45  combs  9.0  cert    0  ( 343.8s, eta   38.2s)
+    [W K=12] real 19/20  S_end med   2.914  bar  5.36  combs  7.0  cert    0  ( 354.4s, eta   18.7s)
+    [W K=12] real 20/20  S_end med   3.723  bar  5.35  combs  7.0  cert    3  ( 366.4s, eta    0.0s)
+    [W K=16] real  1/20  S_end med  10.639  bar  5.50  combs 12.5  cert    8  (  26.2s, eta  498.2s)
+    [W K=16] real  2/20  S_end med   6.360  bar  5.55  combs 11.5  cert    2  (  50.8s, eta  457.1s)
+    [W K=16] real  3/20  S_end med   9.434  bar  5.52  combs 12.0  cert    9  (  81.8s, eta  463.3s)
+    [W K=16] real  4/20  S_end med   3.165  bar  5.61  combs  9.0  cert    0  ( 100.2s, eta  400.6s)
+    [W K=16] real  5/20  S_end med   6.098  bar  5.45  combs 12.0  cert    1  ( 123.5s, eta  370.5s)
+    [W K=16] real  6/20  S_end med   3.327  bar  5.62  combs 12.5  cert    0  ( 148.4s, eta  346.2s)
+    [W K=16] real  7/20  S_end med   6.163  bar  5.57  combs  9.5  cert    4  ( 168.8s, eta  313.5s)
+    [W K=16] real  8/20  S_end med   3.816  bar  5.45  combs  9.5  cert    0  ( 188.0s, eta  281.9s)
+    [W K=16] real  9/20  S_end med   8.765  bar  5.61  combs 12.5  cert    4  ( 213.3s, eta  260.7s)
+    [W K=16] real 10/20  S_end med   1.290  bar  5.45  combs  9.0  cert    0  ( 230.4s, eta  230.4s)
+    [W K=16] real 11/20  S_end med   5.008  bar  5.48  combs 11.0  cert    1  ( 262.9s, eta  215.1s)
+    [W K=16] real 12/20  S_end med   9.177  bar  5.45  combs 11.0  cert    5  ( 311.1s, eta  207.4s)
+    [W K=16] real 13/20  S_end med   4.528  bar  5.54  combs 11.5  cert    3  ( 364.8s, eta  196.5s)
+    [W K=16] real 14/20  S_end med  11.028  bar  5.63  combs 12.0  cert    2  ( 411.4s, eta  176.3s)
+    [W K=16] real 15/20  S_end med  10.437  bar  5.46  combs 11.5  cert    3  ( 462.4s, eta  154.1s)
+    [W K=16] real 16/20  S_end med   5.599  bar  5.53  combs  8.5  cert    1  ( 507.7s, eta  126.9s)
+    [W K=16] real 17/20  S_end med  11.695  bar  5.51  combs  8.5  cert    1  ( 547.1s, eta   96.5s)
+    [W K=16] real 18/20  S_end med  12.740  bar  5.46  combs 13.0  cert   18  ( 605.0s, eta   67.2s)
+    [W K=16] real 19/20  S_end med   4.743  bar  5.46  combs  8.5  cert    0  ( 655.6s, eta   34.5s)
+    [W K=16] real 20/20  S_end med   9.202  bar  5.61  combs 11.5  cert    7  ( 714.3s, eta    0.0s)
+    [W K=20] real  1/20  S_end med  30.648  bar  5.70  combs 14.0  cert   15  (  82.9s, eta 1575.3s)
+    [W K=20] real  2/20  S_end med   3.465  bar  5.59  combs 11.0  cert    0  ( 124.8s, eta 1123.6s)
+    [W K=20] real  3/20  S_end med   7.639  bar  5.64  combs 15.5  cert   18  ( 184.8s, eta 1047.2s)
+    [W K=20] real  4/20  S_end med   8.092  bar  5.76  combs 14.0  cert   12  ( 234.7s, eta  938.6s)
+    [W K=20] real  5/20  S_end med  11.569  bar  5.61  combs 12.5  cert    6  ( 282.8s, eta  848.5s)
+    [W K=20] real  6/20  S_end med  13.134  bar  5.67  combs 14.0  cert   10  ( 368.3s, eta  859.3s)
+    [W K=20] real  7/20  S_end med  13.686  bar  5.68  combs 13.0  cert    8  ( 452.4s, eta  840.2s)
+    [W K=20] real  8/20  S_end med  12.199  bar  5.75  combs 14.5  cert    9  ( 539.9s, eta  809.9s)
+    [W K=20] real  9/20  S_end med  21.441  bar  5.68  combs 16.5  cert   28  ( 641.3s, eta  783.8s)
+    [W K=20] real 10/20  S_end med   3.172  bar  5.59  combs 12.5  cert    8  ( 714.9s, eta  714.9s)
+    [W K=20] real 11/20  S_end med   6.295  bar  5.61  combs 11.5  cert    3  ( 796.9s, eta  652.0s)
+    [W K=20] real 12/20  S_end med  12.517  bar  5.69  combs 11.5  cert    2  ( 864.3s, eta  576.2s)
+    [W K=20] real 13/20  S_end med   9.869  bar  5.59  combs 14.5  cert   10  ( 933.0s, eta  502.4s)
+    [W K=20] real 14/20  S_end med  15.483  bar  5.66  combs 14.5  cert    5  ( 987.1s, eta  423.0s)
+    [W K=20] real 15/20  S_end med  18.899  bar  5.72  combs 13.5  cert    1  (1032.9s, eta  344.3s)
+    [W K=20] real 16/20  S_end med   7.583  bar  5.64  combs  9.0  cert    1  (1065.1s, eta  266.3s)
+    [W K=20] real 17/20  S_end med  16.917  bar  5.60  combs 12.5  cert    4  (1106.5s, eta  195.3s)
+    [W K=20] real 18/20  S_end med   7.064  bar  5.58  combs 12.5  cert    9  (1158.9s, eta  128.8s)
+    [W K=20] real 19/20  S_end med  33.623  bar  5.43  combs 11.0  cert   26  (1205.6s, eta   63.5s)
+    [W K=20] real 20/20  S_end med  11.130  bar  5.69  combs 14.0  cert    9  (1263.5s, eta    0.0s)
+    [W K=24] real  1/20  S_end med  29.036  bar  5.92  combs 17.5  cert   31  (  91.2s, eta 1732.8s)
+    [W K=24] real  2/20  S_end med   7.097  bar  5.81  combs 15.5  cert   11  ( 164.3s, eta 1478.8s)
+    [W K=24] real  3/20  S_end med  21.670  bar  5.82  combs 20.0  cert   39  ( 264.6s, eta 1499.6s)
+    [W K=24] real  4/20  S_end med  23.851  bar  5.88  combs 17.5  cert   31  ( 347.4s, eta 1389.7s)
+    [W K=24] real  5/20  S_end med  18.615  bar  5.78  combs 17.5  cert   37  ( 435.8s, eta 1307.4s)
+    [W K=24] real  6/20  S_end med   7.253  bar  5.87  combs 14.5  cert    7  ( 502.2s, eta 1171.8s)
+    [W K=24] real  7/20  S_end med  36.564  bar  5.93  combs 21.0  cert   66  ( 611.9s, eta 1136.4s)
+    [W K=24] real  8/20  S_end med  20.915  bar  5.92  combs 17.0  cert   30  ( 691.8s, eta 1037.8s)
+    [W K=24] real  9/20  S_end med  32.751  bar  5.86  combs 15.5  cert   13  ( 751.6s, eta  918.6s)
+    [W K=24] real 10/20  S_end med   3.948  bar  5.89  combs 14.0  cert    1  ( 805.5s, eta  805.5s)
+    [W K=24] real 11/20  S_end med   7.854  bar  5.87  combs 14.0  cert    5  ( 865.2s, eta  707.9s)
+    [W K=24] real 12/20  S_end med  44.345  bar  5.84  combs 16.5  cert   23  ( 943.5s, eta  629.0s)
+    [W K=24] real 13/20  S_end med  22.458  bar  5.92  combs 20.0  cert   25  (1035.5s, eta  557.6s)
+    [W K=24] real 14/20  S_end med  23.288  bar  5.91  combs 15.0  cert   14  (1099.6s, eta  471.2s)
+    [W K=24] real 15/20  S_end med  38.192  bar  5.86  combs 14.5  cert    5  (1161.0s, eta  387.0s)
+    [W K=24] real 16/20  S_end med   8.293  bar  5.73  combs 11.0  cert    2  (1207.0s, eta  301.8s)
+    [W K=24] real 17/20  S_end med  28.815  bar  5.84  combs 13.5  cert   11  (1265.1s, eta  223.3s)
+    [W K=24] real 18/20  S_end med  12.121  bar  5.79  combs 19.5  cert   20  (1351.7s, eta  150.2s)
+    [W K=24] real 19/20  S_end med  47.920  bar  5.97  combs 19.5  cert   19  (1438.5s, eta   75.7s)
+    [W K=24] real 20/20  S_end med  20.242  bar  5.87  combs 20.5  cert   20  (1530.9s, eta    0.0s)
+    [W K=28] real  1/20  S_end med  42.902  bar  5.92  combs 24.0  cert   36  ( 134.4s, eta 2552.9s)
+    [W K=28] real  2/20  S_end med  12.996  bar  6.03  combs 19.5  cert   11  ( 218.7s, eta 1968.4s)
+    [W K=28] real  3/20  S_end med  19.376  bar  6.13  combs 21.5  cert   38  ( 325.7s, eta 1845.6s)
+    [W K=28] real  4/20  S_end med  23.138  bar  5.99  combs 20.0  cert   28  ( 419.6s, eta 1678.6s)
+    [W K=28] real  5/20  S_end med  16.474  bar  6.06  combs 21.5  cert   33  ( 526.5s, eta 1579.5s)
+    [W K=28] real  6/20  S_end med  10.510  bar  6.04  combs 21.5  cert   20  ( 631.2s, eta 1472.8s)
+    [W K=28] real  7/20  S_end med  37.408  bar  6.05  combs 24.5  cert   65  ( 776.9s, eta 1442.7s)
+    [W K=28] real  8/20  S_end med  22.987  bar  6.03  combs 22.0  cert   33  ( 887.9s, eta 1331.8s)
+    [W K=28] real  9/20  S_end med  54.449  bar  6.05  combs 23.0  cert   31  (1013.1s, eta 1238.2s)
+    [W K=28] real 10/20  S_end med   4.189  bar  6.06  combs 18.5  cert    2  (1071.7s, eta 1071.7s)
+    [W K=28] real 11/20  S_end med  11.669  bar  6.05  combs 19.0  cert   18  (1143.6s, eta  935.7s)
+    [W K=28] real 12/20  S_end med  55.375  bar  6.01  combs 19.5  cert   20  (1220.8s, eta  813.9s)
+    [W K=28] real 13/20  S_end med  25.556  bar  6.09  combs 22.5  cert   32  (1308.4s, eta  704.5s)
+    [W K=28] real 14/20  S_end med  27.686  bar  5.97  combs 18.0  cert   18  (1373.6s, eta  588.7s)
+    [W K=28] real 15/20  S_end med 147.492  bar  6.05  combs 20.0  cert   13  (1444.1s, eta  481.4s)
+    [W K=28] real 16/20  S_end med  19.521  bar  6.06  combs 16.0  cert    2  (1491.8s, eta  373.0s)
+    [W K=28] real 17/20  S_end med  37.023  bar  6.04  combs 18.0  cert    8  (1551.4s, eta  273.8s)
+    [W K=28] real 18/20  S_end med  25.034  bar  5.99  combs 23.5  cert   34  (1648.6s, eta  183.2s)
+    [W K=28] real 19/20  S_end med  44.017  bar  6.05  combs 21.5  cert   23  (1728.2s, eta   91.0s)
+    [W K=28] real 20/20  S_end med  21.354  bar  5.98  combs 19.5  cert   23  (1790.5s, eta    0.0s)
+    [W K=32] real  1/20  S_end med  32.039  bar  6.17  combs 22.5  cert   25  (  90.3s, eta 1715.4s)
+    [W K=32] real  2/20  S_end med  17.069  bar  6.20  combs 27.0  cert   68  ( 247.7s, eta 2229.7s)
+    [W K=32] real  3/20  S_end med  18.396  bar  6.18  combs 23.5  cert   47  ( 351.9s, eta 1994.0s)
+    [W K=32] real  4/20  S_end med  22.347  bar  6.21  combs 25.5  cert   30  ( 462.1s, eta 1848.3s)
+    [W K=32] real  5/20  S_end med  26.523  bar  6.15  combs 27.0  cert   44  ( 583.7s, eta 1751.2s)
+    [W K=32] real  6/20  S_end med  14.927  bar  6.15  combs 22.0  cert   20  ( 672.5s, eta 1569.1s)
+    [W K=32] real  7/20  S_end med  25.483  bar  6.25  combs 21.5  cert   30  ( 760.8s, eta 1412.9s)
+    [W K=32] real  8/20  S_end med  44.432  bar  6.14  combs 27.5  cert   47  ( 889.8s, eta 1334.7s)
+    [W K=32] real  9/20  S_end med  70.267  bar  6.23  combs 26.0  cert   81  (1021.9s, eta 1249.0s)
+    [W K=32] real 10/20  S_end med   7.129  bar  6.20  combs 19.0  cert    3  (1088.1s, eta 1088.1s)
+    [W K=32] real 11/20  S_end med  25.144  bar  6.20  combs 27.5  cert   41  (1231.7s, eta 1007.7s)
+    [W K=32] real 12/20  S_end med 124.656  bar  6.13  combs 26.5  cert   62  (1367.3s, eta  911.5s)
+    [W K=32] real 13/20  S_end med  27.884  bar  6.22  combs 24.5  cert   34  (1478.9s, eta  796.3s)
+    [W K=32] real 14/20  S_end med  45.919  bar  6.21  combs 25.5  cert   18  (1586.8s, eta  680.1s)
+    [W K=32] real 15/20  S_end med  67.575  bar  6.20  combs 22.5  cert   20  (1676.1s, eta  558.7s)
+    [W K=32] real 16/20  S_end med  60.155  bar  6.21  combs 19.0  cert    2  (1739.3s, eta  434.8s)
+    [W K=32] real 17/20  S_end med  54.052  bar  6.17  combs 22.0  cert   15  (1841.2s, eta  324.9s)
+    [W K=32] real 18/20  S_end med  23.412  bar  6.20  combs 26.0  cert   35  (1957.4s, eta  217.5s)
+    [W K=32] real 19/20  S_end med  45.649  bar  6.25  combs 22.5  cert    6  (2044.1s, eta  107.6s)
+    [W K=32] real 20/20  S_end med  23.279  bar  6.03  combs 24.5  cert   38  (2156.6s, eta    0.0s)
+
+------------------------------------------------------------------------------------------------------------------------
+  ARM W PER-K SUMMARY.  S_end = end-state fringe contrast (max over
+  turns of a per-pulsar max); bar = median trials bar ln K over the turns.
+  x_real = fraction of REALISATIONS whose BEST chain reaches the bar.
+------------------------------------------------------------------------------------------------------------------------
+    K   A_eq  K_rec  combs    S_end   +-SE             IQR   bar  S/bar  x_real   +-SE  x_chain  CERT/run   true  WRONG   null
+   12   1.32    7.5    7.5    2.870  0.333    1.54-   3.79  5.32  0.540    0.35   0.11     0.10      0.07   0.07   0.03   0.01
+   16   0.98   11.0   11.0    6.172  0.959    4.00-   9.91  5.52  1.118    0.90   0.07     0.57      0.57   0.77   0.06   0.03
+   20   1.04   13.0   13.0   11.052  1.376    6.69-  16.90  5.66  1.952    0.95   0.05     0.82      1.53   2.02   0.32   0.16
+   24   1.18   16.5   16.5   21.274  2.654   10.91-  29.69  5.87  3.622    1.00   0.00     0.91      3.42   7.65   0.59   0.39
+   28   1.22   21.0   21.0   24.912  3.911   15.17-  40.05  6.04  4.127    1.00   0.00     0.97      4.07   7.17   0.82   0.46
+   32   1.50   25.0   25.0   29.118  5.222   20.06-  51.77  6.20  4.699    1.00   0.00     0.97      5.55  10.36   1.12   0.68
+
+  SE ADEQUACY -- is SE(median S_end) below half the gap to the nearest
+  neighbouring K median?  (the brief's sampling requirement)
+    K = 12: SE  0.333  vs  half-gap  1.651   OK
+    K = 16: SE  0.959  vs  half-gap  1.651   OK
+    K = 20: SE  1.376  vs  half-gap  2.440   OK
+    K = 24: SE  2.654  vs  half-gap  1.819   NOT MET
+    K = 28: SE  3.911  vs  half-gap  1.819   NOT MET
+    K = 32: SE  5.222  vs  half-gap  2.103   NOT MET
+  -> criterion NOT met in every cell
+
+========================================================================================================================
+DELIVERABLE 2W -- ARM W: K*_50 AND K*_90
+========================================================================================================================
+
+  criterion: best chain's end-state contrast reaches the trials bar
+    crossing fraction vs K:   K=12: 0.35+-0.11  K=16: 0.90+-0.07  K=20: 0.95+-0.05  K=24: 1.00+-0.00  K=28: 1.00+-0.00  K=32: 1.00+-0.00
+    K*_50 (contrast): grid K = 16;  interpolated 13.1 +- 0.6   95 % [12.0, 14.0]
+    K*_90 (contrast): grid K = 16;  interpolated 16.0 +- 1.5   95 % [15.3, 21.3]
+    ** FLAG: nonzero crossing at K = [12] (< 16). That is MeerKAT-era territory, not SKA-era. **
+
+  criterion: best chain actually CERTIFIES at least one pulsar distance
+    crossing fraction vs K:   K=12: 0.25+-0.10  K=16: 0.75+-0.10  K=20: 0.95+-0.05  K=24: 1.00+-0.00  K=28: 1.00+-0.00  K=32: 1.00+-0.00
+    K*_50 (certification): grid K = 16;  interpolated 14.0 +- 0.7   95 % [12.7, 15.3]
+    K*_90 (certification): grid K = 20;  interpolated 19.0 +- 1.3   95 % [15.8, 21.3]
+    ** FLAG: nonzero crossing at K = [12] (< 16). That is MeerKAT-era territory, not SKA-era. **
+
+========================================================================================================================
+DELIVERABLE 3W -- ARM W: SHAPE. IS CONTRAST STILL LINEAR IN COMBS?
+========================================================================================================================
+  V25 read ~2 nat/comb off six points and extrapolated to the bar at 10-11
+  combs. If the curve saturates BELOW the bar, the SKA-era claim is dead.
+
+    K  combs    S_end   +-SE  local dS/dcomb   within-K dS/dcomb  gap to bar
+   12    7.5    2.870  0.333           0.943               0.721      +2.447
+   16   11.0    6.172  0.959           1.488               0.822      -0.649
+   20   13.0   11.052  1.376           2.746               0.953      -5.389
+   24   16.5   21.274  2.654           1.732               1.808     -15.400
+   28   21.0   24.912  3.911           0.923               2.065     -18.876
+   32   25.0   29.118  5.222           1.051               0.819     -22.921
+
+  slope at low K (12-16): +1.215 nat/comb; at high K (28-32): +0.987 nat/comb
+  VERDICT (arm W): ALREADY AT THE BAR by K = 32 -- no extrapolation needed.
+  slope_verdict_W = [1.2155, 0.9871, bar 6.197, S_end(Kmax) 29.118]
+
+########################################################################################################################
+# THE DELIVERABLE -- K*_50 AND K*_90 AS A BRACKET OVER CONSTRUCTION
+########################################################################################################################
+
+  criterion: best chain's end-state contrast reaches the trials bar
+    K*_50:  arm P: 12.0 +- 2.7   |   arm W: 13.1 +- 0.6
+    K*_90:  arm P: > 32   |   arm W: 16.0 +- 1.5
+
+  criterion: best chain actually CERTIFIES at least one pulsar distance
+    K*_50:  arm P: 15.2 +- 3.0   |   arm W: 14.0 +- 0.7
+    K*_90:  arm P: > 32   |   arm W: 19.0 +- 1.3
+
+  Arm W (one seed per bin) is the optimistic construction and Arm P
+  (packed into 10-25 nHz) the pessimistic one; the truth is between.
+
+========================================================================================================================
+DELIVERABLE 4 -- ARM C: WHAT V25's COMB_CAP = 8 COST
+========================================================================================================================
+  V25 caveat 1: 'the comb cap is mine and it binds at exactly the point
+  that matters.' Same universes, same noise, cap 8 vs cap 32.
+
+   arm   K  S_end cap8  S_end cap32   ratio  x_real cap8  x_real cap32  cert cap8  cert cap32
+    [cap8 P K=16] real  1/10  S_end med   1.422  bar  5.33  combs  6.5  cert    0  (   5.8s, eta   52.4s)
+    [cap8 P K=16] real  2/10  S_end med   2.176  bar  5.36  combs  8.0  cert    0  (  15.1s, eta   60.2s)
+    [cap8 P K=16] real  3/10  S_end med   1.582  bar  5.31  combs  7.0  cert    0  (  22.3s, eta   52.1s)
+    [cap8 P K=16] real  4/10  S_end med   5.503  bar  5.32  combs  8.0  cert    2  (  46.6s, eta   70.0s)
+    [cap8 P K=16] real  5/10  S_end med   2.013  bar  5.26  combs  7.0  cert    0  (  54.5s, eta   54.5s)
+    [cap8 P K=16] real  6/10  S_end med   0.934  bar  5.33  combs  6.5  cert    0  (  60.9s, eta   40.6s)
+    [cap8 P K=16] real  7/10  S_end med   2.364  bar  5.35  combs  7.5  cert    0  (  67.8s, eta   29.1s)
+    [cap8 P K=16] real  8/10  S_end med   6.245  bar  5.35  combs  8.0  cert    2  (  78.1s, eta   19.5s)
+    [cap8 P K=16] real  9/10  S_end med   6.999  bar  5.31  combs  8.0  cert    1  (  87.2s, eta    9.7s)
+    [cap8 P K=16] real 10/10  S_end med   0.749  bar  5.25  combs  7.5  cert    0  (  95.0s, eta    0.0s)
+    [cap32 P K=16] real  1/10  S_end med   1.422  bar  5.33  combs  6.5  cert    0  (   5.9s, eta   53.3s)
+    [cap32 P K=16] real  2/10  S_end med   2.174  bar  5.37  combs  9.5  cert    0  (  34.7s, eta  138.9s)
+    [cap32 P K=16] real  3/10  S_end med   1.582  bar  5.31  combs  7.0  cert    0  (  61.4s, eta  143.4s)
+    [cap32 P K=16] real  4/10  S_end med   6.377  bar  5.39  combs 10.5  cert    3  (  90.8s, eta  136.2s)
+    [cap32 P K=16] real  5/10  S_end med   2.013  bar  5.34  combs  8.0  cert    0  ( 117.9s, eta  117.9s)
+    [cap32 P K=16] real  6/10  S_end med   0.934  bar  5.33  combs  6.5  cert    0  ( 142.8s, eta   95.2s)
+    [cap32 P K=16] real  7/10  S_end med   2.364  bar  5.35  combs  7.5  cert    0  ( 168.4s, eta   72.2s)
+    [cap32 P K=16] real  8/10  S_end med   6.718  bar  5.39  combs 10.0  cert    2  ( 198.5s, eta   49.6s)
+    [cap32 P K=16] real  9/10  S_end med   7.409  bar  5.34  combs  9.0  cert    0  ( 226.9s, eta   25.2s)
+    [cap32 P K=16] real 10/10  S_end med   0.815  bar  5.28  combs  8.5  cert    0  ( 253.0s, eta    0.0s)
+     P  16       2.234        2.136    0.96         0.30          0.30       0.12        0.12
+    [cap8 P K=24] real  1/10  S_end med   2.039  bar  5.20  combs  8.0  cert    0  (  14.8s, eta  133.2s)
+    [cap8 P K=24] real  2/10  S_end med   1.423  bar  5.34  combs  8.0  cert    0  (  22.9s, eta   91.8s)
+    [cap8 P K=24] real  3/10  S_end med   2.438  bar  5.11  combs  8.0  cert    0  (  31.4s, eta   73.3s)
+    [cap8 P K=24] real  4/10  S_end med   0.928  bar  5.23  combs  6.5  cert    0  (  38.1s, eta   57.1s)
+    [cap8 P K=24] real  5/10  S_end med   4.678  bar  5.33  combs  8.0  cert    1  (  47.7s, eta   47.7s)
+    [cap8 P K=24] real  6/10  S_end med   1.685  bar  5.31  combs  8.0  cert    0  (  57.5s, eta   38.3s)
+    [cap8 P K=24] real  7/10  S_end med   3.263  bar  5.36  combs  8.0  cert    0  (  66.6s, eta   28.6s)
+    [cap8 P K=24] real  8/10  S_end med   2.528  bar  5.36  combs  8.0  cert    0  (  77.3s, eta   19.3s)
+    [cap8 P K=24] real  9/10  S_end med   3.415  bar  5.30  combs  8.0  cert    0  (  85.8s, eta    9.5s)
+    [cap8 P K=24] real 10/10  S_end med   0.182  bar  4.82  combs  5.0  cert    0  (  90.7s, eta    0.0s)
+    [cap32 P K=24] real  1/10  S_end med   2.251  bar  5.20  combs  8.5  cert    0  (   9.4s, eta   84.4s)
+    [cap32 P K=24] real  2/10  S_end med   1.423  bar  5.34  combs  8.0  cert    0  (  17.8s, eta   71.4s)
+    [cap32 P K=24] real  3/10  S_end med   1.754  bar  5.11  combs  8.5  cert    0  (  26.4s, eta   61.6s)
+    [cap32 P K=24] real  4/10  S_end med   0.928  bar  5.23  combs  6.5  cert    0  (  33.1s, eta   49.6s)
+    [cap32 P K=24] real  5/10  S_end med   5.208  bar  5.34  combs 10.0  cert    1  (  43.1s, eta   43.1s)
+    [cap32 P K=24] real  6/10  S_end med   2.397  bar  5.32  combs  9.5  cert    0  (  53.5s, eta   35.7s)
+    [cap32 P K=24] real  7/10  S_end med   3.263  bar  5.38  combs  8.0  cert    0  (  62.6s, eta   26.8s)
+    [cap32 P K=24] real  8/10  S_end med   3.130  bar  5.45  combs 10.5  cert    0  (  93.4s, eta   23.4s)
+    [cap32 P K=24] real  9/10  S_end med   3.415  bar  5.31  combs  8.0  cert    0  ( 124.8s, eta   13.9s)
+    [cap32 P K=24] real 10/10  S_end med   0.182  bar  4.82  combs  5.0  cert    0  ( 133.0s, eta    0.0s)
+     P  24       2.111        2.245    1.06         0.10          0.20       0.03        0.03
+    [cap8 P K=32] real  1/10  S_end med   3.200  bar  5.36  combs  8.0  cert    1  (  13.6s, eta  122.3s)
+    [cap8 P K=32] real  2/10  S_end med   1.708  bar  5.28  combs  8.0  cert    0  (  35.3s, eta  141.2s)
+    [cap8 P K=32] real  3/10  S_end med   0.875  bar  5.19  combs  6.5  cert    0  (  65.9s, eta  153.8s)
+    [cap8 P K=32] real  4/10  S_end med   0.795  bar  5.12  combs  6.0  cert    0  ( 100.4s, eta  150.6s)
+    [cap8 P K=32] real  5/10  S_end med   0.665  bar  5.03  combs  6.0  cert    0  ( 132.3s, eta  132.3s)
+    [cap8 P K=32] real  6/10  S_end med   1.009  bar  5.43  combs  7.5  cert    0  ( 167.8s, eta  111.9s)
+    [cap8 P K=32] real  7/10  S_end med   1.989  bar  5.35  combs  8.0  cert    1  ( 204.3s, eta   87.6s)
+    [cap8 P K=32] real  8/10  S_end med   3.573  bar  5.35  combs  8.0  cert    1  ( 249.6s, eta   62.4s)
+    [cap8 P K=32] real  9/10  S_end med   2.179  bar  5.37  combs  8.0  cert    0  ( 286.4s, eta   31.8s)
+    [cap8 P K=32] real 10/10  S_end med   0.106  bar  4.91  combs  3.5  cert    0  ( 314.6s, eta    0.0s)
+    [cap32 P K=32] real  1/10  S_end med   4.971  bar  5.39  combs 12.5  cert    1  (  40.5s, eta  364.1s)
+    [cap32 P K=32] real  2/10  S_end med   1.653  bar  5.29  combs 10.0  cert    0  (  77.2s, eta  308.6s)
+    [cap32 P K=32] real  3/10  S_end med   0.875  bar  5.19  combs  6.5  cert    0  ( 111.0s, eta  258.9s)
+    [cap32 P K=32] real  4/10  S_end med   0.795  bar  5.12  combs  6.0  cert    0  ( 145.1s, eta  217.6s)
+    [cap32 P K=32] real  5/10  S_end med   0.665  bar  5.03  combs  6.0  cert    0  ( 175.9s, eta  175.9s)
+    [cap32 P K=32] real  6/10  S_end med   0.568  bar  5.43  combs  7.0  cert    0  ( 210.5s, eta  140.3s)
+    [cap32 P K=32] real  7/10  S_end med   3.049  bar  5.46  combs  9.5  cert    1  ( 249.0s, eta  106.7s)
+    [cap32 P K=32] real  8/10  S_end med   4.211  bar  5.38  combs 12.5  cert    2  ( 285.3s, eta   71.3s)
+    [cap32 P K=32] real  9/10  S_end med   2.171  bar  5.38  combs  8.0  cert    0  ( 294.6s, eta   32.7s)
+    [cap32 P K=32] real 10/10  S_end med   0.106  bar  4.91  combs  3.5  cert    0  ( 299.8s, eta    0.0s)
+     P  32       1.513        1.257    0.83         0.30          0.30       0.07        0.10
+    [cap8 W K=16] real  1/10  S_end med   3.957  bar  5.33  combs  8.0  cert    0  (  31.9s, eta  287.0s)
+    [cap8 W K=16] real  2/10  S_end med   3.719  bar  5.45  combs  8.0  cert    0  (  86.9s, eta  347.4s)
+    [cap8 W K=16] real  3/10  S_end med   5.704  bar  5.30  combs  8.0  cert    2  ( 112.5s, eta  262.5s)
+    [cap8 W K=16] real  4/10  S_end med   2.518  bar  5.56  combs  8.0  cert    0  ( 124.5s, eta  186.7s)
+    [cap8 W K=16] real  5/10  S_end med   4.367  bar  5.38  combs  8.0  cert    0  ( 137.8s, eta  137.8s)
+    [cap8 W K=16] real  6/10  S_end med   2.926  bar  5.57  combs  8.0  cert    0  ( 153.5s, eta  102.3s)
+    [cap8 W K=16] real  7/10  S_end med   4.856  bar  5.55  combs  8.0  cert    0  ( 165.2s, eta   70.8s)
+    [cap8 W K=16] real  8/10  S_end med   3.816  bar  5.37  combs  8.0  cert    0  ( 176.9s, eta   44.2s)
+    [cap8 W K=16] real  9/10  S_end med   7.717  bar  5.54  combs  8.0  cert    1  ( 191.1s, eta   21.2s)
+    [cap8 W K=16] real 10/10  S_end med   1.484  bar  5.47  combs  8.0  cert    0  ( 203.2s, eta    0.0s)
+    [cap32 W K=16] real  1/10  S_end med  13.325  bar  5.50  combs 13.0  cert    6  (  19.8s, eta  178.3s)
+    [cap32 W K=16] real  2/10  S_end med   6.360  bar  5.57  combs 11.5  cert    1  (  35.6s, eta  142.6s)
+    [cap32 W K=16] real  3/10  S_end med  11.231  bar  5.54  combs 12.5  cert    8  (  57.3s, eta  133.7s)
+    [cap32 W K=16] real  4/10  S_end med   3.352  bar  5.61  combs  9.5  cert    0  (  68.8s, eta  103.2s)
+    [cap32 W K=16] real  5/10  S_end med   6.974  bar  5.45  combs 11.5  cert    1  (  82.9s, eta   82.9s)
+    [cap32 W K=16] real  6/10  S_end med   3.418  bar  5.62  combs 12.5  cert    0  (  98.8s, eta   65.8s)
+    [cap32 W K=16] real  7/10  S_end med   5.473  bar  5.57  combs  9.0  cert    0  ( 110.3s, eta   47.3s)
+    [cap32 W K=16] real  8/10  S_end med   3.816  bar  5.37  combs  9.0  cert    0  ( 122.0s, eta   30.5s)
+    [cap32 W K=16] real  9/10  S_end med   8.705  bar  5.61  combs 12.0  cert    2  ( 137.0s, eta   15.2s)
+    [cap32 W K=16] real 10/10  S_end med   2.178  bar  5.50  combs  9.5  cert    0  ( 149.2s, eta    0.0s)
+     W  16       3.809        5.106    1.34         0.40          0.60       0.07        0.45
+    [cap8 W K=24] real  1/10  S_end med  13.184  bar  5.52  combs  8.0  cert    8  (  30.7s, eta  276.7s)
+    [cap8 W K=24] real  2/10  S_end med   3.451  bar  5.51  combs  8.0  cert    0  (  57.3s, eta  229.1s)
+    [cap8 W K=24] real  3/10  S_end med   6.601  bar  5.63  combs  8.0  cert    4  (  86.9s, eta  202.9s)
+    [cap8 W K=24] real  4/10  S_end med   9.830  bar  5.50  combs  8.0  cert    5  ( 113.0s, eta  169.4s)
+    [cap8 W K=24] real  5/10  S_end med   4.986  bar  5.48  combs  8.0  cert    1  ( 140.2s, eta  140.2s)
+    [cap8 W K=24] real  6/10  S_end med   3.946  bar  5.64  combs  8.0  cert    0  ( 165.1s, eta  110.1s)
+    [cap8 W K=24] real  7/10  S_end med  13.842  bar  5.51  combs  8.0  cert   11  ( 199.1s, eta   85.3s)
+    [cap8 W K=24] real  8/10  S_end med  11.466  bar  5.68  combs  8.0  cert    2  ( 226.2s, eta   56.6s)
+    [cap8 W K=24] real  9/10  S_end med  19.683  bar  5.66  combs  8.0  cert    5  ( 251.6s, eta   28.0s)
+    [cap8 W K=24] real 10/10  S_end med   3.952  bar  5.74  combs  8.0  cert    0  ( 273.5s, eta    0.0s)
+    [cap32 W K=24] real  1/10  S_end med  25.978  bar  5.94  combs 18.0  cert   22  (  47.9s, eta  430.9s)
+    [cap32 W K=24] real  2/10  S_end med   9.745  bar  5.81  combs 16.5  cert    9  (  82.6s, eta  330.3s)
+    [cap32 W K=24] real  3/10  S_end med  21.670  bar  5.82  combs 20.0  cert   29  ( 131.9s, eta  307.7s)
+    [cap32 W K=24] real  4/10  S_end med  23.851  bar  5.88  combs 16.5  cert   17  ( 168.7s, eta  253.1s)
+    [cap32 W K=24] real  5/10  S_end med  18.615  bar  5.81  combs 17.5  cert   23  ( 224.8s, eta  224.8s)
+    [cap32 W K=24] real  6/10  S_end med   7.523  bar  5.93  combs 14.5  cert    6  ( 336.7s, eta  224.5s)
+    [cap32 W K=24] real  7/10  S_end med  42.605  bar  5.94  combs 21.0  cert   43  ( 474.0s, eta  203.1s)
+    [cap32 W K=24] real  8/10  S_end med  21.901  bar  5.93  combs 17.5  cert   27  ( 533.0s, eta  133.2s)
+    [cap32 W K=24] real  9/10  S_end med  40.111  bar  5.86  combs 15.5  cert    9  ( 589.1s, eta   65.5s)
+    [cap32 W K=24] real 10/10  S_end med   4.768  bar  5.89  combs 14.0  cert    1  ( 612.3s, eta    0.0s)
+     W  24       9.466       21.525    2.27         0.80          1.00       0.90        4.65
+    [cap8 W K=32] real  1/10  S_end med  15.462  bar  5.95  combs  8.0  cert    2  (  36.6s, eta  329.7s)
+    [cap8 W K=32] real  2/10  S_end med   6.489  bar  5.80  combs  8.0  cert    6  (  81.4s, eta  325.5s)
+    [cap8 W K=32] real  3/10  S_end med   6.164  bar  5.72  combs  8.0  cert    3  ( 122.3s, eta  285.4s)
+    [cap8 W K=32] real  4/10  S_end med  14.054  bar  5.81  combs  8.0  cert    4  ( 161.8s, eta  242.7s)
+    [cap8 W K=32] real  5/10  S_end med   8.414  bar  5.70  combs  8.0  cert    5  ( 204.5s, eta  204.5s)
+    [cap8 W K=32] real  6/10  S_end med   5.695  bar  5.86  combs  8.0  cert    0  ( 242.3s, eta  161.5s)
+    [cap8 W K=32] real  7/10  S_end med  12.844  bar  6.01  combs  8.0  cert    3  ( 280.1s, eta  120.1s)
+    [cap8 W K=32] real  8/10  S_end med  16.687  bar  5.76  combs  8.0  cert    9  ( 326.5s, eta   81.6s)
+    [cap8 W K=32] real  9/10  S_end med  28.362  bar  5.69  combs  8.0  cert   13  ( 371.0s, eta   41.2s)
+    [cap8 W K=32] real 10/10  S_end med   4.514  bar  5.98  combs  8.0  cert    0  ( 405.0s, eta    0.0s)
+    [cap32 W K=32] real  1/10  S_end med  31.817  bar  6.17  combs 21.0  cert   13  (  53.0s, eta  476.8s)
+    [cap32 W K=32] real  2/10  S_end med  17.069  bar  6.20  combs 26.5  cert   46  ( 185.8s, eta  743.2s)
+    [cap32 W K=32] real  3/10  S_end med  18.585  bar  6.18  combs 23.5  cert   30  ( 256.0s, eta  597.3s)
+    [cap32 W K=32] real  4/10  S_end med  22.347  bar  6.19  combs 26.0  cert   22  ( 327.1s, eta  490.7s)
+    [cap32 W K=32] real  5/10  S_end med  26.075  bar  6.15  combs 28.0  cert   33  ( 409.1s, eta  409.1s)
+    [cap32 W K=32] real  6/10  S_end med  13.386  bar  6.08  combs 22.0  cert   13  ( 468.1s, eta  312.1s)
+    [cap32 W K=32] real  7/10  S_end med  25.483  bar  6.25  combs 20.5  cert   20  ( 527.1s, eta  225.9s)
+    [cap32 W K=32] real  8/10  S_end med  44.432  bar  6.15  combs 27.5  cert   32  ( 607.5s, eta  151.9s)
+    [cap32 W K=32] real  9/10  S_end med  70.267  bar  6.22  combs 26.0  cert   50  ( 692.7s, eta   77.0s)
+    [cap32 W K=32] real 10/10  S_end med   6.903  bar  6.20  combs 19.0  cert    2  ( 736.1s, eta    0.0s)
+     W  32       9.465       22.303    2.36         0.90          1.00       1.12        6.53
+
+========================================================================================================================
+DELIVERABLE 5 -- THE SAFETY KIT
+========================================================================================================================
+  M = 1 control (single bin, seeded, sea removed): detected 6/12; CERT 0.00 (true 0.00); rho_P max 3.06; best fringe contrast 0.000 nat
+    one comb cannot break its own degeneracy at any SNR (V24, V25).
+  pure-noise null, arm P (K = 32 geometry, 10 bins, no signal): fired 3/12 (expected 0.40 at alpha = 0.05 per bin), 0 certifications, 0 ignitions
+  pure-noise null, arm W (K = 32 geometry, 32 bins, no signal): fired 11/12 (expected 0.81 at alpha = 0.05 per bin), 0 certifications, 0 ignitions
+
+  per-turn SOURCE-LEVEL scrambled null, and the WRONG-CERT ledger:
+     arm   K  cert/run  true/run  WRONG/run  wrong frac  scrambled null/run  null frac
+    CERT/run counts pulsars NEWLY certified; true/WRONG/null are per-turn
+    sums, so the fractions are taken against true+WRONG, not against CERT.
+       P  12      0.07      0.08       0.01       0.071                0.00      0.000
+       P  16      0.18      0.11       0.09       0.438                0.01      0.031
+       P  20      0.18      0.18       0.02       0.094                0.00      0.000
+       P  24      0.09      0.11       0.02       0.150                0.01      0.100
+       P  28      0.11      0.13       0.00       0.000                0.00      0.000
+       P  32      0.07      0.09       0.01       0.118                0.00      0.000
+       W  12      0.07      0.07       0.03       0.250                0.01      0.083
+       W  16      0.57      0.77       0.06       0.071                0.03      0.030
+       W  20      1.53      2.02       0.32       0.135                0.16      0.068
+       W  24      3.42      7.65       0.59       0.072                0.39      0.048
+       W  28      4.07      7.17       0.82       0.103                0.46      0.057
+       W  32      5.55     10.36       1.12       0.097                0.68      0.059
+
+  V18 accounting -- what the chain's turns actually landed on:
+     arm   K  turns  genuine  split  blend  seeds hit  hit/K  blend frac  deepen  ignite
+       P  12   17.0      7.0    0.0   10.0        6.0   0.50        0.59    0.09    0.00
+       P  16   20.0      8.0    0.0   12.0        7.0   0.44        0.60    0.17    0.00
+       P  20   24.0      8.0    0.0   17.0        7.0   0.35        0.71    0.16    0.00
+       P  24   27.0      8.0    0.0   19.0        6.0   0.25        0.70    0.09    0.00
+       P  28   30.0      7.0    0.0   23.0        6.0   0.21        0.77    0.13    0.01
+       P  32   32.0      7.0    0.0   24.0        6.0   0.19        0.75    0.11    0.00
+       W  12   21.0      7.5    0.0   13.0        6.0   0.50        0.62    0.07    0.00
+       W  16   29.0     11.0    0.0   18.0        8.5   0.53        0.62    0.51    0.03
+       W  20   36.0     13.0    0.0   23.0       11.0   0.55        0.64    1.23    0.06
+       W  24   40.0     16.5    0.0   24.0       14.0   0.58        0.60    2.57    0.28
+       W  28   45.0     21.0    0.0   24.0       18.0   0.64        0.53    3.19    0.27
+       W  32   49.0     25.0    0.0   24.0       21.0   0.66        0.49    4.22    0.39
+
+  chance-match floor (GENUINE scored against this bin's seeds + top-10 sky):
+    arm P K = 12: pool = 2 seed(s) + 10 sky = 12, floor 0.065
+    arm W K = 12: pool = 1 seed(s) + 10 sky = 11, floor 0.060
+    arm P K = 16: pool = 2 seed(s) + 10 sky = 12, floor 0.065
+    arm W K = 16: pool = 1 seed(s) + 10 sky = 11, floor 0.060
+    arm P K = 20: pool = 2 seed(s) + 10 sky = 12, floor 0.065
+    arm W K = 20: pool = 1 seed(s) + 10 sky = 11, floor 0.060
+    arm P K = 24: pool = 3 seed(s) + 10 sky = 13, floor 0.071
+    arm W K = 24: pool = 1 seed(s) + 10 sky = 11, floor 0.060
+    arm P K = 28: pool = 3 seed(s) + 10 sky = 13, floor 0.071
+    arm W K = 28: pool = 1 seed(s) + 10 sky = 11, floor 0.060
+    arm P K = 32: pool = 4 seed(s) + 10 sky = 14, floor 0.076
+    arm W K = 32: pool = 1 seed(s) + 10 sky = 11, floor 0.060
+
+  banked -> /home/mattm/projects/HSYMT/reports/vernier27.npz   (243.4 min)

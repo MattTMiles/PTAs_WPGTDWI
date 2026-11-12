@@ -1,0 +1,218 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 195 s
+  [stat_h_s1 skies 104-107] 89 s
+[progress] 1/190 chunks, 285 s
+  [stat_h_s1 skies 120-123] 91 s
+  [stat_h_s1 skies 100-103] 96 s
+  [stat_h_s1 skies 136-139] 103 s
+  [stat_h_s1 skies 128-131] 103 s
+  [stat_h_s1 skies 108-111] 108 s
+  [stat_h_s1 skies 144-147] 108 s
+  [stat_h_s1 skies 116-119] 109 s
+  [stat_h_s1 skies 132-135] 111 s
+  [stat_h_s1 skies 124-127] 113 s
+  [stat_h_s1 skies 140-143] 119 s
+  [stat_h_s1 skies 112-115] 122 s
+  [stat_h_s1 skies 148-151] 106 s
+  [stat_h_s1 skies 152-155] 104 s
+  [stat_h_s1 skies 160-163] 99 s
+  [stat_h_s1 skies 156-159] 107 s
+  [stat_h_s1 skies 184-187] 92 s
+  [stat_h_s1 skies 188-191] 91 s
+  [stat_h_s1 skies 176-179] 102 s
+  [stat_h_s1 skies 172-175] 108 s
+  [stat_h_s1 skies 180-183] 107 s
+  [stat_h_s1 skies 168-171] 111 s
+  [stat_h_s1 skies 164-167] 124 s
+  [stat_h_s1 skies 192-195] 108 s
+  [stat_h_s10 skies 112-115] 93 s
+  [stat_h_s10 skies 104-107] 100 s
+[progress] 26/190 chunks, 498 s
+  [stat_h_s10 skies 100-103] 112 s
+  [stat_h_s1 skies 196-199] 114 s
+  [stat_h_s10 skies 120-123] 101 s
+  [stat_h_s10 skies 108-111] 114 s
+  [stat_h_s10 skies 116-119] 115 s
+  [stat_h_s10 skies 124-127] 111 s
+  [stat_h_s10 skies 136-139] 101 s
+  [stat_h_s10 skies 132-135] 124 s
+  [stat_h_s10 skies 128-131] 130 s
+  [stat_h_s10 skies 140-143] 123 s
+  [stat_h_s10 skies 144-147] 102 s
+  [stat_h_s10 skies 160-163] 95 s
+  [stat_h_s10 skies 164-167] 99 s
+  [stat_h_s10 skies 168-171] 92 s
+  [stat_h_s10 skies 156-159] 111 s
+  [stat_h_s10 skies 148-151] 120 s
+  [stat_h_s10 skies 152-155] 114 s
+  [stat_h_s10 skies 176-179] 103 s
+  [stat_h_s10 skies 180-183] 101 s
+  [stat_h_s10 skies 172-175] 120 s
+  [stat_h_s10 skies 188-191] 103 s
+  [stat_h_s10 skies 184-187] 110 s
+  [stat_h_s10 skies 192-195] 76 s
+  [stat_h_s10 skies 196-199] 70 s
+  [stat_h_sinf skies 100-103] 66 s
+[progress] 51/190 chunks, 678 s
+  [stat_h_sinf skies 108-111] 68 s
+  [stat_h_sinf skies 124-127] 45 s
+  [stat_h_sinf skies 112-115] 68 s
+  [stat_h_sinf skies 116-119] 69 s
+  [stat_h_sinf skies 104-107] 77 s
+  [stat_h_sinf skies 128-131] 48 s
+  [stat_h_sinf skies 120-123] 67 s
+  [stat_h_sinf skies 136-139] 55 s
+  [stat_h_sinf skies 132-135] 57 s
+  [stat_h_sinf skies 144-147] 41 s
+  [stat_h_sinf skies 140-143] 48 s
+  [stat_h_sinf skies 148-151] 43 s
+  [stat_h_sinf skies 160-163] 38 s
+  [stat_h_sinf skies 156-159] 42 s
+  [stat_h_sinf skies 152-155] 45 s
+  [stat_h_sinf skies 164-167] 42 s
+  [stat_h_sinf skies 168-171] 40 s
+  [stat_h_sinf skies 172-175] 44 s
+  [stat_h_sinf skies 176-179] 44 s
+  [stat_h_sinf skies 188-191] 33 s
+  [stat_h_sinf skies 184-187] 40 s
+  [stat_h_sinf skies 180-183] 44 s
+  [stat_c_s1 skies 112-115] 34 s
+  [stat_h_sinf skies 192-195] 43 s
+  [stat_c_s1 skies 104-107] 38 s
+[progress] 76/190 chunks, 764 s
+  [stat_h_sinf skies 196-199] 43 s
+  [stat_c_s1 skies 116-119] 38 s
+  [stat_c_s1 skies 100-103] 45 s
+  [stat_c_s1 skies 108-111] 45 s
+  [stat_c_s1 skies 120-123] 39 s
+  [stat_c_s1 skies 124-127] 40 s
+  [stat_c_s1 skies 128-131] 39 s
+  [stat_c_s1 skies 132-135] 39 s
+  [stat_c_s1 skies 136-139] 35 s
+  [stat_c_s1 skies 140-143] 31 s
+  [stat_c_s1 skies 144-147] 36 s
+  [stat_c_s1 skies 152-155] 41 s
+  [stat_c_s1 skies 156-159] 38 s
+  [stat_c_s1 skies 148-151] 43 s
+  [stat_c_s1 skies 164-167] 35 s
+  [stat_c_s1 skies 160-163] 44 s
+  [stat_c_s1 skies 168-171] 42 s
+  [stat_c_s1 skies 172-175] 40 s
+  [stat_c_s1 skies 180-183] 33 s
+  [stat_c_s1 skies 184-187] 33 s
+  [stat_c_s1 skies 176-179] 38 s
+  [stat_c_s1 skies 188-191] 38 s
+  [stat_c_s1 skies 192-195] 33 s
+  [stat_c_s1 skies 196-199] 36 s
+  [joint_h_s1 skies 108-111] 60 s
+[progress] 101/190 chunks, 867 s
+  [joint_h_s1 skies 100-103] 69 s
+  [joint_h_s1 skies 132-135] 60 s
+  [joint_h_s1 skies 140-143] 60 s
+  [joint_h_s1 skies 116-119] 81 s
+  [joint_h_s1 skies 104-107] 92 s
+  [joint_h_s1 skies 120-123] 90 s
+  [joint_h_s1 skies 136-139] 75 s
+  [joint_h_s1 skies 144-147] 68 s
+  [joint_h_s1 skies 128-131] 87 s
+  [joint_h_s1 skies 112-115] 103 s
+  [joint_h_s1 skies 124-127] 103 s
+  [joint_h_s1 skies 148-151] 59 s
+  [joint_h_s1 skies 156-159] 62 s
+  [joint_h_s1 skies 160-163] 57 s
+  [joint_h_s1 skies 168-171] 71 s
+  [joint_h_s1 skies 164-167] 76 s
+  [joint_h_s1 skies 184-187] 72 s
+  [joint_h_s1 skies 180-183] 76 s
+  [joint_h_s1 skies 188-191] 72 s
+  [joint_h_s1 skies 172-175] 91 s
+  [joint_h_s1 skies 152-155] 124 s
+  [joint_h_s1 skies 176-179] 92 s
+  [joint_h_s1 skies 196-199] 75 s
+  [joint_h_s3 skies 100-103] 67 s
+  [joint_h_s1 skies 192-195] 90 s
+[progress] 126/190 chunks, 1014 s
+  [joint_h_s3 skies 104-107] 72 s
+  [joint_h_s3 skies 108-111] 77 s
+  [joint_h_s3 skies 112-115] 86 s
+  [joint_h_s3 skies 132-135] 62 s
+  [joint_h_s3 skies 140-143] 61 s
+  [joint_h_s3 skies 116-119] 80 s
+  [joint_h_s3 skies 120-123] 89 s
+  [joint_h_s3 skies 128-131] 82 s
+  [joint_h_s3 skies 136-139] 80 s
+  [joint_h_s3 skies 144-147] 68 s
+  [joint_h_s3 skies 148-151] 74 s
+  [joint_h_s3 skies 124-127] 115 s
+  [joint_h_s3 skies 160-163] 60 s
+  [joint_h_s3 skies 168-171] 57 s
+  [joint_h_s3 skies 156-159] 84 s
+  [joint_h_s3 skies 188-191] 57 s
+  [joint_h_s3 skies 164-167] 80 s
+  [joint_h_s3 skies 172-175] 89 s
+  [joint_h_s3 skies 152-155] 131 s
+  [joint_h_s3 skies 184-187] 76 s
+  [joint_h_s3 skies 176-179] 83 s
+  [joint_h_s3 skies 192-195] 74 s
+  [joint_h_s3 skies 180-183] 85 s
+  [joint_h_s10 skies 100-103] 67 s
+  [joint_h_s3 skies 196-199] 85 s
+[progress] 151/190 chunks, 1187 s
+  [joint_h_s10 skies 104-107] 73 s
+  [joint_h_s10 skies 108-111] 89 s
+  [joint_h_s10 skies 116-119] 82 s
+  [joint_h_s10 skies 112-115] 86 s
+  [joint_h_s10 skies 140-143] 62 s
+  [joint_h_s10 skies 136-139] 66 s
+  [joint_h_s10 skies 128-131] 88 s
+  [joint_h_s10 skies 132-135] 90 s
+  [joint_h_s10 skies 148-151] 61 s
+  [joint_h_s10 skies 120-123] 100 s
+  [joint_h_s10 skies 144-147] 71 s
+  [joint_h_s10 skies 160-163] 68 s
+  [joint_h_s10 skies 124-127] 148 s
+  [joint_h_s10 skies 168-171] 82 s
+  [joint_h_s10 skies 164-167] 94 s
+  [joint_h_s10 skies 152-155] 164 s
+  [joint_h_s10 skies 188-191] 105 s
+  [joint_h_s10 skies 172-175] 138 s
+  [joint_h_s10 skies 184-187] 118 s
+  [joint_h_s10 skies 156-159] 153 s
+  [joint_h_s10 skies 180-183] 140 s
+  [joint_h_s10 skies 176-179] 165 s
+  [joint_h_s10 skies 196-199] 156 s
+  [joint_h_s10 skies 192-195] 191 s
+  [joint_c_s1 skies 108-111] 433 s
+[progress] 176/190 chunks, 1752 s
+  [joint_c_s3 skies 108-111] 395 s
+  [joint_c_s1 skies 100-103] 483 s
+  [joint_c_s3 skies 100-103] 461 s
+  [joint_c_s3 skies 104-107] 464 s
+  [joint_c_s10 skies 100-103] 426 s
+  [joint_c_s1 skies 104-107] 602 s
+  [joint_c_s3 skies 112-115] 526 s
+  [joint_c_s3 skies 116-119] 547 s
+  [joint_c_s1 skies 112-115] 609 s
+  [joint_c_s10 skies 104-107] 539 s
+  [joint_c_s1 skies 116-119] 640 s
+  [joint_c_s10 skies 108-111] 347 s
+  [joint_c_s10 skies 116-119] 394 s
+  [joint_c_s10 skies 112-115] 420 s
+[stat_h_s1] records 7900 skies 100
+[stat_h_s10] records 7900 skies 100
+[stat_h_sinf] records 7900 skies 100
+[stat_c_s1] records 7900 skies 100
+[joint_h_s1] records 7900 skies 100
+[joint_h_s3] records 7900 skies 100
+[joint_h_s10] records 7900 skies 100
+[joint_c_s1] records 1580 skies 20
+[joint_c_s3] records 1580 skies 20
+[joint_c_s10] records 1580 skies 20
+TOTAL 2189 s

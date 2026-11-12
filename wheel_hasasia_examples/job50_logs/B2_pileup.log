@@ -1,0 +1,4 @@
+max |f_ret - FP_ALL|/FP_ALL: 1.4432899320127035e-15
+(a) notebook masses, pulsar 41 (L=2105 pc, cos mu ~ U(-0.9,0.9)): >=50 nHz Earth 232  pulsar 44
+    over all 120 pulsars: pulsar-term count mean 77.3, min 29, max 160
+(b) Job-41 mass recipe (used by p2r): pulsar 41 -> 20; all pulsars mean 36.9, min 5, max 92

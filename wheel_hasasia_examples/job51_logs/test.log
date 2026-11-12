@@ -1,0 +1,4 @@
+(1) sky 100, marg=True, hook=None: 79 pulsars, all 6 keys identical to Job 50 run: True  [16 s]
+(2) noiseless=True: joint right 1.000 (K>=60: 1.000, n=16); shared-data stack right 0.570 (K>=60 0.125); Job50-style stack 0.620 (K>=60 0.188); cand share of GW power/bin median 0.051; N max 262144; cap 0  [34 s]
+(2) noiseless=False: joint right 0.823 (K>=60: 0.312, n=16); shared-data stack right 0.557 (K>=60 0.062); Job50-style stack 0.620 (K>=60 0.188); cand share of GW power/bin median 0.051; N max 262144; cap 0  [29 s]
+(3) StatHook: arr_noise median 25.2, arr_bg 0.10, arr_opt 0.15; n candidates with >=4 pulsars share>0.5: 0 of 1213  [23 s]

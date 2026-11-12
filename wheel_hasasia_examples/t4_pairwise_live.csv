@@ -1,0 +1,17 @@
+knob_a,knob_b,purity,delta,R2,nonadditive_excess,n
+BASELINE,,0.9412,0,0.9737,0,253
+L1 dmu full dist,,0.9808,+0.0396,,,
+L2 rate x1.6 (counts only),,0.8298,-0.1114,,,
+L3 split x3,,0.9615,+0.0204,,,
+L4 f_bend 2->4 nHz,,0.9623,+0.0211,,,
+L6 K prior-wt x1.3,,0.9412,+0.0000,,,
+L1 dmu full dist,L2 rate x1.6 (counts only),0.9388,-0.0024,0.9634,+0.0694,245
+L1 dmu full dist,L3 split x3,0.9815,+0.0403,nan,-0.0196,267
+L1 dmu full dist,L4 f_bend 2->4 nHz,0.9444,+0.0033,nan,-0.0574,266
+L1 dmu full dist,L6 K prior-wt x1.3,0.9615,+0.0204,0.9636,-0.0192,260
+L2 rate x1.6 (counts only),L3 split x3,0.9038,-0.0373,nan,+0.0537,257
+L2 rate x1.6 (counts only),L4 f_bend 2->4 nHz,0.9412,+0.0000,nan,+0.0903,254
+L2 rate x1.6 (counts only),L6 K prior-wt x1.3,0.8298,-0.1114,0.9644,+0.0000,231
+L3 split x3,L4 f_bend 2->4 nHz,0.9231,-0.0181,nan,-0.0595,260
+L3 split x3,L6 K prior-wt x1.3,0.9615,+0.0204,0.9661,+0.0000,259
+L4 f_bend 2->4 nHz,L6 K prior-wt x1.3,0.9057,-0.0355,0.9663,-0.0566,261

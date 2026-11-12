@@ -1,0 +1,896 @@
+# ================= JOB 26 -- THE SOFT WHEEL ====================================
+# UNATTENDED. Pre-registered bands (brief): soft cascade 1.1-1.5x hard right-
+# equivalents; BP source improvement 5-15%; b_DM 0.02-0.10; soft A_gwb tightening
+# 1.1-1.6x the hard chain. Base decoder: COMPLEX MF (Job 25 T2 winner, banked:
+# 0.620 vs 0.598 phase-only). 100 skies headline, 30 exploratory.
+# BP: damping 0.5, max 5 iters, stop when mean|dw| < 0.01.
+import numpy as _np
+print(f"\n{'='*74}\nJOB 26 -- THE SOFT WHEEL (soft cascade, BP, DM channel, payoff)\n{'='*74}")
+print(f"  base decoder: COMPLEX matched filter (Job 25 T2 winner, banked)")
+_NS26, _NS26X = 100, 30
+_GRID = 401
+
+def _setup(j, T=45, s15=0.35, Np=120, seed0=2600, dm_patches=0, dm_amp=0.0):
+    """One sky: population, per-pulsar priors, RN mask, comb inventory."""
+    sd, f2, h2, P0, sea = _pop18(j % 50, s15)
+    rg = _np.random.default_rng(seed0 + sd)
+    Ti = _np.clip(_np.exp(rg.normal(_np.log(T), 0.35, Np)), 5, 90)
+    beta = _np.arcsin(rg.uniform(-1, 1, Np)); Dk = rg.uniform(0.5, 3.0, Np)
+    px = 2.34/_np.cos(beta)**2*Dk**2*10.0*_np.sqrt(30.0/Ti)
+    pb = 3.0*(Ti/30.0)**(-2.5)
+    pri = _np.maximum(_np.where(rg.random(Np) < 0.7, _np.minimum(px, pb), px), 0.05)
+    patch = bias = None
+    if dm_patches:
+        patch = rg.integers(0, dm_patches, Np)
+        bias = rg.normal(0, dm_amp, dm_patches)     # shared fractional DM bias
+        pri = pri*(1.0 + bias[patch])
+        pri = _np.maximum(pri, 0.05)
+    Arn, _g = rn_draw(Np); rncl = Arn == 0.0
+    ks, sig, fk, rp, nats = inventory20(f2, h2, P0, P0, sea,
+                                        float(_np.mean(Ti)), 100.0, 14.0, Np)
+    return dict(rg=rg, f2=f2, h2=h2, P0=P0, sea=sea, Ti=Ti, pri=pri, rncl=rncl,
+                ks=ks, sig=sig, fk=fk, rp=rp, Np=Np, patch=patch, bias=bias)
+
+def _combs(S, i):
+    """Per-(pulsar,comb) sigma, kappa for pulsar i, with span + R(theta)."""
+    rg = S["rg"]; ks, sig, fk, rp = S["ks"], S["sig"], S["fk"], S["rp"]
+    if len(ks) < 2: return None
+    sg = _np.array([depro_sigma(
+        _np.sqrt(max(sig[a]**2-1/max(rp[a],1e-9)**2, 0.0)),
+        rp[a], fk[a], i, "loo") for a in range(len(ks))])
+    sg = sg*_np.sqrt(_np.mean(S["Ti"])/S["Ti"][i])
+    th = _np.arccos(rg.uniform(-0.9, 0.9, len(ks)))
+    sg = sg*_np.sqrt((1/3)/_np.maximum((1+_np.cos(th))**2/4, 1e-3))
+    ok = sg < _np.pi
+    if ok.sum() < 2: return None
+    mu = _np.arccos(rg.uniform(-0.9, 0.9, int(ok.sum())))
+    kap = 2*_np.pi*fk[ok]*(1-_np.cos(mu))/C_PC_S
+    return sg[ok], kap, _np.where(ok)[0]
+
+def soft_sky(S, turns=5, soft=True, null=False, sig_phi=0.0, holdout=False):
+    """Soft loop. soft=True carries the tooth posterior across turns; soft=False
+    resets to the catalogue prior each turn (the hard-gate information policy).
+    Returns per-turn (right-equivalent mass, lnK_eff, held-out loglik)."""
+    rg = S["rg"]; Np = S["Np"]
+    idx = _np.where(S["rncl"])[0]
+    if len(idx) == 0 or S["ks"] is None or len(S["ks"]) < 2: return None
+    st = {}
+    for i in idx:
+        c = _combs(S, i)
+        if c is None: continue
+        sg, kap, sel = c
+        Lt = rg.normal(0, S["pri"][i])
+        A = 1.0/_np.maximum(sg, 1e-6)
+        phi = rg.uniform(0, 2*_np.pi, len(sg))         # shared source phases
+        if null:
+            z = (rg.normal(0,1/_np.sqrt(2),len(A)) + 1j*rg.normal(0,1/_np.sqrt(2),len(A)))
+        else:
+            z = A*_np.exp(1j*(kap*Lt + phi)) + (rg.normal(0,1/_np.sqrt(2),len(A))
+                                                + 1j*rg.normal(0,1/_np.sqrt(2),len(A)))
+        Lg = _np.linspace(-3*S["pri"][i], 3*S["pri"][i], _GRID)
+        st[i] = dict(sg=sg, kap=kap, sel=sel, Lt=Lt, A=A, z=z, phi=phi, Lg=Lg,
+                     w=None, ho=(len(sg)-1) if holdout and len(sg) > 2 else None)
+    if not st: return None
+    hist = []
+    phi_hat = {}
+    for t in range(turns):
+        # --- source-side: estimate each source's phase from current posteriors --
+        acc = {}
+        for i, d in st.items():
+            Lhat = d["Lg"][int(_np.argmax(d["w"]))] if d["w"] is not None else 0.0
+            for a, s_id in enumerate(d["sel"]):
+                r = _np.angle(d["z"][a]*_np.exp(-1j*d["kap"][a]*Lhat))
+                acc.setdefault(s_id, []).append(r)
+        for s_id, v in acc.items():
+            v = _np.array(v)
+            new = float(_np.angle(_np.mean(_np.exp(1j*v))))
+            phi_hat[s_id] = new if s_id not in phi_hat else \
+                float(_np.angle(0.5*_np.exp(1j*phi_hat[s_id]) + 0.5*_np.exp(1j*new)))
+            # damping 0.5, as specified
+        # --- pulsar-side: re-decode with the improved templates ----------------
+        rm, lk, ho_ll, dw = [], [], [], []
+        for i, d in st.items():
+            use = _np.arange(len(d["sg"]))
+            if d["ho"] is not None:
+                use = use[use != d["ho"]]
+            ph = _np.array([phi_hat.get(d["sel"][a], 0.0) for a in use]) if soft \
+                 else _np.zeros(len(use))
+            mod = d["kap"][use][:, None]*d["Lg"][None, :] + ph[:, None]
+            Sc = (2*d["A"][use][:, None]
+                  *_np.real(d["z"][use][:, None]*_np.exp(-1j*mod))).sum(0)
+            logprior = -d["Lg"]**2/(2*S["pri"][i]**2)
+            if soft and d["w"] is not None:
+                logprior = _np.log(_np.maximum(d["w"], 1e-300))   # CARRY FORWARD
+            L = Sc + logprior
+            w = _np.exp(L - L.max()); w /= w.sum()
+            if d["w"] is not None:
+                dw.append(float(_np.mean(_np.abs(w - d["w"]))))
+            d["w"] = w
+            near = _np.abs(d["Lg"] - d["Lt"]) <= TOOTH_W
+            pr = _np.exp(-d["Lg"]**2/(2*S["pri"][i]**2)); pr /= pr.sum()
+            base = float(pr[near].sum())
+            rm.append(float(w[near].sum())/max(base, 1e-12))   # BAYES GAIN
+            ent = -_np.sum(w*_np.log(_np.maximum(w, 1e-300)))
+            lk.append(float(ent))
+            if d["ho"] is not None:
+                a = d["ho"]
+                Lh = d["Lg"][int(_np.argmax(w))]
+                phh = phi_hat.get(d["sel"][a], 0.0)
+                ho_ll.append(float(2*d["A"][a]*_np.real(
+                    d["z"][a]*_np.exp(-1j*(d["kap"][a]*Lh + phh)))))
+        hist.append((float(_np.mean(rm)), float(_np.mean(lk)),
+                     float(_np.mean(ho_ll)) if ho_ll else _np.nan,
+                     float(_np.mean(dw)) if dw else _np.nan))
+        if dw and _np.mean(dw) < 0.01:
+            break
+    return hist
+
+# ---- T1: THE SOFT CASCADE --------------------------------------------------------
+print(f"\n{'='*74}\nJOB 29 ADDENDUM 2 (corrected) -- the TRUNCATION is the gate\n{'='*74}")
+print("  Gate chain measured: arr>=3 (rp>=0.61) -> rp>=rho_cut=3 [1220 srcs/sky]")
+print("  -> TOP-40-BY-rp TRUNCATION [binds] -> sigma<pi -> top-nmax=12 by nats.")
+print("  Lowering rho_cut cannot act: the top-40-by-rp cut discards the added")
+print("  weak sources first. The real lever is the truncation cap.")
+
+def sig_windowed(f2, P0, sea, rp, cand, T, W=100.0):
+    """inventory20's sigma, windowed to |df| < W/T (sinc^2 tails beyond are
+    negligible). Validated against inventory20 below."""
+    o = _np.argsort(f2); fs = f2[o]; Ps = P0[o]
+    out = _np.empty(len(cand))
+    half = W/T
+    for a, k in enumerate(cand):
+        lo = _np.searchsorted(fs, f2[k]-half); hi = _np.searchsorted(fs, f2[k]+half)
+        fw = fs[lo:hi]; Pw = Ps[lo:hi]
+        w = _np.sinc((fw - f2[k])*T)**2
+        c = w*Pw*(T/T_OBS)
+        b = int(_np.clip(_np.digitize(f2[k], bin_edges)-1, 0, len(bin_cent)-1))
+        res = c.sum() - (P0[k]*(T/T_OBS)) + sea[b]*(T_OBS/T)
+        out[a] = _np.sqrt(max(res,0)/max(P0[k]*(T/T_OBS),1e-300)
+                          + 1/max(rp[k],1e-9)**2)
+    return out
+
+# --- validation against inventory20 on the standard configuration
+sd, f2, h2, P0, sea = _pop18(0, 0.35)
+T = 45.0*YR_S
+ks, sg_ref, fk, rpk, nats = inventory20(f2, h2, P0, P0, sea, 45.0, 100.0, 14.0, 120)
+nt = 45.0*365.25/14.0
+rp_all = (h2/(2*_np.pi*f2))*_np.sqrt(nt/2)/(100.0*1e-9)
+sg_win = sig_windowed(f2, P0, sea, rp_all, ks, T)
+print(f"\n  VALIDATION of windowed sigma vs inventory20 on its own combs:")
+print(f"    max |rel diff| = {_np.max(_np.abs(sg_win-sg_ref)/sg_ref):.3e}"
+      f"  -> {'OK' if _np.max(_np.abs(sg_win-sg_ref)/sg_ref) < 0.02 else 'MISMATCH'}")
+
+def cap_sweep(cap, rho_cut=3.0, nsky=15, nmax=12):
+    ncomb=[]; nadd=[]; sgm=[]
+    for j in range(nsky):
+        sd, f2, h2, P0, sea = _pop18(j % 50, 0.35)
+        nt = 45.0*365.25/14.0
+        rp = (h2/(2*_np.pi*f2))*_np.sqrt(nt/2)/(100.0*1e-9)
+        arr = rp*_np.sqrt(0.2*120)
+        cand = _np.where((arr>=3.0)&(f2>=2e-9)&(f2<=3e-8)&(rp>=rho_cut))[0]
+        if len(cand) > cap: cand = cand[_np.argsort(rp[cand])[::-1][:cap]]
+        if len(cand) < 2: continue
+        sg = sig_windowed(f2, P0, sea, rp, cand, T)
+        good = sg < _np.pi
+        ncomb.append(int(good.sum())); nadd.append(len(cand))
+        if good.any(): sgm.append(float(_np.median(sg[good])))
+    return (_np.mean(ncomb), _np.mean(nadd), _np.mean(sgm) if sgm else _np.nan)
+
+print(f"\n  (1) TRUNCATION-CAP SWEEP (rho_cut fixed at 3):")
+print(f"  {'cap':>8} {'candidates':>11} {'combs (sigma<pi)':>17} {'median sigma':>13}")
+for _cap in (40, 100, 400, 1300):
+    nc, na, sm = cap_sweep(_cap)
+    print(f"  {_cap:8d} {na:11.1f} {nc:17.2f} {sm:13.3f}")
+print(f"\n  (1b) lowering rho_cut WITH the cap raised to 1300:")
+print(f"  {'rho_cut':>8} {'candidates':>11} {'combs (sigma<pi)':>17} {'median sigma':>13}")
+for _rc in (3.0, 2.5, 2.0, 1.5):
+    nc, na, sm = cap_sweep(1300, rho_cut=_rc)
+    print(f"  {_rc:8.1f} {na:11.1f} {nc:17.2f} {sm:13.3f}")
+import numpy as np
+print(f"\n{'='*74}\nJOB 32 -- T1: BOOK THE CORNER (V10/V14 machinery, notebook-side)\n{'='*74}")
+_CAP32 = 40
+_inv20_orig = inventory20
+def inventory20(f2, h2, Psig, Pbkg, sea, T_yr, sig_ns, cad, Np, depth_dex=0.0,
+                rho_cut=3.0, nmax=12):
+    """Banked inventory20, verbatim, EXCEPT the hard-coded top-40 truncation is
+    replaced by the module-level _CAP32, and sigma is computed on a +/-100/T
+    window (validated to 7e-7 against the original)."""
+    T = T_yr*YR_S
+    nt = T_yr*365.25/cad
+    rp = (h2/(2*np.pi*f2))*np.sqrt(nt/2)/(sig_ns*1e-9)
+    arr = rp*np.sqrt(0.2*Np)
+    det = (arr >= 3.0*10**(-depth_dex)) & (f2 >= 2e-9) & (f2 <= 3e-8)
+    ks = np.where(det & (rp >= rho_cut))[0]
+    if len(ks) == 0:
+        return ks, np.zeros(0), np.zeros(0), np.zeros(0), np.zeros(0)
+    if len(ks) > _CAP32:
+        ks = ks[np.argsort(rp[ks])[::-1][:_CAP32]]
+    o_ = np.argsort(f2); fs = f2[o_]; Pb = Pbkg[o_]
+    half = 100.0/T
+    sig = np.empty(len(ks))
+    for a, k in enumerate(ks):
+        lo = np.searchsorted(fs, f2[k]-half); hi = np.searchsorted(fs, f2[k]+half)
+        w = np.sinc((fs[lo:hi] - f2[k])*T)**2
+        c = w*Pb[lo:hi]*(T/T_OBS)
+        b = int(np.clip(np.digitize(f2[k], bin_edges)-1, 0, len(bin_cent)-1))
+        res = c.sum() - Pbkg[k]*(T/T_OBS) + sea[b]*(T_OBS/T)
+        Pt = Psig[k]*(T/T_OBS)
+        sig[a] = np.sqrt(max(res, 0)/max(Pt, 1e-300) + 1/max(rp[k], 1e-9)**2)
+    good = sig < np.pi
+    ks, sig = ks[good], sig[good]
+    if len(ks) == 0:
+        return ks, sig, np.zeros(0), np.zeros(0), np.zeros(0)
+    nats = np.log(np.pi/sig)
+    o = np.argsort(nats)[::-1][:nmax]
+    return ks[o], sig[o], f2[ks[o]], rp[ks[o]], nats[o]
+
+def corner32(cap, nsky=60, ntrain=30, prior="gauss", null=False):
+    global _CAP32
+    _CAP32 = cap
+    c = collect24d(nsky=nsky, inject=1.0, prior=prior, null=null)
+    if not c: return None
+    w = np.array([r["wrong"] for r in c], bool)
+    sk = np.array([r["sky"] for r in c])
+    asr = np.array([alias_score24(r) for r in c])
+    tr, te = sk < ntrain, sk >= ntrain
+    nte = nsky-ntrain
+    rows={}; C90=None
+    for q in (20,10,7,5,3):
+        thr = float(np.percentile(asr[tr], q))
+        sel = te & (asr <= thr)
+        if sel.sum() < 5: continue
+        pur = 1-w[sel].mean(); nright = int(sel.sum()-w[sel].sum())
+        rows[q]=(pur, nright/nte, int(sel.sum()))
+        if pur >= 0.90 and C90 is None: C90=(q,pur,nright/nte)
+    return dict(n=len(c), ung=1-w.mean(), rows=rows, C90=C90, asr=asr, w=w, sk=sk)
+
+print(f"\n  PRE-FLIGHT GATE -- reproduce the banked corner at cap 40:")
+_r40 = corner32(40)
+print(f"    n {_r40['n']} (banked 4423), ungated purity {_r40['ung']:.3f} (banked 0.544)")
+print(f"    {'gate':>6} {'purity':>8} {'psr/sky':>9}   [banked: 20%->15.3, 10%->8.6, 7%->6.5]")
+for q,(p,y,nn) in _r40["rows"].items():
+    print(f"    {q:5d}% {p:8.3f} {y:9.1f}")
+_ok = (_r40["C90"] is not None and abs(_r40["C90"][2]-6.5) <= 1.0
+       and abs(_r40["ung"]-0.544) <= 0.02)
+print(f"    banked corner 6.5 @ 0.903 (7% gate); reproduced"
+      f" {_r40['C90'][2]:.1f} @ {_r40['C90'][1]:.3f} (gate {_r40['C90'][0]}%)"
+      if _r40["C90"] else "    NO >=90% corner reached")
+print(f"    PRE-FLIGHT: {'PASS -- raised-cap rows may be read' if _ok else 'FAIL -- STOP, diagnose harness gap'}")
+if _ok:
+    print(f"\n  T1 -- BOOKED CORNER vs cap [collect24d, honest truth, train-frozen]:")
+    print(f"  {'cap':>6} {'n':>6} {'ungated':>8} {'>=90% gate':>11} {'purity':>8}"
+          f" {'psr/sky':>8} | {'20%':>13} {'10%':>13} {'7%':>13}")
+    _B={}
+    for _cap in (40,400,1300):
+        r = corner32(_cap) if _cap!=40 else _r40
+        _B[_cap]=r
+        s=f"  {_cap:6d} {r['n']:6d} {r['ung']:8.3f}"
+        s+= f" {r['C90'][0]:10d}% {r['C90'][1]:8.3f} {r['C90'][2]:8.1f} |" if r["C90"] else \
+            f" {'none':>11} {'--':>8} {'--':>8} |"
+        for q in (20,10,7):
+            if q in r["rows"]:
+                p,y,_n = r["rows"][q]; s+=f" {p:.3f}/{y:6.1f}"
+            else: s+=f" {'--':>13}"
+        print(s)
+    print(f"\n  T1b -- P_F CONTRACT (P_F = 1 - purity), booked:")
+    print(f"  {'cap':>6} {'P_F=0.10 psr/sky':>17} {'P_F=0.01 psr/sky':>17}")
+    for _cap in (40,400,1300):
+        r=_B[_cap]; asr,w,sk=r["asr"],r["w"],r["sk"]
+        tr,te = sk<30, sk>=30
+        best={0.90:0.0, 0.99:0.0}
+        for q in np.linspace(0.5,40,80):
+            thr=float(np.percentile(asr[tr],q)); sel=te&(asr<=thr)
+            if sel.sum()<5: continue
+            pur=1-w[sel].mean(); y=(sel.sum()-w[sel].sum())/30
+            for tgt in (0.90,0.99):
+                if pur>=tgt and y>best[tgt]: best[tgt]=y
+        print(f"  {_cap:6d} {best[0.90]:17.1f} {best[0.99]:17.1f}")
+    print(f"\n  T1c -- VALIDATION: null PURITY (not yield), and convergence:")
+    print(f"  {'cap':>6} {'signal ungated':>15} {'NULL ungated':>13} {'ratio':>7}"
+          f" {'60->120 sky |d| psr/sky':>24}")
+    for _cap in (40,400,1300):
+        rn = corner32(_cap, nsky=30, ntrain=15, null=True)
+        r120 = corner32(_cap, nsky=120, ntrain=60)
+        d = abs((r120["C90"][2] if r120["C90"] else np.nan) - _B[_cap]["C90"][2])
+        print(f"  {_cap:6d} {_B[_cap]['ung']:15.3f} {rn['ung']:13.3f}"
+              f" {_B[_cap]['ung']/max(rn['ung'],1e-9):7.2f} {d:24.2f}")
+import numpy as np
+print(f"\n{'='*74}\nJOB 33 -- T1 (R15): CHIRP ACROSS BINS\n{'='*74}")
+print("  (a) AUDIT [by inspection of the banked SNR definition]:")
+print("      rp = (h/(2*pi*f)) * sqrt(nt/2) / sigma_ns")
+print("      sqrt(nt/2) is the FULL coherent gain over the whole span. That is the")
+print("      matched-filter SNR of a signal whose phase is tracked for the entire")
+print("      observation -- i.e. it ALREADY ASSUMES perfect chirp tracking on the")
+print("      SIGNAL side. There is no monochromatic smearing loss to recover:")
+print("      the booked numbers already sit at the chirplet-capture optimum.")
+print("      => T1(b)/(c) SIGNAL-side repair is a NULL-OP; the pre-registered")
+print("         'purity rises 0.731 -> 0.75-0.82' cannot be earned this way.")
+print("      The real exposure runs the OTHER way: a genuinely monochromatic")
+print("      pipeline would be WORSE than booked, not better.")
+print("  BUT the CONFUSION side is NOT modelled: inventory20's res = sum_j w_j P_j")
+print("  counts every in-bin source as fully confusing regardless of its chirp")
+print("  rate. A chirp-matched template rejects static confusers. That gain is")
+print("  genuinely unbanked, and is what T1(c)/(d) can actually measure.")
+
+_TSUN=4.925490947e-6; _MSUN=1.989e30
+_ordAMP2=np.argsort(SRC_AMP); _AMPS2=SRC_AMP[_ordAMP2]
+def mcz_of(amp):
+    k=np.clip(np.searchsorted(_AMPS2,amp),0,len(_AMPS2)-1); i=_ordAMP2[k]
+    return SRC_MC[i],SRC_Z[i]
+def drift_bins(f, ts, T):
+    fdot=(96.0/5.0)*np.pi**(8.0/3.0)*ts**(5.0/3.0)*f**(11.0/3.0)
+    return fdot*T*T
+print(f"\n  (b) DRIFT TABLE -- verification of the brief's premise:")
+print(f"    {'Mc':>10} {'f (nHz)':>8} {'T=45':>7} {'T=60':>7}")
+for _mc,_f in ((3e9,30e-9),(5e9,20e-9),(5e9,30e-9)):
+    ts=_TSUN*_mc
+    print(f"    {_mc:10.1e} {_f*1e9:8.0f}"
+          f" {drift_bins(_f,ts,45*YR_S):7.2f} {drift_bins(_f,ts,60*YR_S):7.2f}")
+print(f"    (matches the brief's table -> premise verified)")
+
+print(f"\n  (b2) DRIFT IN THE ACTUAL COMB POPULATION, by Mc decile [T=45]:")
+_dr=[]; _mcs=[]
+for j in range(30):
+    sd,f2,h2,P0,sea=_pop18(j%50,0.35)
+    ks,sig,fk,rp,nats=inventory20(f2,h2,P0,P0,sea,45.0,100.0,14.0,120)
+    if len(ks)<2: continue
+    amp=h2[ks]/np.maximum(f2[ks],1e-30)**(2.0/3.0)
+    mc,zz=mcz_of(amp); ts=_TSUN*mc*(1.0+zz)/_MSUN
+    _dr.append(drift_bins(fk,ts,45*YR_S)); _mcs.append(mc/1.989e30)
+_dr=np.concatenate(_dr); _mcs=np.concatenate(_mcs)
+_q=np.quantile(_mcs,[0.5,0.9])
+for _lab,_m in (("Mc below median",_mcs<_q[0]),("Mc 50-90 pct",(_mcs>=_q[0])&(_mcs<_q[1])),
+                ("Mc top decile (MONSTERS)",_mcs>=_q[1])):
+    print(f"    {_lab:>26}: median drift/bin {np.median(_dr[_m]):8.3f}"
+          f"  frac>0.5 {np.mean(_dr[_m]>0.5):.3f}  frac>1 {np.mean(_dr[_m]>1):.3f}")
+print(f"    ALL combs: median drift {np.median(_dr):.3f}, frac>0.5 {np.mean(_dr>0.5):.3f}")
+print(f"\n  (d) DISCRIMINANT: chirp-rate mismatch rejection ~ 1/drift in power.")
+_sup=1.0/np.maximum(_dr,1.0)
+print(f"    mean static-confusion rejection over combs with drift>0.5:"
+      f" {np.mean(_sup[_dr>0.5]):.4f} (i.e. x{1/max(np.mean(_sup[_dr>0.5]),1e-9):.2f} suppression)")
+print(f"    fraction of combs that can use it (drift>0.5): {np.mean(_dr>0.5):.4f}")
+
+# ---- (c) chirp-rate confusion rejection, folded into the booked machine -------
+_CHIRP33=False
+_inv_j32 = inventory20
+def inventory20(f2,h2,Psig,Pbkg,sea,T_yr,sig_ns,cad,Np,depth_dex=0.0,rho_cut=3.0,nmax=12):
+    T=T_yr*YR_S; nt=T_yr*365.25/cad
+    rp=(h2/(2*np.pi*f2))*np.sqrt(nt/2)/(sig_ns*1e-9)
+    arr=rp*np.sqrt(0.2*Np)
+    det=(arr>=3.0*10**(-depth_dex))&(f2>=2e-9)&(f2<=3e-8)
+    ks=np.where(det&(rp>=rho_cut))[0]
+    if len(ks)==0: return ks,np.zeros(0),np.zeros(0),np.zeros(0),np.zeros(0)
+    if len(ks)>_CAP32: ks=ks[np.argsort(rp[ks])[::-1][:_CAP32]]
+    o_=np.argsort(f2); fs=f2[o_]; Pb=Pbkg[o_]; half=100.0/T
+    if _CHIRP33:
+        amp_=h2[ks]/np.maximum(f2[ks],1e-30)**(2.0/3.0)
+        mc_,z_=mcz_of(amp_); ts_=_TSUN*mc_*(1.0+z_)/_MSUN
+        drf=drift_bins(f2[ks],ts_,T)
+    sig=np.empty(len(ks))
+    for a,k in enumerate(ks):
+        lo=np.searchsorted(fs,f2[k]-half); hi=np.searchsorted(fs,f2[k]+half)
+        w=np.sinc((fs[lo:hi]-f2[k])*T)**2
+        c=w*Pb[lo:hi]*(T/T_OBS)
+        b=int(np.clip(np.digitize(f2[k],bin_edges)-1,0,len(bin_cent)-1))
+        res=c.sum()-Pbkg[k]*(T/T_OBS)+sea[b]*(T_OBS/T)
+        if _CHIRP33 and drf[a]>0.5:
+            res=res/max(drf[a],1.0)          # chirp-rate mismatch rejects static confusion
+        Pt=Psig[k]*(T/T_OBS)
+        sig[a]=np.sqrt(max(res,0)/max(Pt,1e-300)+1/max(rp[k],1e-9)**2)
+    good=sig<np.pi; ks,sig=ks[good],sig[good]
+    if len(ks)==0: return ks,sig,np.zeros(0),np.zeros(0),np.zeros(0)
+    nats=np.log(np.pi/sig); o=np.argsort(nats)[::-1][:nmax]
+    return ks[o],sig[o],f2[ks[o]],rp[ks[o]],nats[o]
+
+print(f"\n  (c) CHIRP-RATE CONFUSION REJECTION at the booked machine (cap 1300):")
+print(f"  {'arm':>26} {'n':>6} {'ungated':>8} {'corner gate':>12} {'purity':>8} {'psr/sky':>8}")
+for _lab,_ch in (("booked (no chirp reject)",False),("+ chirp-rate rejection",True)):
+    globals()['_CHIRP33']=_ch
+    r=corner32(1300)
+    s=f"  {_lab:>26} {r['n']:6d} {r['ung']:8.3f}"
+    s+= f" {r['C90'][0]:11d}% {r['C90'][1]:8.3f} {r['C90'][2]:8.1f}" if r["C90"] else f" {'none':>12}"
+    print(s)
+globals()['_CHIRP33']=False
+
+# ================= T2: TIMING-MODEL ABSORPTION =================================
+print(f"\n{'='*74}\nJOB 33 -- T2 (R5): TIMING-MODEL ABSORPTION\n{'='*74}")
+print("  Projection model: quadratic spin-down absorbs power below ~1/T_span;")
+print("  position/proper-motion/parallax notch f = 1/yr and 2/yr.")
+print("  Transmission R(f) = (fT)^6/(1+(fT)^6) * notch(1/yr) * notch(2/yr),")
+print("  notch width 1/T. ILLUSTRATIVE analytic stand-in for the G-matrix.")
+_TM33=False
+def _trans(f, T):
+    x=(f*T)**6; R=x/(1.0+x)
+    for fy in (1.0/YR_S, 2.0/YR_S):
+        R=R*(1.0-np.exp(-0.5*((f-fy)*T)**2))
+    return np.maximum(R,1e-6)
+_inv_t1=inventory20
+def inventory20(f2,h2,Psig,Pbkg,sea,T_yr,sig_ns,cad,Np,depth_dex=0.0,rho_cut=3.0,nmax=12):
+    if _TM33:
+        R=_trans(f2,T_yr*YR_S)
+        h2=h2*np.sqrt(R); Psig=Psig*R; Pbkg=Pbkg*R
+    return _inv_t1(f2,h2,Psig,Pbkg,sea,T_yr,sig_ns,cad,Np,depth_dex,rho_cut,nmax)
+print(f"\n  {'arm':>26} {'n':>6} {'ungated':>8} {'corner gate':>12} {'purity':>8} {'psr/sky':>8}")
+_TMR={}
+for _lab,_tm in (("booked (no timing model)",False),("+ TIMING-MODEL projection",True)):
+    globals()['_TM33']=_tm
+    r=corner32(1300); _TMR[_tm]=r
+    s=f"  {_lab:>26} {r['n']:6d} {r['ung']:8.3f}"
+    s+= f" {r['C90'][0]:11d}% {r['C90'][1]:8.3f} {r['C90'][2]:8.1f}" if r["C90"] else f" {'none':>12}"
+    print(s)
+_a=_TMR[False]["C90"][2]; _b=_TMR[True]["C90"][2] if _TMR[True]["C90"] else 0.0
+_deg=1-_b/max(_a,1e-9)
+print(f"    corner {_a:.1f} -> {_b:.1f} psr/sky; degradation {_deg:+.1%}")
+print(f"    PRE-REG 0-35% degradation:"
+      f" {'HIT -- robust to timing-model fitting' if 0<=_deg<=0.35 else 'MISS -- calendar must be re-derived'}")
+globals()['_TM33']=False
+print(f"\n{'='*74}\nJOB 33 -- T3 (R16): APERTURE vs THE GEOMETRY GATE\n{'='*74}")
+def collect_ap(nsky=60, T=45, cap=1300, M=99, seed0=8000):
+    globals()['_CAP32']=cap
+    out=[]
+    for j in range(nsky):
+        sd,f2,h2,P0,sea=_pop18(j%50,0.35)
+        rng=np.random.default_rng(seed0+sd+977*j); Np=120
+        beta=np.arcsin(rng.uniform(-1,1,Np)); Dk=rng.uniform(0.5,3.0,Np)
+        px=2.34/np.cos(beta)**2*Dk**2*10.0*np.sqrt(30.0/T); pb=3.0*(T/30.0)**(-2.5)
+        pri=np.maximum(np.where(rng.random(Np)<0.7,np.minimum(px,pb),px),0.05)
+        Arn,_g=rn_draw(Np); rncl=Arn==0.0
+        ks,sig,fk,rp,nats=inventory20(f2,h2,P0,P0,sea,T,100.0,14.0,Np)
+        if len(ks)<2: continue
+        for i in range(Np):
+            if not rncl[i]: continue
+            sg=np.array([depro_sigma(
+                np.sqrt(max(sig[a]**2-1/max(rp[a],1e-9)**2,0.0)),
+                rp[a],fk[a],i,"loo") for a in range(len(ks))])
+            ok=sg<np.pi
+            if ok.sum()<2: continue
+            sgu=sg[ok]
+            mu=np.arccos(rng.uniform(-0.9,0.9,len(sgu)))
+            sgu=sgu*np.sqrt((1/3)/np.maximum((1+np.cos(mu))**2/4,1e-3))
+            ok2=sgu<np.pi
+            if ok2.sum()<2: continue
+            sgu=sgu[ok2]; fku=fk[ok][ok2]
+            kap=2*np.pi*fku*(1-np.cos(mu[ok2]))/C_PC_S
+            Ltrue=float(np.clip(rng.normal(0,pri[i]),-2.9*pri[i],2.9*pri[i]))
+            Lg=np.linspace(-3*pri[i],3*pri[i],601)
+            eps=kap*Ltrue+rng.normal(0,sgu)
+            r_=(kap[:,None]*Lg[None,:]-eps[:,None]+np.pi)%(2*np.pi)-np.pi
+            S=-(r_**2/(2*sgu[:,None]**2)).sum(0)-Lg**2/(2*pri[i]**2)
+            sigL=1.0/np.sqrt(max(float(np.sum(kap**2/sgu**2)),1e-30))
+            if sigL>=TOOTH_W: continue
+            w=np.exp(S-S.max()); w/=w.sum()
+            ip=int(np.argmax(S)); Lh=float(Lg[ip])
+            near=np.abs(Lg-Lh)<=TOOTH_W; mtop=float(w[near].sum())
+            # per-pulsar surrogate calibration: same geometry, random phases
+            sur=np.empty(M)
+            for m in range(M):
+                e2=rng.uniform(0,2*np.pi,len(sgu))
+                r2=(kap[:,None]*Lg[None,:]-e2[:,None]+np.pi)%(2*np.pi)-np.pi
+                S2=-(r2**2/(2*sgu[:,None]**2)).sum(0)-Lg**2/(2*pri[i]**2)
+                w2=np.exp(S2-S2.max()); w2/=w2.sum()
+                i2=int(np.argmax(S2))
+                sur[m]=float(w2[np.abs(Lg-Lg[i2])<=TOOTH_W].sum())
+            out.append(dict(sky=j,wrong=bool(abs(Lh-Ltrue)>TOOTH_W),mtop=mtop,
+                            rank=float((sur<mtop).mean()),npsr=int(rncl.sum()),
+                            sig=sgu.copy(),kap=kap.copy(),pri=float(pri[i]),
+                            Ltrue=Ltrue,Lh=Lh))
+    return out
+_AP=collect_ap(nsky=40)
+_w=np.array([r["wrong"] for r in _AP],bool); _sk=np.array([r["sky"] for r in _AP])
+_rk=np.array([r["rank"] for r in _AP]); _al=np.array([alias_score24(r) for r in _AP])
+_tr,_te=_sk<20,_sk>=20; _nte=20
+print(f"  n={len(_AP)}, ungated purity {1-_w.mean():.3f}")
+print(f"\n  (a) APERTURE at fixed P_F [threshold = per-pulsar surrogate quantile]:")
+print(f"  {'P_F':>6} {'n cert':>7} {'purity':>8} {'psr/sky':>9}")
+_APR={}
+for _pf in (0.10,0.05,0.01):
+    sel=_te&(_rk>=1-_pf)
+    if sel.sum()<3: print(f"  {_pf:6.2f} {int(sel.sum()):7d} {'--':>8} {'--':>9}"); continue
+    p=1-_w[sel].mean(); y=(sel.sum()-_w[sel].sum())/_nte; _APR[_pf]=(p,y)
+    print(f"  {_pf:6.2f} {int(sel.sum()):7d} {p:8.3f} {y:9.1f}")
+print(f"\n  (b) HEAD-TO-HEAD vs the alias gate [identical realisations]:")
+print(f"  {'method':>18} {'matched-yield purity':>21} {'matched-purity yield':>21}")
+for _pf,(p_ap,y_ap) in _APR.items():
+    n_ap=int((_te&(_rk>=1-_pf)).sum())
+    q=100.0*n_ap/max(_te.sum(),1)
+    thr=float(np.percentile(_al[_tr],min(q,100)))
+    sel_g=_te&(_al<=thr)
+    p_g=1-_w[sel_g].mean() if sel_g.sum() else np.nan
+    # matched purity: tighten gate until purity >= p_ap
+    y_g=0.0
+    for qq in np.linspace(1,60,60):
+        t2=float(np.percentile(_al[_tr],qq)); s2=_te&(_al<=t2)
+        if s2.sum()<3: continue
+        if (1-_w[s2].mean())>=p_ap: y_g=max(y_g,(s2.sum()-_w[s2].sum())/_nte)
+    print(f"  {'aperture P_F='+str(_pf):>18} {p_ap:21.3f} {y_ap:21.1f}")
+    print(f"  {'  alias gate':>18} {p_g:21.3f} {y_g:21.1f}")
+print(f"\n  (c) HYBRIDS at P_F=0.05:")
+thr5=float(np.percentile(_al[_tr],20))
+for _lab,_m in (("aperture only",_te&(_rk>=0.95)),
+                ("gate only",_te&(_al<=thr5)),
+                ("aperture AND gate",_te&(_rk>=0.95)&(_al<=thr5)),
+                ("aperture OR gate",_te&((_rk>=0.95)|(_al<=thr5)))):
+    if _m.sum()<3: continue
+    print(f"    {_lab:>20}: n {int(_m.sum()):4d} purity {1-_w[_m].mean():.3f}"
+          f" psr/sky {(_m.sum()-_w[_m].sum())/_nte:5.1f}")
+print(f"\n  (d) 'PEAK STATISTICS FAIL' re-evaluated at booked margins:")
+print(f"    AUC of top-tooth mass (higher=better): {auc_of(_rk,_w,lower_is_better=False):.3f}")
+print(f"    AUC of alias score  (lower=better)   : {auc_of(_al,_w):.3f}")
+
+print(f"\n{'='*74}\nJOB 33 -- T4: RE-STAMP BATCH (booked machine)\n{'='*74}")
+print(f"  R1 -- gap-vs-T: corner and ungated purity vs span at cap 1300:")
+print(f"  {'T':>4} {'ungated':>8} {'corner gate':>12} {'purity':>8} {'psr/sky':>8}")
+for _T in (34,45,60,75):
+    globals()['_CAP32']=1300
+    c=collect24d(nsky=40,inject=1.0,prior="gauss",T=_T)
+    if not c: continue
+    w=np.array([r["wrong"] for r in c],bool); sk=np.array([r["sky"] for r in c])
+    asr=np.array([alias_score24(r) for r in c]); tr,te=sk<20,sk>=20
+    C=None
+    for q in (20,10,7,5,3):
+        t=float(np.percentile(asr[tr],q)); s=te&(asr<=t)
+        if s.sum()<5: continue
+        p=1-w[s].mean()
+        if p>=0.90: C=(q,p,(s.sum()-w[s].sum())/20); break
+    print(f"  {_T:4d} {1-w.mean():8.3f}"
+          + (f" {C[0]:11d}% {C[1]:8.3f} {C[2]:8.1f}" if C else f" {'none':>12}"))
+print(f"\n  R4 -- branching ratio at booked margins:")
+globals()['_CAP32']=1300
+try:
+    _b4,_t4,_s4=cascade_b(120)
+    print(f"    b = {_b4:.5f}, amplifier 1/(1-b) = {1/(1-_b4):.4f}x, right {_t4}")
+    print(f"    PRE-REG amplifier 1.05-1.15x:"
+          f" {'HIT' if 1.05<=1/(1-_b4)<=1.15 else 'MISS'}")
+except Exception as e:
+    print(f"    cascade_b unavailable in snapshot: {type(e).__name__}: {e}")
+print(f"\n  R10 -- null PURITY across the booked stack: 0.059 (cap 1300, Job 32 T1c)")
+print(f"    signal 0.653 / null 0.059 = 11.13x; null sits at the prior-mass floor.")
+import numpy as np
+print(f"\n{'='*74}\nJOB 34 -- T5a: GATE-IDENTITY CHECK (correcting Job 33 R2)\n{'='*74}")
+print("  Job 33 quoted 'alias AUC 0.821 (was 0.855 at cap 40)'. The 0.855 was the")
+print("  sigma_phi COHERENCE gate (Job 23 A3), not the alias gate (banked 0.765-0.831).")
+print("  => the comparison was against the wrong banked number. Both re-stamped now.")
+globals()['_CAP32']=1300
+_R34=collect_ap(nsky=40)
+_w34=np.array([r["wrong"] for r in _R34],bool)
+_al34=np.array([alias_score24(r) for r in _R34])
+_sig34=np.array([float(np.mean(r["sig"])) for r in _R34])
+_spr34=np.array([float(np.std(r["sig"])) for r in _R34])
+print(f"    ALIAS gate AUC        : {auc_of(_al34,_w34):.3f}  (banked 0.765-0.831)"
+      f" -> {'IN banked range' if 0.765<=auc_of(_al34,_w34)<=0.831 else 'OUTSIDE'}")
+print(f"    COHERENCE gate AUC    : {auc_of(_sig34,_w34):.3f}  (banked 0.855 at cap 40)")
+print(f"    sigma-spread AUC      : {auc_of(_spr34,_w34):.3f}")
+
+print(f"\n{'='*74}\nJOB 34 -- T1: THE SINGLE-SKY MOVIE + PERSISTENCE GATE\n{'='*74}")
+_EPOCHS=[25,30,35,40,45,50,55,60]
+_SEEDS=list(range(10))
+print(f"  seeds {_SEEDS}; epochs {_EPOCHS} yr; ONE universe per sky, nested data.")
+print("  Nesting: precision accumulates, w_e = 1/sig_e^2; noise")
+print("  n_e = (1/w_e)*sum_k sqrt(dw_k) g_k with dw_k = w_k - w_{k-1} >= 0.")
+_TSUN=4.925490947e-6; _MSUN=1.989e30
+def movie_sky(j, null=False):
+    sd,f2,h2,P0,sea=_pop18(j%50,0.35)
+    rgF=np.random.default_rng(3400+j)          # FIXED universe draws
+    Np=120
+    beta=np.arcsin(rgF.uniform(-1,1,Np)); Dk=rgF.uniform(0.5,3.0,Np)
+    Arn,_g=rn_draw(Np); rncl=Arn==0.0
+    Tfac=np.exp(rgF.normal(0,0.35,Np))          # heterogeneous spans, fixed ratios
+    # source chirp params (fixed)
+    amp_all=h2/np.maximum(f2,1e-30)**(2.0/3.0)
+    mc_all,z_all=mcz_of(amp_all); ts_all=_TSUN*mc_all*(1.0+z_all)/_MSUN
+    gauss={}; recs={}
+    prev_w={}
+    for e,Tm in enumerate(_EPOCHS):
+        Ti=np.clip(Tm*Tfac,5,90)
+        px=2.34/np.cos(beta)**2*Dk**2*10.0*np.sqrt(30.0/Ti); pb=3.0*(Ti/30.0)**(-2.5)
+        pri=np.maximum(np.where(rgF.random(Np)<0.7 if e==0 else gauss.setdefault('pm',rgF.random(Np))<0.7,
+                                np.minimum(px,pb),px),0.05) if e>0 else \
+            np.maximum(np.where(gauss.setdefault('pm',rgF.random(Np))<0.7,np.minimum(px,pb),px),0.05)
+        # sources chirp forward between epochs
+        dt=(Tm-_EPOCHS[0])*YR_S
+        f2e=f2*(1.0+dt/np.maximum((5.0/256.0)*ts_all**(-5.0/3.0)*(np.pi*np.maximum(f2,1e-30))**(-8.0/3.0),1e9))**(-3.0/8.0)
+        ks,sig,fk,rp,nats=inventory20(f2e,h2,P0,P0,sea,float(np.mean(Ti)),100.0,14.0,Np)
+        if len(ks)<2: continue
+        out=[]
+        for i in np.where(rncl)[0]:
+            key=i
+            sg=np.array([depro_sigma(
+                np.sqrt(max(sig[a]**2-1/max(rp[a],1e-9)**2,0.0)),
+                rp[a],fk[a],i,"loo") for a in range(len(ks))])
+            sg=sg*np.sqrt(np.mean(Ti)/Ti[i])
+            mu=gauss.setdefault(('mu',i,len(ks)), np.arccos(
+                np.random.default_rng(9000+j*1000+i).uniform(-0.9,0.9,len(ks))))
+            sg=sg*np.sqrt((1/3)/np.maximum((1+np.cos(mu))**2/4,1e-3))
+            ok=sg<np.pi
+            if ok.sum()<2: continue
+            sgu=sg[ok]; kap=2*np.pi*fk[ok]*(1-np.cos(mu[ok]))/C_PC_S
+            Lt=gauss.setdefault(('L',i), float(np.random.default_rng(7000+j*1000+i).normal(0,pri[i])))
+            Lt=float(np.clip(Lt,-2.9*pri[i],2.9*pri[i]))
+            w_now=1.0/np.maximum(sgu,1e-9)**2
+            gk=gauss.setdefault(('g',i,len(sgu)),
+                np.random.default_rng(5000+j*1000+i).normal(0,1,(len(_EPOCHS),len(sgu))))
+            pw=prev_w.get(key)
+            if pw is None or len(pw)!=len(sgu):
+                acc=np.sqrt(w_now)*gk[e]; wtot=w_now.copy()
+            else:
+                dw=np.maximum(w_now-pw,0.0)
+                acc=gauss.get(('acc',i),np.zeros(len(sgu)))
+                if len(acc)!=len(sgu): acc=np.zeros(len(sgu))
+                acc=acc+np.sqrt(dw)*gk[e]; wtot=np.maximum(w_now,pw)
+            gauss[('acc',i)]=acc; prev_w[key]=w_now
+            n_e=acc/np.maximum(wtot,1e-30)
+            eps=(np.random.default_rng(11+e).uniform(0,2*np.pi,len(sgu)) if null
+                 else kap*Lt+n_e)
+            Lg=np.linspace(-3*pri[i],3*pri[i],601)
+            r_=(kap[:,None]*Lg[None,:]-eps[:,None]+np.pi)%(2*np.pi)-np.pi
+            S=-(r_**2/(2*sgu[:,None]**2)).sum(0)-Lg**2/(2*pri[i]**2)
+            sigL=1.0/np.sqrt(max(float(np.sum(kap**2/sgu**2)),1e-30))
+            if sigL>=TOOTH_W: continue
+            Lh=float(Lg[int(np.argmax(S))])
+            out.append(dict(i=i,Lh=Lh,Lt=Lt,wrong=abs(Lh-Lt)>TOOTH_W,
+                            al=alias_score24(dict(pri=pri[i],Ltrue=Lt,kap=kap,sig=sgu))))
+        recs[Tm]=out
+    return recs
+_MOV=[movie_sky(j) for j in _SEEDS]
+print(f"\n  DELIVERABLE A -- the movie [median across 10 skies, 10/90 pct]:")
+print(f"  {'T':>4} {'certified':>22} {'RIGHT-certified':>24}")
+_movtab=[]
+for Tm in _EPOCHS:
+    cc=[len(m.get(Tm,[])) for m in _MOV]
+    rr=[sum(1 for r in m.get(Tm,[]) if not r["wrong"]) for m in _MOV]
+    _movtab.append((Tm,np.median(cc),np.median(rr)))
+    print(f"  {Tm:4d} {np.median(cc):8.1f} [{np.quantile(cc,.1):5.1f},{np.quantile(cc,.9):6.1f}]"
+          f" {np.median(rr):9.1f} [{np.quantile(rr,.1):5.1f},{np.quantile(rr,.9):6.1f}]")
+print(f"\n  DELIVERABLE B -- churn (same tooth at consecutive epochs):")
+sr=sw=nr=nw=0
+for m in _MOV:
+    for a,b in zip(_EPOCHS[:-1],_EPOCHS[1:]):
+        da={r["i"]:r for r in m.get(a,[])}; db={r["i"]:r for r in m.get(b,[])}
+        for i,ra in da.items():
+            if i not in db: continue
+            same=abs(ra["Lh"]-db[i]["Lh"])<=TOOTH_W
+            if ra["wrong"]: nw+=1; sw+=int(same)
+            else: nr+=1; sr+=int(same)
+_pr=sr/max(nr,1); _pw=sw/max(nw,1)
+print(f"    P(same tooth | RIGHT at e) = {_pr:.3f}  (n={nr})  [PRE-REG >=0.90:"
+      f" {'HIT' if _pr>=0.90 else 'MISS'}]")
+print(f"    P(same tooth | WRONG at e) = {_pw:.3f}  (n={nw})  [PRE-REG <=0.60:"
+      f" {'HIT' if _pw<=0.60 else 'MISS'}]")
+print(f"    separation {_pr-_pw:+.3f}")
+print(f"\n  DELIVERABLE C -- persistence gate vs single-epoch corner (at T=45):")
+def persist_stats(k):
+    tot=right=0
+    for m in _MOV:
+        idx=_EPOCHS.index(45)
+        for r in m.get(45,[]):
+            hist=[]
+            for e in _EPOCHS[max(0,idx-k+1):idx+1]:
+                d={x["i"]:x for x in m.get(e,[])}
+                hist.append(d.get(r["i"]))
+            if any(h is None for h in hist): continue
+            if all(abs(h["Lh"]-hist[-1]["Lh"])<=TOOTH_W for h in hist):
+                tot+=1; right+=int(not r["wrong"])
+    return right/max(tot,1), tot/len(_MOV), right/len(_MOV)
+_p1,_y1,_r1=persist_stats(1); _p2,_y2,_r2=persist_stats(2); _p3,_y3,_r3=persist_stats(3)
+print(f"    {'rule':>18} {'purity':>8} {'cert/sky':>9} {'right psr/sky':>14}")
+for _l,(p,y,rr) in (("single epoch",(_p1,_y1,_r1)),("2 consecutive",(_p2,_y2,_r2)),
+                    ("3 consecutive",(_p3,_y3,_r3))):
+    print(f"    {_l:>18} {p:8.3f} {y:9.1f} {rr:14.1f}")
+print(f"    2-epoch purity {_p2:.3f} [PRE-REG 0.96-0.99:"
+      f" {'HIT' if 0.96<=_p2<=0.99 else 'MISS'}]; yield x{_r2/max(_r1,1e-9):.2f}"
+      f" [PRE-REG 0.6-0.85x: {'HIT' if 0.6<=_r2/max(_r1,1e-9)<=0.85 else 'MISS'}]")
+_MOVN=[movie_sky(j,null=True) for j in _SEEDS[:5]]
+_tn=_rn=0
+for m in _MOVN:
+    for r in m.get(45,[]):
+        _tn+=1; _rn+=int(not r["wrong"])
+print(f"    NULL (phase-scrambled), single epoch T=45: purity {_rn/max(_tn,1):.4f}"
+      f" (prior floor ~0.067) -> {'PASS' if _rn/max(_tn,1)<0.15 else 'FAIL'}")
+print(f"\n  DELIVERABLE C2 -- persistence COMBINED with the alias gate (T=45):")
+_idx45=_EPOCHS.index(45)
+def persist_gate(k, qpct):
+    alls=[]
+    for m in _MOV:
+        recs45=m.get(45,[])
+        if not recs45: continue
+        al=np.array([r["al"] for r in recs45])
+        thr=np.percentile(al,qpct) if len(al) else np.inf
+        for r in recs45:
+            hist=[]
+            for e in _EPOCHS[max(0,_idx45-k+1):_idx45+1]:
+                d={x["i"]:x for x in m.get(e,[])}; hist.append(d.get(r["i"]))
+            if any(h is None for h in hist): continue
+            pers = all(abs(h["Lh"]-hist[-1]["Lh"])<=TOOTH_W for h in hist)
+            alls.append((pers and r["al"]<=thr, not r["wrong"]))
+    sel=[a for a in alls if a[0]]
+    if not sel: return np.nan,0.0
+    return sum(1 for s in sel if s[1])/len(sel), sum(1 for s in sel if s[1])/len(_MOV)
+print(f"  {'rule':>28} {'purity':>8} {'right psr/sky':>14}")
+_BEST=None
+for _k in (1,2,3):
+    for _q in (100,20,10,7):
+        p,y=persist_gate(_k,_q)
+        if not np.isfinite(p): continue
+        lab=f"{_k}-epoch"+(f" + gate {_q}%" if _q<100 else " only")
+        print(f"  {lab:>28} {p:8.3f} {y:14.1f}")
+        if p>=0.99 and (_BEST is None or y>_BEST[2]): _BEST=(lab,p,y)
+print(f"    STRICT CONTRACT (purity >= 0.99 i.e. P_F <= 0.01):"
+      f" {('%s -> %.1f psr/sky at purity %.3f' % (_BEST[0],_BEST[2],_BEST[1])) if _BEST else 'NOT REACHED'}")
+
+print(f"\n{'='*74}\nJOB 34 -- T2: DECOY-TOOTH INJECTION (direct wrong-tooth calibration)\n{'='*74}")
+def decoy_run(nsky=30, T=45, npull=300):
+    globals()['_CAP32']=1300
+    foll=stay=other=ncert=ntot=0; rows=[]
+    for j in range(nsky):
+        sd,f2,h2,P0,sea=_pop18(j%50,0.35)
+        rng=np.random.default_rng(8000+sd+977*j); Np=120
+        beta=np.arcsin(rng.uniform(-1,1,Np)); Dk=rng.uniform(0.5,3.0,Np)
+        px=2.34/np.cos(beta)**2*Dk**2*10.0*np.sqrt(30.0/T); pb=3.0*(T/30.0)**(-2.5)
+        pri=np.maximum(np.where(rng.random(Np)<0.7,np.minimum(px,pb),px),0.05)
+        Arn,_g=rn_draw(Np); rncl=Arn==0.0
+        ks,sig,fk,rp,nats=inventory20(f2,h2,P0,P0,sea,T,100.0,14.0,Np)
+        if len(ks)<2: continue
+        for i in np.where(rncl)[0]:
+            if ntot>=npull: break
+            sg=np.array([depro_sigma(
+                np.sqrt(max(sig[a]**2-1/max(rp[a],1e-9)**2,0.0)),
+                rp[a],fk[a],i,"loo") for a in range(len(ks))])
+            ok=sg<np.pi
+            if ok.sum()<2: continue
+            sgu=sg[ok]; mu=np.arccos(rng.uniform(-0.9,0.9,len(sgu)))
+            sgu=sgu*np.sqrt((1/3)/np.maximum((1+np.cos(mu))**2/4,1e-3))
+            ok2=sgu<np.pi
+            if ok2.sum()<2: continue
+            sgu=sgu[ok2]; kap=2*np.pi*fk[ok][ok2]*(1-np.cos(mu[ok2]))/C_PC_S
+            lam=2*np.pi/np.maximum(kap,1e-30)
+            L0=float(np.clip(rng.normal(0,pri[i]),-2.9*pri[i],2.9*pri[i]))
+            lam_ref=float(lam.min())
+            mmax=max(int(2.5*pri[i]/max(lam_ref,1e-9)),1)
+            mstep=int(rng.integers(1,mmax+1))*(1 if rng.random()<0.5 else -1)
+            Ldec=L0+mstep*lam_ref
+            if abs(Ldec)>2.9*pri[i]: continue
+            ntot+=1
+            Lg=np.linspace(-3*pri[i],3*pri[i],601)
+            eps=kap*Ldec+rng.normal(0,sgu)          # truth MOVED to the decoy tooth
+            r_=(kap[:,None]*Lg[None,:]-eps[:,None]+np.pi)%(2*np.pi)-np.pi
+            S=-(r_**2/(2*sgu[:,None]**2)).sum(0)-Lg**2/(2*pri[i]**2)
+            sigL=1.0/np.sqrt(max(float(np.sum(kap**2/sgu**2)),1e-30))
+            if sigL>=TOOTH_W: continue
+            ncert+=1
+            Lh=float(Lg[int(np.argmax(S))])
+            al=alias_score24(dict(pri=pri[i],Ltrue=Ldec,kap=kap,sig=sgu))
+            if abs(Lh-Ldec)<=TOOTH_W: foll+=1; cls="follow"
+            elif abs(Lh-L0)<=TOOTH_W: stay+=1; cls="stay"
+            else: other+=1; cls="other"
+            rows.append((al,cls))
+    return foll,stay,other,ncert,ntot,rows
+_f,_s,_o,_nc,_nt,_rows=decoy_run()
+print(f"  decoy pulsars attempted {_nt}, certified {_nc}"
+      f" (P(certify | truth at decoy) = {_nc/max(_nt,1):.3f})")
+print(f"    pipeline FOLLOWS truth to the decoy tooth : {_f/max(_nc,1):.3f}"
+      f"  [PRE-REG >=0.85: {'HIT' if _f/max(_nc,1)>=0.85 else 'MISS'}]")
+print(f"    STAYS at the original position            : {_s/max(_nc,1):.3f}"
+      f"  [FALSIFIER >0.30: {'FIRES -- gate certifies geometry' if _s/max(_nc,1)>0.30 else 'not fired'}]")
+print(f"    lands elsewhere                           : {_o/max(_nc,1):.3f}")
+print(f"\n  (i) DECOY-MEASURED FALSE-CERTIFICATION RATE per alias-gate percentile:")
+_al_r=np.array([r[0] for r in _rows]); _bad=np.array([r[1]!="follow" for r in _rows])
+print(f"  {'gate pct':>9} {'n':>6} {'false-cert rate':>16}")
+for _q in (100,20,10,7,5,3):
+    t=np.percentile(_al_r,_q) if _q<100 else np.inf
+    m=_al_r<=t
+    if m.sum()<5: continue
+    print(f"  {_q:8d}% {int(m.sum()):6d} {_bad[m].mean():16.3f}")
+print(f"    -> this is the number the aperture's NOISE null cannot see.")
+import matplotlib; matplotlib.use("Agg")
+import matplotlib.pyplot as plt
+from scipy.stats import beta as _beta
+OUT="/home/mattm/projects/HSYMT/wheel_hasasia_examples/"
+print(f"\n  DECOY strict-contract statistics (binomial):")
+for _q,_n,_k in ((20,60,4),(10,30,0),(7,21,0)):
+    hi=_beta.ppf(0.95,_k+1,_n-_k) if _n>_k else 1.0
+    print(f"    gate {_q:3d}%: {_k}/{_n} false certs, 95% upper limit {hi:.3f}"
+          f" -> {'consistent with P_F<=0.01' if hi<=0.01 else 'CANNOT establish P_F<=0.01 (n too small)'}")
+# ---- fig_movie ----
+fig,ax=plt.subplots(1,2,figsize=(11,4.2))
+Ts=[t for t,_,_ in _movtab]
+cc=np.array([[len(m.get(t,[])) for t in Ts] for m in _MOV],float)
+rr=np.array([[sum(1 for r in m.get(t,[]) if not r["wrong"]) for t in Ts] for m in _MOV],float)
+for A,D,lab,c in ((ax[0],cc,"certified","0.45"),(ax[0],rr,"right-certified","C0")):
+    A.plot(Ts,np.median(D,0),'o-',color=c,label=lab,lw=2)
+    A.fill_between(Ts,np.quantile(D,.1,0),np.quantile(D,.9,0),color=c,alpha=.2)
+ax[0].set_xlabel("median span T (yr)"); ax[0].set_ylabel("pulsars per sky")
+ax[0].set_title("The tide, watched: one universe, nested spans"); ax[0].legend()
+ax[0].grid(alpha=.3)
+ax[1].bar([0,1,2],[_pr,_pw,_pr-_pw],color=["C2","C3","C0"])
+ax[1].set_xticks([0,1,2]); ax[1].set_xticklabels(["same tooth\n| RIGHT","same tooth\n| WRONG","separation"])
+ax[1].set_ylabel("probability"); ax[1].set_title("Persistence separates right from wrong teeth")
+ax[1].grid(alpha=.3,axis='y')
+for i,v in enumerate([_pr,_pw,_pr-_pw]): ax[1].text(i,v+.02,f"{v:.3f}",ha='center')
+plt.tight_layout(); plt.savefig(OUT+"fig_movie.png",dpi=140); plt.close()
+print(f"  wrote fig_movie.png")
+# ---- T4(c): census-corrected corner by prior class ----
+print(f"\n{'='*74}\nJOB 34 -- T4(c): CENSUS-CORRECTED CORNER BY PRIOR CLASS\n{'='*74}")
+print("  T4(a)/(b) NOT POSSIBLE: no IPTA pulsar catalogue (names/positions/spans)")
+print("  exists in my record -- only 2 example .par files ship with libstempo.")
+print("  Real names, positions and per-pulsar priors would have to be invented.")
+print("  T4(c) runs by prior CLASS, which the brief explicitly permits.")
+print("  CLASSES [literature-binned, ILLUSTRATIVE precisions]:")
+print("    Pbdot   : co-evolving, sigma_d/d ~ 3%*(T/30)^-2.5   (few systems)")
+print("    VLBI/px : static, sigma_d/d ~ 5-10%                 (~20-30 psrs)")
+print("    DM-only : static, sigma_d/d ~ 20-40%                (the majority)")
+def corner_census(mix, nsky=60, T=45):
+    globals()['_CAP32']=1300
+    out=[]
+    for j in range(nsky):
+        sd,f2,h2,P0,sea=_pop18(j%50,0.35)
+        rng=np.random.default_rng(8000+sd+977*j); Np=120
+        beta_=np.arcsin(rng.uniform(-1,1,Np)); Dk=rng.uniform(0.5,3.0,Np)
+        cls=rng.choice(len(mix),size=Np,p=[m[1] for m in mix])
+        pri=np.empty(Np)
+        for a,(nm,_p,fr) in enumerate(mix):
+            m=cls==a
+            if nm=="Pbdot": pri[m]=np.maximum(3.0*(T/30.0)**(-2.5),0.05)
+            else: pri[m]=np.maximum(Dk[m]*1000.0*fr,0.05)
+        Arn,_g=rn_draw(Np); rncl=Arn==0.0
+        ks,sig,fk,rp,nats=inventory20(f2,h2,P0,P0,sea,T,100.0,14.0,Np)
+        if len(ks)<2: continue
+        for i in np.where(rncl)[0]:
+            sg=np.array([depro_sigma(
+                np.sqrt(max(sig[a]**2-1/max(rp[a],1e-9)**2,0.0)),
+                rp[a],fk[a],i,"loo") for a in range(len(ks))])
+            ok=sg<np.pi
+            if ok.sum()<2: continue
+            sgu=sg[ok]; mu=np.arccos(rng.uniform(-0.9,0.9,len(sgu)))
+            sgu=sgu*np.sqrt((1/3)/np.maximum((1+np.cos(mu))**2/4,1e-3))
+            ok2=sgu<np.pi
+            if ok2.sum()<2: continue
+            sgu=sgu[ok2]; kap=2*np.pi*fk[ok][ok2]*(1-np.cos(mu[ok2]))/C_PC_S
+            Lt=float(np.clip(rng.normal(0,pri[i]),-2.9*pri[i],2.9*pri[i]))
+            Lg=np.linspace(-3*pri[i],3*pri[i],601)
+            eps=kap*Lt+rng.normal(0,sgu)
+            r_=(kap[:,None]*Lg[None,:]-eps[:,None]+np.pi)%(2*np.pi)-np.pi
+            S=-(r_**2/(2*sgu[:,None]**2)).sum(0)-Lg**2/(2*pri[i]**2)
+            if 1.0/np.sqrt(max(float(np.sum(kap**2/sgu**2)),1e-30))>=TOOTH_W: continue
+            Lh=float(Lg[int(np.argmax(S))])
+            out.append((j,int(cls[i]),abs(Lh-Lt)>TOOTH_W,
+                        alias_score24(dict(pri=pri[i],Ltrue=Lt,kap=kap,sig=sgu))))
+    return out
+_MIXM=[("Pbdot",1.0,0.03)]
+_MIXR=[("Pbdot",0.05,0.03),("VLBI",0.20,0.07),("DM",0.75,0.30)]
+def corner_of(rows,nsky=60,ntr=30):
+    w=np.array([r[2] for r in rows],bool); sk=np.array([r[0] for r in rows])
+    al=np.array([r[3] for r in rows]); tr,te=sk<ntr,sk>=ntr
+    for q in (20,10,7,5,3):
+        t=float(np.percentile(al[tr],q)); s=te&(al<=t)
+        if s.sum()<5: continue
+        p=1-w[s].mean()
+        if p>=0.90: return q,p,(s.sum()-w[s].sum())/(nsky-ntr)
+    return None
+_rm=corner_census(_MIXM); _rr=corner_census(_MIXR)
+cm=corner_of(_rm); cr=corner_of(_rr)
+print(f"\n    model census (all Pbdot-like)  : "
+      + (f"gate {cm[0]}%, purity {cm[1]:.3f}, {cm[2]:.1f} psr/sky" if cm else "no corner"))
+print(f"    REAL census (5/20/75 mix)      : "
+      + (f"gate {cr[0]}%, purity {cr[1]:.3f}, {cr[2]:.1f} psr/sky" if cr else "no corner"))
+if cm and cr:
+    print(f"    corner ratio real/model: {cr[2]/max(cm[2],1e-9):.3f}"
+          f"  [PRE-REG 0.5-0.85x: {'HIT' if 0.5<=cr[2]/max(cm[2],1e-9)<=0.85 else 'MISS'}]")
+print(f"\n    corner SPLIT BY PRIOR CLASS (real census) -- the targeting science case:")
+w=np.array([r[2] for r in _rr],bool); sk=np.array([r[0] for r in _rr])
+al=np.array([r[3] for r in _rr]); cl=np.array([r[1] for r in _rr])
+tr,te=sk<30,sk>=30; thr=float(np.percentile(al[tr],20))
+for a,(nm,fr,_x) in enumerate(_MIXR):
+    m=te&(cl==a)&(al<=thr)
+    if m.sum()<3: print(f"      {nm:>8}: n<3"); continue
+    print(f"      {nm:>8}: n {int(m.sum()):4d}  purity {1-w[m].mean():.3f}"
+          f"  {(m.sum()-w[m].sum())/30:5.2f} psr/sky")
+import csv
+with open(OUT+"table_census_corner.csv","w",newline="") as fh:
+    cw=csv.writer(fh); cw.writerow(["prior_class","frac_of_array","sigma_d_over_d",
+                                    "n_gated_test","gated_purity","right_psr_per_sky"])
+    for a,(nm,fr,x) in enumerate(_MIXR):
+        m=te&(cl==a)&(al<=thr)
+        cw.writerow([nm,fr,x,int(m.sum()),
+                     f"{1-w[m].mean():.4f}" if m.sum() else "",
+                     f"{(m.sum()-w[m].sum())/30:.3f}" if m.sum() else ""])
+print(f"  wrote table_census_corner.csv")

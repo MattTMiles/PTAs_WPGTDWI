@@ -1,0 +1,50 @@
+=== RUNNING-BELIEF M-STEP GATES (FORGE-B) ===
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/enterprise/signals/utils.py:13: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  from pkg_resources import Requirement, resource_filename
+-- g1 LIMITS: belief width -> inf == LIVE; width -> 0 == FROZEN-after-feed --
+   [A] live limit  max|src - glacier_loop.mstep_quadratic| = 0.000e+00, max|widths| = 0.000e+00, n_eval 24 == 24 -> PASS
+   [A] frozen limit max|src - feed point| = 0.000e+00, n_eval 0 (== 0, frozen costs nothing) -> PASS
+   [B] live limit  max|src - glacier_loop.mstep_quadratic| = 0.000e+00, max|widths| = 0.000e+00, n_eval 36 == 36 -> PASS
+   [B] frozen limit max|src - feed point| = 0.000e+00, n_eval 0 (== 0, frozen costs nothing) -> PASS
+   [C] live limit  max|src - glacier_loop.mstep_quadratic| = 0.000e+00, max|widths| = 0.000e+00, n_eval 24 == 24 -> PASS
+   [C] frozen limit max|src - feed point| = 0.000e+00, n_eval 0 (== 0, frozen costs nothing) -> PASS
+   [g1] -> PASS
+-- g2 THE GUARD: no tighten without news; one event -> exactly one tighten --
+   6 quiet iterations: width array EXACTLY unchanged: True; n_tighten [0, 0] (all 0): True
+   re-centring remained free: max|centre - feed| = 1.500e-02 (> 0): True; stayed inside the belief band: True
+   event fired: ['cert_set'] -> tightens [1, 1] (exactly 1 each): True
+   licensed widths strictly narrowed on the M-step axes: True (unmeasured axes untouched: True); every tighten logged with its event: True
+   5 further quiet iterations: width EXACTLY unchanged, n_tighten still 1: True
+   all four event kinds detected, in order: ['background', 'fed_set', 'data_epoch'] -> True
+   [g2] -> PASS
+-- g3 WANDER BOUND: flat fixture (0.2 nat at 0.44 dex, sigma 0.696 dex), 120 iterations --
+   belief width 0.2887 dex, bound (K=1) 0.1443 dex
+   BELIEF arm: max displacement over 120 iters = 0.0087 dex (<= bound: True); tightens 0 (== 0, no news): True
+   LIVE control (no belief, same fixture): max displacement = 1.6969 dex -- exceeds the bound (True); walk suppressed by x194.2
+   [g3] -> PASS
+-- B3 GRADUATION: the ladder reads belief width LIVE --
+   stage vs width ratio [2, 1, .6, .49, .3, .19, .11, .09, 0]: [0, 0, 0, 1, 1, 2, 2, 3, 3] (monotone True, ends carried..cert True, rungs True)
+   fed rung == ModelQualityGate(SPARK3_GATE_RATIO) on every probe: True
+   lopsided belief (1e-4 on the M-step axes, PRIOR BOX on the other six): all-axis ladder -> carried, M-step-axis ladder -> cert-eligible -> PASS (the default must be the all-axis reduction)
+   belief-width trajectory banked (4, 2) + the M-step-axis diagnostic column, monotone-tightening curve, first fed crossing iter 0: True
+   [B3] -> PASS
+-- g4 DEFAULT-INERT: no belief state -> bit-identical to the incumbent --
+   [A] vs glacier_loop.mstep_quadratic: max|src| 0.000e+00, max|widths| 0.000e+00, n_eval 24 == 24 -> PASS
+   [B] vs glacier_loop.mstep_quadratic: max|src| 0.000e+00, max|widths| 0.000e+00, n_eval 48 == 48 -> PASS
+   [C] vs glacier_loop.mstep_quadratic: max|src| 0.000e+00, max|widths| 0.000e+00, n_eval 12 == 12 -> PASS
+   [D-nonconcave] vs glacier_loop.mstep_quadratic: max|src| 0.000e+00, max|widths| 0.000e+00, n_eval 12 == 12 -> PASS
+   [empty book] a BeliefBook with no belief for the fed slots is inert: True
+   checkpoint round-trip exact: True; pre-belief checkpoint -> None (inert): True
+   [g4] -> PASS
+-- g5 RUNTIME-SMASK: pattern flips with belief state live (no recompile) --
+  build_b1_amortised: 57.8s
+[NoiseDrawer] WARNING: no banked L_gwb at /home/mattm/projects/HSYMT/CW_transition/b1_L_gwb.npz. Recomputed by np.linalg.eigh at BLAS threads=unset -> fingerprint 17d2a3013bf50fda. THIS DRAW IS THREAD-COUNT DEPENDENT and is NOT guaranteed to reproduce any banked realisation. Bank L_gwb (see load_or_build_L_gwb.__doc__) before quoting any number from it.
+  build_b1_problem total 82.0s (npsr=116, ncw=16, n_theta=244)
+   warm evaluator with belief live: fixed-pattern 112.70 ms, FLIP 109.89 ms (median of 20)
+   FLIP OVERHEAD = -2.80 ms (gate < 10 ms, lane-independent) -> PASS
+   absolute flip < 10 ms (FORGE-G2's jug-gpu budget): 109.9 ms on this lane -- the EVALUATOR costs 112.7 ms here, so the absolute budget is OWED ON jug-gpu, not failed by the belief layer
+   jit cache size across flips: 1 -> 1 (unchanged -> NO RECOMPILE)
+   belief state stayed live and banked across every flip (20 rows, 3 beliefs): True
+   (the belief is numpy-side and never enters a trace: it CANNOT recompile -- this gate proves the structure rather than asserting it)
+   [g5] -> PASS  (absolute-ms sub-check deferred to jug-gpu)
+=== RUNNING-BELIEF M-STEP GATES: ALL PASS ===

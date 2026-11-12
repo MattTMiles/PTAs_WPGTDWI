@@ -1,0 +1,11 @@
+config,quantity,value,tolerance
+C1,sigma_L_pc,0.00773,+/-10%
+C1,sigma_L_over_Fisher,1.0,+/-0.10
+C2,K_teeth,6.177,+/-0.05
+C2,tooth_spacing_pc,1.943,+/-1%
+C3,margin_nats_s0.75,7.89,+/-1.5
+C3,argmax_on_truth,1,exact
+C4,hit_fraction_s0.50,0.79,+/-0.10
+C4,median_margin_nats,1.42,+/-0.5
+C5,null_hit_rate,0.0427,+/-0.010
+C5,prior_mass_reference,0.0417,reference

@@ -1,0 +1,13 @@
+instrument,purity,right_psr_per_sky
+ungated (cap40),0.544,24.12
+alias 20% (cap40),0.881,15.3
+alias 10% (cap40),0.899,8.6
+alias 7% (cap40),0.903,6.5
+ungated (cap1300),0.653,31.35
+alias 20% (cap1300),0.947,13.6
+alias 10% (cap1300),0.953,6.8
++timing model,0.954,13.0
+aperture P_F=0.05,0.89,10.9
+persist 2ep+gate20,0.978,8.9
+persist 3ep+gate20,0.987,7.4
+decoy-calibrated 3ep+20,0.958,10.4

@@ -1,0 +1,5 @@
+alpha,mondrian,coverage,median_set_size,singleton_frac,singleton_purity,singleton_psr_per_sky
+0.1000,False,0.8978,14.0000,0.0000,nan,0.0000
+0.1000,True,0.9249,14.0000,0.0089,1.0000,0.7000
+0.0100,False,0.9890,14.0000,0.0000,nan,0.0000
+0.0100,True,0.9924,14.0000,0.0000,nan,0.0000

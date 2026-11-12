@@ -1,0 +1,93 @@
+{
+ "cfg": "rate2.70",
+ "repro_ok": true,
+ "repro_txt": "booked: no 0.90 crossing; reproduced: no crossing",
+ "identical": true,
+ "n": 13071,
+ "arms": {
+  "inc": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.7091596604340789
+   },
+   "oldgate": null,
+   "ungated_purity": 0.4487797414122867
+  },
+  "p1_inc": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.8401320382271888
+   },
+   "oldgate": null,
+   "ungated_purity": 0.5926095937571724
+  },
+  "p1_mf": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.8843343035438712
+   },
+   "oldgate": null,
+   "ungated_purity": 0.6445566521306709
+  },
+  "p2_inc": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.6563767989329568
+   },
+   "oldgate": null,
+   "ungated_purity": 0.4383750286894652
+  },
+  "p2_mf": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.7354612468268528
+   },
+   "oldgate": null,
+   "ungated_purity": 0.48619080407007875
+  },
+  "p2g_inc": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.644189835557107
+   },
+   "oldgate": null,
+   "ungated_purity": 0.4520694667584729
+  },
+  "p2g_mf": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.7220799795075264
+   },
+   "oldgate": null,
+   "ungated_purity": 0.497743095402035
+  }
+ }
+}

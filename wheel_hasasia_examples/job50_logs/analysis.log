@@ -1,0 +1,74 @@
+== B2 tau=0: p2r(tau=0) == p2 flags on all 15800 pulsars: 1.00000; vs Job 49 p2_mf on booked records: 13923/13923; booked gate: 36.56 @ 0.9083 (Job 49: 36.56 @ 0.9083)
+
+== Part C [harness priors] held-out skies 100-199: 7900 pulsars (79.0/sky); n(Kc>=60)=1524, n(Kc>=600)=226, n(Kf>=60)=2337, n(Kf>=600)=868
+   prior-only (decode = prior centre): K>=60 0.002, K>=600 0.000, all 0.131; finest-K: 0.006, 0.002
+      off|top12|oracle: FINE K>=60 0.252 [0.212, 0.291]  K>=600 0.133 [0.089, 0.184]  all 0.694 [0.666, 0.721] | finest-K 0.320/0.215 | BOOKED-GRID 0.073/0.013/0.649 | n_src 12 info 12.72
+     off|top12|machine: FINE K>=60 0.017 [0.011, 0.024]  K>=600 0.000 [0.000, 0.000]  all 0.606 [0.586, 0.626] | finest-K 0.061/0.007 | BOOKED-GRID 0.013/0.000/0.605 | n_src 10 info 9.49
+        off|top12|full: FINE K>=60 0.001 [0.000, 0.003]  K>=600 0.000 [0.000, 0.000]  all 0.142 [0.135, 0.149] | finest-K 0.005/0.001 | BOOKED-GRID 0.000/0.000/0.143 | n_src 12 info 0.00
+        off|all|oracle: FINE K>=60 0.543 [0.492, 0.584]  K>=600 0.389 [0.327, 0.456]  all 0.835 [0.811, 0.856] | finest-K 0.598/0.515 | BOOKED-GRID 0.154/0.031/0.746 | n_src 1127 info 18.08
+       off|all|machine: FINE K>=60 0.028 [0.022, 0.036]  K>=600 0.000 [0.000, 0.000]  all 0.688 [0.673, 0.702] | finest-K 0.113/0.015 | BOOKED-GRID 0.022/0.000/0.688 | n_src 1127 info 13.68
+          off|all|full: FINE K>=60 0.002 [0.001, 0.004]  K>=600 0.000 [0.000, 0.000]  all 0.142 [0.135, 0.148] | finest-K 0.004/0.001 | BOOKED-GRID 0.001/0.000/0.143 | n_src 1127 info 0.00
+       on|top12|oracle: FINE K>=60 0.035 [0.026, 0.046]  K>=600 0.004 [0.000, 0.014]  all 0.402 [0.380, 0.423] | finest-K 0.080/0.025 | BOOKED-GRID 0.031/0.009/0.404 | n_src 12 info 2.93
+      on|top12|machine: FINE K>=60 0.005 [0.003, 0.008]  K>=600 0.000 [0.000, 0.000]  all 0.377 [0.357, 0.397] | finest-K 0.030/0.003 | BOOKED-GRID 0.007/0.000/0.378 | n_src 10 info 2.20
+         on|top12|full: FINE K>=60 0.000 [0.000, 0.000]  K>=600 0.000 [0.000, 0.000]  all 0.137 [0.129, 0.144] | finest-K 0.006/0.000 | BOOKED-GRID 0.000/0.000/0.137 | n_src 12 info 0.00
+         on|all|oracle: FINE K>=60 0.236 [0.203, 0.271]  K>=600 0.133 [0.097, 0.172]  all 0.651 [0.623, 0.676] | finest-K 0.329/0.215 | BOOKED-GRID 0.110/0.009/0.620 | n_src 1127 info 7.11
+        on|all|machine: FINE K>=60 0.010 [0.006, 0.015]  K>=600 0.004 [0.000, 0.013]  all 0.562 [0.544, 0.581] | finest-K 0.065/0.009 | BOOKED-GRID 0.007/0.000/0.562 | n_src 1127 info 5.40
+           on|all|full: FINE K>=60 0.001 [0.000, 0.002]  K>=600 0.000 [0.000, 0.000]  all 0.135 [0.128, 0.143] | finest-K 0.005/0.000 | BOOKED-GRID 0.001/0.000/0.136 | n_src 1127 info 0.00
+
+== Part C [census priors] held-out skies 100-199: 7900 pulsars (79.0/sky); n(Kc>=60)=6578, n(Kc>=600)=2475, n(Kf>=60)=7686, n(Kf>=600)=5271
+   prior-only (decode = prior centre): K>=60 0.001, K>=600 0.000, all 0.006; finest-K: 0.001, 0.001
+      off|top12|oracle: FINE K>=60 0.199 [0.167, 0.229]  K>=600 0.134 [0.105, 0.163]  all 0.250 [0.217, 0.280] | finest-K 0.235/0.174 | BOOKED-GRID 0.042/0.011/0.100 | n_src 12 info 12.72
+     off|top12|machine: FINE K>=60 0.007 [0.005, 0.009]  K>=600 0.002 [0.001, 0.004]  all 0.043 [0.039, 0.048] | finest-K 0.024/0.003 | BOOKED-GRID 0.005/0.001/0.041 | n_src 2 info 0.91
+        off|top12|full: FINE K>=60 0.002 [0.001, 0.002]  K>=600 0.000 [0.000, 0.001]  all 0.011 [0.009, 0.012] | finest-K 0.004/0.001 | BOOKED-GRID 0.001/0.000/0.009 | n_src 12 info 0.00
+        off|all|oracle: FINE K>=60 0.480 [0.433, 0.524]  K>=600 0.387 [0.336, 0.435]  all 0.523 [0.478, 0.564] | finest-K 0.512/0.451 | BOOKED-GRID 0.083/0.026/0.166 | n_src 1127 info 18.08
+       off|all|machine: FINE K>=60 0.014 [0.011, 0.017]  K>=600 0.001 [0.000, 0.002]  all 0.069 [0.063, 0.075] | finest-K 0.047/0.006 | BOOKED-GRID 0.009/0.001/0.063 | n_src 1127 info 1.70
+          off|all|full: FINE K>=60 0.002 [0.001, 0.003]  K>=600 0.000 [0.000, 0.000]  all 0.012 [0.010, 0.014] | finest-K 0.006/0.001 | BOOKED-GRID 0.001/0.000/0.011 | n_src 1127 info 0.01
+       on|top12|oracle: FINE K>=60 0.039 [0.031, 0.047]  K>=600 0.013 [0.008, 0.017]  all 0.080 [0.071, 0.090] | finest-K 0.063/0.027 | BOOKED-GRID 0.019/0.005/0.058 | n_src 12 info 3.23
+      on|top12|machine: FINE K>=60 0.003 [0.002, 0.005]  K>=600 0.001 [0.000, 0.002]  all 0.030 [0.027, 0.033] | finest-K 0.013/0.002 | BOOKED-GRID 0.004/0.000/0.031 | n_src 2 info 0.18
+         on|top12|full: FINE K>=60 0.001 [0.001, 0.002]  K>=600 0.000 [0.000, 0.001]  all 0.008 [0.006, 0.009] | finest-K 0.003/0.001 | BOOKED-GRID 0.001/0.000/0.008 | n_src 12 info 0.00
+         on|all|oracle: FINE K>=60 0.224 [0.192, 0.252]  K>=600 0.124 [0.099, 0.149]  all 0.277 [0.246, 0.306] | finest-K 0.263/0.190 | BOOKED-GRID 0.066/0.016/0.134 | n_src 1127 info 7.50
+        on|all|machine: FINE K>=60 0.008 [0.006, 0.010]  K>=600 0.001 [0.000, 0.002]  all 0.050 [0.046, 0.055] | finest-K 0.030/0.003 | BOOKED-GRID 0.007/0.001/0.048 | n_src 1127 info 0.50
+           on|all|full: FINE K>=60 0.002 [0.001, 0.002]  K>=600 0.000 [0.000, 0.000]  all 0.010 [0.008, 0.012] | finest-K 0.004/0.001 | BOOKED-GRID 0.001/0.000/0.009 | n_src 1127 info 0.00
+
+  booked grid step = 6 sigma_d/600: median over K>=60 pulsars 1.474 pc, over K>=600 7.51 pc (window 0.25 pc); fine grid step max 108.095 pc; fine grid relaxed (FFT cap) for 0.0015 of pulsars
+
+== C2 anchors: pulsars (of 79 red-noise-clean per sky) with K < 1 for a given source
+       census priors, booked top-12 sources: per (sky, source) median 0, 10/90 [0.0, 0.0], share with >= 3: 0.002
+             census priors, every candidate: per (sky, source) median 0, 10/90 [0.0, 1.0], share with >= 3: 0.010
+      harness priors, booked top-12 sources: per (sky, source) median 1, 10/90 [0.0, 8.0], share with >= 3: 0.362
+            harness priors, every candidate: per (sky, source) median 14, 10/90 [6.0, 21.0], share with >= 3: 0.976
+
+== Part D: timing noise / n (strains untouched), arm p2r every candidate, held-out skies
+  n= 1   oracle: candidates/pulsar 1161 | K>=60 0.236 [0.203, 0.271] | K>=600 0.133 [0.097, 0.172] | all 0.651 [0.623, 0.676] | info 7.11
+  n= 1  machine: candidates/pulsar 1161 | K>=60 0.010 [0.006, 0.015] | K>=600 0.004 [0.000, 0.013] | all 0.562 [0.544, 0.581] | info 5.40
+  n= 3   oracle: candidates/pulsar 1300 | K>=60 0.257 [0.222, 0.294] | K>=600 0.177 [0.130, 0.228] | all 0.673 [0.645, 0.697] | info 7.61
+  n= 3  machine: candidates/pulsar 1300 | K>=60 0.028 [0.020, 0.036] | K>=600 0.000 [0.000, 0.000] | all 0.599 [0.578, 0.618] | info 5.91
+  n=10   oracle: candidates/pulsar 1300 | K>=60 0.257 [0.222, 0.294] | K>=600 0.177 [0.130, 0.228] | all 0.673 [0.645, 0.697] | info 7.62
+  n=10  machine: candidates/pulsar 1300 | K>=60 0.072 [0.057, 0.088] | K>=600 0.009 [0.000, 0.020] | all 0.614 [0.592, 0.635] | info 6.26
+
+== Part E: gate = edge-safe 7-pt mean, scan 0.5-100 %, LAST train crossing of 0.90, blind on held-out skies
+                                                 incumbent: 39.69 [36.95, 42.55] @ 0.8760 [0.859, 0.893], gate 66.1%; catalogue K<1 0.45, K<3 0.98; right with K>=10: 0.04/sky
+                                       p2_mf (booked grid): 40.04 [37.28, 42.89] @ 0.8920 [0.878, 0.906], gate 65.6%; catalogue K<1 0.45, K<3 0.98; right with K>=10: 0.03/sky
+                                         p2_mf (fine grid): 39.52 [36.75, 42.34] @ 0.8947 [0.881, 0.908], gate 64.4%; catalogue K<1 0.45, K<3 0.98; right with K>=10: 0.02/sky
+             p2r_mf top 12, machine template (booked grid): no 0.90 catalogue (max train purity 0.861)
+               p2r_mf top 12, machine template (fine grid): no 0.90 catalogue (max train purity 0.861)
+    p2r_mf every candidate, machine template (booked grid): 17.17 [14.45, 20.27] @ 0.8814 [0.860, 0.901], gate 34.4%; catalogue K<1 0.45, K<3 0.99; right with K>=10: 0.00/sky
+      p2r_mf every candidate, machine template (fine grid): 17.46 [14.71, 20.57] @ 0.8809 [0.859, 0.901], gate 34.8%; catalogue K<1 0.45, K<3 0.99; right with K>=10: 0.00/sky
+  amplitude table, arm p2r_mf every candidate, machine template:
+    A= 3.7e-15 [       fine] ungated 0.800: 57.15 [56.49, 57.79] @ 0.9044 [0.896, 0.913], gate 88.3%; catalogue K<1 0.42, K<3 0.86; right with K>=10: 2.15/sky
+    A= 3.7e-15 [booked grid] ungated 0.799: 57.16 [56.53, 57.77] @ 0.9051 [0.897, 0.914], gate 88.2%; catalogue K<1 0.42, K<3 0.86; right with K>=10: 2.18/sky
+    A= 3.7e-15 [ top12 fine] ungated 0.603: no 0.90 catalogue (max train purity 0.804)
+    A= 5.0e-15 [       fine] ungated 0.728: 49.24 [48.49, 49.99] @ 0.8977 [0.890, 0.906], gate 76.4%; catalogue K<1 0.48, K<3 0.98; right with K>=10: 0.05/sky
+    A= 5.0e-15 [booked grid] ungated 0.727: 48.07 [47.21, 48.93] @ 0.9000 [0.892, 0.908], gate 74.5%; catalogue K<1 0.48, K<3 0.98; right with K>=10: 0.00/sky
+    A= 5.0e-15 [ top12 fine] ungated 0.498: no 0.90 catalogue (max train purity 0.707)
+    A= 6.4e-15 [       fine] ungated 0.634: no 0.90 catalogue (max train purity 0.858)
+    A= 6.4e-15 [booked grid] ungated 0.637: no 0.90 catalogue (max train purity 0.855)
+    A= 6.4e-15 [ top12 fine] ungated 0.412: no 0.90 catalogue (max train purity 0.561)
+    A= 8.3e-15 [       fine] ungated 0.529: no 0.90 catalogue (max train purity 0.760)
+    A= 8.3e-15 [booked grid] ungated 0.529: no 0.90 catalogue (max train purity 0.727)
+    A= 8.3e-15 [ top12 fine] ungated 0.326: no 0.90 catalogue (max train purity 0.539)
+    A=10.6e-15 [       fine] ungated 0.443: no 0.90 catalogue (max train purity 0.593)
+    A=10.6e-15 [booked grid] ungated 0.442: no 0.90 catalogue (max train purity 0.620)
+    A=10.6e-15 [ top12 fine] ungated 0.269: no 0.90 catalogue (max train purity 0.408)
+
+wrote job50_fraction_vs_K.png, job50_data/analysis.json

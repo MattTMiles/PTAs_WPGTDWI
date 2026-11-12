@@ -1,0 +1,85 @@
+==============================================================================
+VERNIER-30  --  integer ambiguity resolution (LAMBDA/ILS) on the comb
+==============================================================================
+
+--- S0. LAMBDA machinery sanity ------------------------------------
+  LDL' + Z-transform round-trip max rel err : 3.12e-09   (200 draws, M=5)
+  cond(Q_nn) median                         : 3.370e+07
+  -> Q_nn is rank-1-dominant; decorrelation is the method, not cosmetics.
+  ILS vs dense-grid exhaustive (M=4, sigL=10pc, 64 pts/fringe):
+    identical integer vector                : 300/300
+    ILS objective <= grid objective         : 300/300
+    ILS strictly BETTER than grid           : 0/300  (grid missed the optimum)
+    grid strictly BETTER than ILS           : 0/300  (must be 0 -- ILS is exact)
+
+--- E1. success / wall-clock vs K = number of sources ---------------
+    (rho=4.0, sigL=100.0 pc, 400 realisations, RNG-matched)
+           K=2 (lnK=6.7) | snap:  4.0%/  2.697ms | snapR:  4.0%/  0.174ms | grid:  4.5%/  0.865ms | ils:  4.5%/  0.226ms |
+           K=3 (lnK=6.9) | snap:  3.5%/  2.024ms | snapR:  8.0%/  0.123ms | grid: 19.2%/  0.798ms | ils: 19.2%/  0.198ms |
+           K=4 (lnK=7.0) | snap:  2.2%/  9.199ms | snapR: 11.8%/  0.433ms | grid: 48.0%/  2.579ms | ils: 48.0%/  0.936ms |
+           K=5 (lnK=7.1) | snap:  2.2%/ 12.148ms | snapR:  9.8%/  0.398ms | grid: 79.0%/  3.014ms | ils: 79.0%/  1.679ms |
+           K=6 (lnK=7.2) | snap:  3.2%/ 15.378ms | snapR: 11.8%/  0.536ms | grid: 94.8%/  4.034ms | ils: 94.8%/  2.018ms |
+           K=7 (lnK=7.2) | snap:  1.5%/ 19.560ms | snapR: 11.5%/  0.605ms | grid: 97.5%/  5.387ms | ils: 97.5%/  3.062ms |
+           K=8 (lnK=7.2) | snap:  3.8%/ 15.617ms | snapR: 10.2%/  0.480ms | grid: 99.5%/  4.482ms | ils:100.0%/  2.676ms |
+
+--- E2. success vs per-(pulsar,source) SNR rho ----------------------
+    (K=4, sigL=100.0 pc, 400 realisations)
+                   rho=1 | snap:  0.8%/  4.956ms | snapR:  0.5%/  0.177ms | grid:  2.2%/  1.731ms | ils:  2.2%/  0.640ms |
+                   rho=2 | snap:  3.0%/  3.493ms | snapR:  7.2%/  0.189ms | grid: 13.8%/  1.393ms | ils: 13.8%/  0.517ms |
+                   rho=4 | snap:  4.5%/  7.380ms | snapR:  6.5%/  0.388ms | grid: 46.8%/  2.002ms | ils: 46.8%/  0.672ms |
+                   rho=8 | snap:  3.0%/  9.076ms | snapR: 12.0%/  0.366ms | grid: 85.5%/  2.268ms | ils: 85.5%/  1.239ms |
+                  rho=16 | snap:  4.0%/  9.119ms | snapR: 14.8%/  0.546ms | grid: 97.8%/  2.024ms | ils: 98.2%/  1.037ms |
+                  rho=32 | snap:  2.0%/  8.111ms | snapR: 11.5%/  0.383ms | grid: 99.2%/  2.151ms | ils: 99.8%/  1.126ms |
+
+--- E3. success / wall-clock vs prior width sigL --------------------
+    (K=4, rho=4.0, 400 realisations)
+      sigL=1pc (lnK=2.4) | snap: 71.0%/  7.464ms | snapR: 96.8%/  0.343ms | grid: 98.0%/  0.147ms | ils: 98.5%/  0.604ms |
+      sigL=3pc (lnK=3.5) | snap: 47.8%/  8.304ms | snapR: 86.0%/  0.370ms | grid: 94.0%/  0.147ms | ils: 93.8%/  0.858ms |
+     sigL=10pc (lnK=4.7) | snap: 29.5%/  2.454ms | snapR: 57.8%/  0.099ms | grid: 88.0%/  0.112ms | ils: 88.0%/  0.197ms |
+     sigL=30pc (lnK=5.7) | snap: 10.0%/  2.204ms | snapR: 31.2%/  0.081ms | grid: 73.5%/  0.164ms | ils: 73.8%/  0.224ms |
+    sigL=100pc (lnK=7.0) | snap:  1.8%/  1.661ms | snapR:  8.8%/  0.073ms | grid: 50.5%/  0.557ms | ils: 50.5%/  0.202ms |
+    sigL=300pc (lnK=8.1) | snap:  0.8%/  1.716ms | snapR:  4.0%/  0.079ms | grid: 29.8%/  2.001ms | ils: 29.8%/  0.235ms |
+   sigL=1000pc (lnK=9.3) | snap:  0.0%/  2.759ms | snapR:  0.0%/  0.197ms | grid: 10.0%/ 18.341ms | ils: 10.0%/  1.082ms |
+  sigL=3000pc (lnK=10.4) | snap:  0.0%/  5.260ms | snapR:  0.0%/  0.160ms | grid: 10.0%/ 70.028ms | ils: 10.0%/  1.663ms |
+
+--- E4. ratio test vs contrast-vs-bar certification gate ------------
+    pooled n = 4320, overall ILS success 56.1%
+    trials bar ln K spans 2.85 - 10.11 (sd 1.95) -- the bar is not a constant in this pool
+    NATIVE gate  (contrast >= ln K)  : accept  23.9%  wrong-fix  0.29%
+    NATIVE ratio (R >= 1.5)           : accept  65.4%  wrong-fix 27.61%  agree-with-gate  58.5%
+    NATIVE ratio (R >= 2.0)           : accept  51.2%  wrong-fix 19.39%  agree-with-gate  72.5%
+    NATIVE ratio (R >= 3.0)           : accept  37.7%  wrong-fix 13.45%  agree-with-gate  84.0%
+
+    MATCHED-ACCEPTANCE comparison (which criterion is safer):
+      target  ratio-acc  ratio-WF  gate-acc  gate-WF   agree
+          5%       5.0%     4.17%      5.0%     0.00%    95.7%
+         10%      10.0%     5.09%     10.0%     0.00%    93.2%
+         20%      20.0%     7.18%     20.0%     0.00%    89.8%
+         35%      35.0%    12.17%     35.0%     2.78%    85.1%
+         50%      50.0%    18.75%     50.0%    14.03%    76.8%
+         70%      70.0%    29.83%     70.0%    27.35%    71.8%
+         90%      90.0%    39.89%     90.0%    38.73%    85.7%
+
+    Max acceptance rate holding the wrong-fix rate under a target:
+      WF <=  1.0%  ->  ratio   0.0%   gate  30.0%   (ratio never reaches this target)
+      WF <=  5.0%  ->  ratio  12.0%   gate  38.0%   (3.2x)
+
+    mechanism: among R>=3 accepts, median s_1 = 3.245 (correct fixes) vs 0.237 (WRONG fixes); median contrast 10.27 vs 0.50 nat
+
+    Spearman(ratio, contrast) = 0.8258   Kendall tau = 0.6452
+
+--- E5. NULL control (no coherent comb): false-acceptance -----------
+    gate  (contrast >= ln K) fires on pure noise :  0.00%
+    ratio (R >= 1.5)           fires on pure noise : 38.75%
+    ratio (R >= 2.0)           fires on pure noise : 20.75%
+    ratio (R >= 3.0)           fires on pure noise : 10.25%
+
+--- E6. partial ambiguity resolution: are wide lanes fixable? -------
+    bootstrapped per-component fix probability, decorrelated (M=5):
+      component :   z1  z2  z3  z4  z5
+      median P  :   0.908  0.956  0.976  0.985  0.996
+    full-vector bootstrap success (product) median: 0.8041
+    >=1 component with P>0.99: 75.7% of draws; mean count 1.26/5
+    Teunissen bootstrap PREDICTS full-fix success 0.804; MEASURED ILS success on a matched cell = 0.793
+
+total runtime 90.6 s -> reports/vernier30.npz

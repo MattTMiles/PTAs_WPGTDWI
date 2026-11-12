@@ -5,7 +5,9 @@ GENERALISE commit a8d3d97 and the sky-marginalisation slot filled from the Arm A
 943dcf3, same day). Audience: the distance-measurement community —
 PSRpi/MSPSRpi VLBI programmes, Pbdot/orbital-parallax timing groups, Verbiest-lineage
 distance-catalogue readers. Every number below is an artifact readback from a banked file in
-this repository; per-column provenance is in the footer. No number is new analysis.*
+this repository — with one flagged exception, the COMPASS isotropic-control attribution in
+framing item 3, whose bank is staged on ACCRE and not yet pushed here; per-column provenance
+is in the footer. No number is new analysis.*
 
 ---
 
@@ -69,6 +71,19 @@ Three consequences an observing programme should internalise:
    every threshold claim that rested on a single-member 3+13 population. Loudness buys no
    floor calm: the per-sky floor swing stays ×2.5–4.3 at every h (the `floor ∝ h^1.66` race,
    confirmed along the sky axis).
+
+   **What the band is made of — the isotropic control (COMPASS):** *"COMPASS (isotropic
+   control array): the surviving cell's sky band is INTRINSIC SOURCE GEOMETRY (scatter ratio
+   iso/real = 0.89, persists; strengthens to 8/8 skies, mean 4.82 under isotropy); the
+   sparse-population/single-member lottery is ARRAY ANISOTROPY (ratio 0.23, collapses)."*
+   Read for the table: the ±3.02 band on the surviving 5+11 / e = 0.3 cell is **not** an
+   artifact of where this array's pulsars happen to sit — it survives an isotropic array
+   almost undiminished, so it is a property of the source population and must be carried
+   whatever the array. The 3+13 single-member lottery is the opposite: it is **this array's**
+   anisotropy, and it does not survive isotropy. Neither result changes the quoting
+   convention — sky-median with band, never a per-sky guarantee — but it changes what an
+   observer can hope to buy: adding pulsars can retire the lottery, and cannot retire the
+   band. [ACCRE: `reports/COMPASS.md`, pending push — re-verify citation at Matt's next push.]
 
 **One flag before the table. J0437−4715 has a dual role.** It is the array's best anchor
 candidate — smallest K at every frequency (11.88 → 5.94 → **2.97** under the optimal prior at
@@ -223,3 +238,4 @@ $16\times$ at $f/4$ --- wider fringes buy anchors and pay for them in floor.}
 - **pc-class campaign column** — derived: 6 × (1 pc)/`dL_med` (banked formula K = 6σ_d/dL, STORY S3.1.1; banked dL); double-edge citations: onset extension RECUT §1.1 (vlbi 2+14 T=50: 0.90 → 1.17, below → ONSET; single-sky-set), floor tax +2.9 ± 1.0 nat at h = −13.25 from ANCHOR §7 (`reports/ANCHOR_realdata_null.md`) / STORY S7.2.8; frequency-axis floor race (×3.7 at f/2, ×16 at f/4; single-member, sky-median-with-band class) from `reports/GENERALISE.md` §3 (Arm B2).
 - **J0437 dual-role flag** — anchor side: `gen_b1_kcensus.npz` (K_opt 11.88 → 5.94 → 2.97), STORY S3.1.3 (K_lit = 3.07), S3.1.7 (89% true-fringe MAP on the R plateau), IGNITE §4.4 (20/50 correct, 0 wrong; single-sky-set); false-alarm side: ANCHOR §6 (+31 offenders under R3, table row J0437), ln K = 1.39 array minimum (quoted in ANCHOR), convention STORY S5.2.4.
 - **sky-marginalised switch statement (framing item 3)** — GENERALISE §4b (Arm A-SKY, commit 943dcf3; bank `reports/gen_armAS_sky.npz`, figure `GENERALISE_AS_sky.png`): sole surviving boundary cell (5+11, e = 0.3, h = −12.75) at 6/8 skies, sky median 1.77, mean 3.18 ± 3.02; all single-member 3+13 threshold claims sky-lottery (2–4/8); floor sky-swing ×2.5–4.3 at every h. Single-member counts throughout this document carry the A-SKY convention: sky-median with band, never per-sky guarantee.
+- **band-attribution sentence (framing item 3, isotropic control)** — COMPASS, isotropic control array: surviving-cell sky band = intrinsic source geometry (scatter ratio iso/real = 0.89, persists; strengthens to 8/8 skies, mean 4.82 under isotropy); sparse-population/single-member lottery = array anisotropy (ratio 0.23, collapses). **[ACCRE: `reports/COMPASS.md`, pending push — re-verify citation at Matt's next push.]** This is the one entry in this footer not yet readable from a bank in this repository; every other number above is a local artifact readback.

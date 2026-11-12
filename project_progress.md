@@ -162,10 +162,13 @@ both power modes; GPU, jax 0.4.28 venv, ~21 min total):**
   band 3–20 nHz): knee = 288/412/555, N\* = 5.4/8.0/10.7 → **knee/N\* ≈ 52 (constant)**.
   Varying band (3–12/3–20/3–40 nHz, T=15 yr): knee = 255/412/716 → knee/N\* = 60/51/41
   (drifts). So the **T-scaling** of the confusion onset is captured by T·Δf; the
-  **bandwidth-scaling** only roughly. The ~50× offset is the array-resolution boost: 116
-  pulsars pin the global source phases ~50× better than naive one-source-per-1/T-bin
-  counting, pushing confusion onset to N≈50·(T·Δf). **Practical threshold (goal "y"):
-  distance info survives marginalisation up to N ≈ 50·T·Δf for a 116-pulsar array.**
+  **bandwidth-scaling** only roughly. The **52.0×** offset is the array-resolution boost:
+  116 pulsars pin the global source phases 52× better than naive one-source-per-1/T-bin
+  counting, pushing confusion onset to N≈52·(T·Δf). **Practical threshold (goal "y"):
+  distance info survives marginalisation up to N ≈ 52·T·Δf for a 116-pulsar array.**
+  [UPDATED 2026-08-06, PRONG2-N: 52 is NOT a universal constant — it is the N_psr=116
+  value of `knee/N* = 0.410·N_psr^1.017`, measured at N_psr = 30/58/116/232 →
+  12.98/25.46/51.99/104.33. Use `0.410·N_psr^1.017·T·Δf` for any other array size.]
 
 **Optimisation (this session, GPU):** padded source array to fixed N_max + boolean mask
 → one compiled XLA shape serves all N (no per-N recompile; padded sources contribute
@@ -211,8 +214,9 @@ assembled per-pulsar (F_LL diagonal) to keep memory O(n_src²) not O(n_param·n_
 ### Two distinct transitions (do not conflate) — REVISED after Stage A.2
 
 A. SOURCE CONFUSION / RESOLVABILITY  (Stage A)
-   - Controlled by N vs N* = T·Δf, with ~50× array-resolution boost (116 psr,
-     varied 1-cos mu). An ESTIMATION limit: can't separate source phases once
+   - Controlled by N vs N* = T·Δf, with 52× array-resolution boost (116 psr,
+     varied 1-cos mu; the boost is 0.410·N_psr^1.017 — an N_psr-dependent law, not
+     a constant: PRONG2-N). An ESTIMATION limit: can't separate source phases once
      crowded. Conditional info never collapses (∝N); loss is all in resolvability.
    - Requires N>1. Knee scales with T·Δf.
 
@@ -1979,6 +1983,39 @@ not the absolute Fisher heights.
   campaigns in §10; criterion + derivation + margin + caveat in the spec. Code:
   `CW_transition/trackB_criterion.py` (fits the floor, emits the table, asserts the invariants).
   Gates: 8/8 b1_core + census triple bit-identical. (Claude + Matt)
+
+- 2026-08-06 (PRONG2-N — the N_psr lever, cronus/4090, jug-gpu) — Reran the Stage-A
+  confusion knee at **N_psr = 30/58/116/232** in the production config (T=15 yr, 3-20 nHz,
+  100 ns, 7 d, fixed_persource, 30 seeds, rcond 1e-10) to test the counting law
+  `M_max = (d-m)N_psr/p` against its alternatives. **knee/N\* = 12.98 / 25.46 / 51.99 /
+  104.33**; fit **`knee/N* = 0.410 · N_psr^1.017`** (slope err 0.0038 after chi2/dof=4.5
+  inflation). GATE: 116 -> 53.13 on P2-C's first-crossing estimator vs P2-C's 52.75 (0.7%,
+  PASS); N_psr=30 -> 13.32 vs P2-C 12.92. **Slope 1.017 +- 0.004 = +4.6 sigma above 1** — the
+  boost is real but *slightly* super-linear, so the local coefficient
+  `c = knee/(N*·N_psr)` is NOT constant: 0.4328/0.4389/0.4482/0.4497.
+  **At N_psr=232 the candidates DO separate: knee/N\* = 104.33 +- 3.54** (seed SE 0.15,
+  knee-estimator systematic 3.50, 3-sky-realisation spread 0.55, in quadrature) ->
+  **`N_psr/2` = 116.0 REJECTED (-3.3 sigma, -10.1%)**; `2N_psr/5` = 92.8 REJECTED
+  (+3.3 sigma, +12.4%); raw `2N_psr/7` = 66.3 REJECTED (+10.7 sigma); **closest survivor
+  `3N_psr/7` = 99.4 (+1.4 sigma, +4.9%)**. But `3N_psr/7` is a CROSSING, not a law:
+  `c(N_psr)` passes 3/7 at N_psr~13 and keeps rising (reaches 1/2 only at N_psr~1e5).
+  **No fixed-coefficient parameter count reproduces the measured law** -> this SUPERSEDES
+  the ABACUS/STORY-S2.1.3 `0.40 = 2/5` identification, which read the power-law AMPLITUDE
+  as if it were the coefficient (valid only if b=1; it is 1.017).
+  **Two P2-C defects found and fixed here:** (i) its `bootstrap_knee_scatter` re-ran the
+  SAME seed batch every iteration (`run_sweep` seeds off a fixed `seed0`), so it always
+  returned ~0 — the banked law had never carried an error bar; (ii) its single 34%-spaced
+  N grid could not resolve a 17% coefficient split — replaced with a coarse-locate +
+  6.3%-spaced fine grid, and with a noise-robust knee estimator (regress R on log N over
+  0.25<R<0.75) because the first-crossing estimator re-crossed 0.5 in 15/30 seeds at
+  N_psr=30. Both estimators are reported; their difference is the dominant error term.
+  **Also fixed the OOM that bit P2-C at N_psr=200:** `fisher_blocks` vmaps the whole array
+  and materialises H = (N_psr, n_toa, 2·n_max) = 4.4 GB at N_psr=232; PRONG2-N accumulates
+  `F_ss = sum_a H_a^T H_a` over pulsar chunks instead (gated identical to 1e-15, peak
+  3.1 GiB). Also replaced the hardcoded "~50x" array offset: `plot_prong2.py` now reads it
+  from the npz, `prong2_transition.py` gained `KNEE_COEF_PER_PSR` and scales by `n_psr`.
+  Files `CW_transition/stagec_p2n_arraylaw.py`, `stagec_p2n_results.npz`,
+  `p2n_array_law.png`, `logs/p2n_arraylaw.log`. (Claude + Matt)
 
 ## 9. Environment (cronus)
 - GPU box cronus = NVIDIA RTX 4090, driver 550.120.

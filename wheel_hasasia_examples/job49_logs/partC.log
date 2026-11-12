@@ -1,0 +1,30 @@
+booked lines exec'd:
+   sg[a]=np.sqrt(max(res,0)/max(Pt,1e-300)+1/max(rp[k],1e-9)**2) 
+   eps=kap*Lt+rng.normal(0,sgu) 
+   eps = kap*Lt + rg.normal(0, sigphi, len(kap))
+
+ beta | machine43 rms(wrapped)         <cos> | machine47 <cos> | Rice rms  <cos> | WN(1-b)/b rms  <cos> | WN(1-b)/2b rms  <cos>
+ 0.99 |      0.100 (raw 0.100)  0.995+-0.000 |    0.995+-0.000 |    0.071  0.997 |         0.101  0.995 |          0.071  0.997
+ 0.90 |      0.333 (raw 0.333)  0.946+-0.000 |    0.946+-0.000 |    0.244  0.971 |         0.333  0.946 |          0.236  0.973
+ 0.70 |      0.656 (raw 0.656)  0.807+-0.001 |    0.807+-0.001 |    0.552  0.868 |         0.655  0.807 |          0.463  0.898
+ 0.50 |      0.996 (raw 0.999)  0.607+-0.001 |    0.607+-0.001 |    0.871  0.710 |         0.997  0.607 |          0.707  0.779
+ 0.30 |      1.430 (raw 1.523)  0.313+-0.001 |    0.311+-0.001 |    1.166  0.524 |         1.433  0.311 |          1.073  0.558
+ 0.20 |      1.654 (raw 1.995)  0.138+-0.002 |    0.137+-0.002 |    1.314  0.417 |         1.658  0.135 |          1.355  0.368
+ 0.10 |      1.802 (raw 2.998)  0.010+-0.002 |    0.014+-0.002 |    1.480  0.287 |         1.802  0.011 |          1.694  0.105
+
+  z = (machine <cos> - reference)/MC s.e.:
+   beta 0.99:  vs Rice    -157.5   vs WN(1-b)/b  +0.18   vs WN(1-b)/2b    -158.3
+   beta 0.90:  vs Rice    -149.2   vs WN(1-b)/b  +0.86   vs WN(1-b)/2b    -159.9
+   beta 0.70:  vs Rice    -110.5   vs WN(1-b)/b  -0.70   vs WN(1-b)/2b    -165.6
+   beta 0.50:  vs Rice    -103.9   vs WN(1-b)/b  +0.21   vs WN(1-b)/2b    -172.6
+   beta 0.30:  vs Rice    -148.3   vs WN(1-b)/b  +1.02   vs WN(1-b)/2b    -172.1
+   beta 0.20:  vs Rice    -179.6   vs WN(1-b)/b  +1.93   vs WN(1-b)/2b    -147.9
+   beta 0.10:  vs Rice    -175.5   vs WN(1-b)/b  -0.62   vs WN(1-b)/2b     -60.3
+
+  VERDICT: machine matches wrapped normal with var (1-b)/b at every beta: True; matches Rice anywhere below b=0.95: False
+  wrote job49_partC_table.csv
+  wrote job49_partC_hist.png
+
+real	0m0.527s
+user	0m0.637s
+sys	0m0.035s

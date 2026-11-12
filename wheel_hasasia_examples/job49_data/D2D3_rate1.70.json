@@ -1,0 +1,111 @@
+{
+ "cfg": "rate1.70",
+ "repro_ok": true,
+ "repro_txt": "booked: no 0.90 crossing; reproduced: no crossing",
+ "identical": true,
+ "n": 13545,
+ "arms": {
+  "inc": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.8976588615708642
+   },
+   "oldgate": null,
+   "ungated_purity": 0.580140273163529
+  },
+  "p1_inc": {
+   "refrozen": {
+    "ok": true,
+    "gate": 17.00975137688229,
+    "pur": 0.9126637554585153,
+    "y": 10.45,
+    "yb": [
+     8.909,
+     11.92
+    ],
+    "pb": [
+     0.901038578395547,
+     0.922486624754562
+    ],
+    "n": 1145,
+    "thr": 0.0010642907185685817,
+    "maxpur": 0.9410895307890575
+   },
+   "oldgate": null,
+   "ungated_purity": 0.6867478774455519
+  },
+  "p1_mf": {
+   "refrozen": {
+    "ok": true,
+    "gate": 58.51882181766222,
+    "pur": 0.9092721834496511,
+    "y": 36.48,
+    "yb": [
+     34.609,
+     38.383
+    ],
+    "pb": [
+     0.9015655366046083,
+     0.9157237372603476
+    ],
+    "n": 4012,
+    "thr": 0.026149520414489633,
+    "maxpur": 0.9673396782148744
+   },
+   "oldgate": null,
+   "ungated_purity": 0.7311184939091916
+  },
+  "p2_inc": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.8373323166949092
+   },
+   "oldgate": null,
+   "ungated_purity": 0.5362864525655223
+  },
+  "p2_mf": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.8634246550246866
+   },
+   "oldgate": null,
+   "ungated_purity": 0.591140642303433
+  },
+  "p2g_inc": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.7793494019273657
+   },
+   "oldgate": null,
+   "ungated_purity": 0.5394610557401255
+  },
+  "p2g_mf": {
+   "refrozen": {
+    "ok": false,
+    "gate": NaN,
+    "pur": NaN,
+    "y": NaN,
+    "thr": NaN,
+    "maxpur": 0.8761203050874179
+   },
+   "oldgate": null,
+   "ungated_purity": 0.5915097822074566
+  }
+ }
+}

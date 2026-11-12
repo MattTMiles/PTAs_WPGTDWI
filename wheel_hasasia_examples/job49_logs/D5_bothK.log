@@ -1,0 +1,4 @@
+K_coarsest>=60: n= 1432 (skies 199) | inc: 0.020 (UL95 0.027); gated 0/0 | p1_inc: 0.027 (UL95 0.035); gated 0/0 | p1_mf: 0.027 (UL95 0.035); gated 0/0 | p2_inc: 0.021 (UL95 0.028); gated 0/0 | p2_mf: 0.021 (UL95 0.028); gated 0/0
+K_coarsest>=600: n=   79 (skies 62) | inc: 0.000 (UL95 0.037); gated 0/0 | p1_inc: 0.000 (UL95 0.037); gated 0/0 | p1_mf: 0.000 (UL95 0.037); gated 0/0 | p2_inc: 0.000 (UL95 0.037); gated 0/0 | p2_mf: 0.000 (UL95 0.037); gated 0/0
+K_finest>=60: n= 2869 (skies 200) | inc: 0.091 (UL95 0.101); gated 12/14 | p1_inc: 0.131 (UL95 0.142); gated 14/14 | p1_mf: 0.133 (UL95 0.144); gated 14/14 | p2_inc: 0.089 (UL95 0.098); gated 3/6 | p2_mf: 0.096 (UL95 0.106); gated 11/14
+K_finest>=600: n=  620 (skies 187) | inc: 0.011 (UL95 0.021); gated 0/0 | p1_inc: 0.013 (UL95 0.023); gated 0/0 | p1_mf: 0.016 (UL95 0.027); gated 0/0 | p2_inc: 0.011 (UL95 0.021); gated 0/0 | p2_mf: 0.016 (UL95 0.027); gated 0/0

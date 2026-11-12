@@ -1,0 +1,4 @@
+world,purity,median_margin_nats,null_bar_nats,sigma_phi_comb1,sigma_phi_comb2,beats_bar,verdict
+"M0 naive pair, window 120 pc",0.4950,0.138,0.306,0.050,0.050,False,FAILS
+"M1 two sources, no noise",1.0000,15.184,14.602,0.050,0.050,True,CERTIFIES
+"M2 same seeds, pile-up ON",0.0950,0.072,0.089,1.419,1.213,False,FAILS

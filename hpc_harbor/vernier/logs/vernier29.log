@@ -1,0 +1,312 @@
+
+============================================================================================================
+DELIVERABLE 0 -- THE REAL ARRAY, ITS WEIGHTS AND ITS DISTANCE-PRIOR CATEGORIES
+============================================================================================================
+  116 pulsars, REAL sky unit vectors (feather pos_t), REAL residual rms (reports/anchor_data_forensics.npz),
+  REAL distance priors from get_distance.py vs the Cornell parallax catalogue (CW_transition/anchor_a0_priors.npz).
+  T = 20 yr, 1/T = 1.584 nHz, band 10.00-24.26 nHz in 10 bins; lambda_GW(15 nHz) = 0.648 pc.
+
+  residual rms: median 756 ns, range 196-40434 ns
+  REALISED weight heterogeneity: sigma_log10(1/rms) = 0.370 dex  (VERNIER-13 assumed 0.400 dex -- the real array is 0.370)
+  w = sigma_med/sigma_a normalised to unit mean POWER: 0.013-2.595, median 0.674
+
+  DISTANCE-PRIOR CATEGORY CENSUS (the catalogue values this run uses):
+      category    N  median d (pc)  median sigma_d (pc)  median sigma_d/d  sub-pc now
+          VLBI   19         1075.3                82.64             0.082           2
+     timing-PX   50         1125.3               219.21             0.208           0
+     Pbdot-Shk    5          930.0               197.60             0.200           0
+      DM-model   12         2173.5               434.70             0.200           0
+    DM-default   30         1495.0               300.00             0.200           0
+
+  pulsars with sigma_d < 1 pc TODAY: 2 -- J0437-4715 (0.11 pc), J2222-0137 (0.97 pc)
+  pulsars with sigma_d < lambda_GW/2 = 0.324 pc TODAY: 1
+
+  ANCHOR: J0437-4715 entered at sigma_d = 0.11 pc per the brief.
+    DISCREPANCY, STATED: the canonical prior file in this repo carries Deller et al. (2008),
+    PX = 6.396 +/- 0.054 mas -> d = 156.3 pc, sigma_d = 1.32 pc. The 0.11 pc figure is the
+    Reardon-era value the brief specifies; deliverable 5 prices the anchor both ways.
+
+============================================================================================================
+DELIVERABLE 1 -- WHAT VLBI CAN ACTUALLY REACH  (sigma_d = sigma_pi d^2)
+============================================================================================================
+  A parallax campaign of precision sigma_pi buys a DISTANCE precision
+      sigma_d [pc] = sigma_pi [arcsec] * (d [pc])^2 ,
+  because pi[arcsec] = 1/d[pc]. Sub-parsec is therefore a DISTANCE cut on the
+  target, not a telescope-time cut. Floors used:
+      sigma_pi = 13 uas -- DEMONSTRATED: Ding et al. (2024), J2222-0137, PX = 3.723 +/- 0.013 mas
+      sigma_pi = 30 uas -- typical deep campaign
+
+  sigma_pi = 13 uas : sub-parsec out to d =  277.4 pc ( 6 of 116 array pulsars) ; sub-lambda/2 out to  157.8 pc ( 3 pulsars)
+  sigma_pi = 30 uas : sub-parsec out to d =  182.6 pc ( 3 of 116 array pulsars) ; sub-lambda/2 out to  103.9 pc ( 1 pulsars)
+
+  THE REACHABLE SET at 13 uas (sorted by reachable sigma_d):
+    #       pulsar    d (pc)  sigma_d now  category now  sigma_d reachable  gain factor
+    1   J1630+3734      89.0        24.00    DM-default              0.103        233.1
+    2   J0711-6830     106.0        21.20      DM-model              0.146        145.1
+    3   J0437-4715     156.3         0.11          VLBI              0.318          0.3  <-- ANCHOR
+    4   J1737-0811     206.0        41.20      DM-model              0.552         74.7
+    5   J1017-7156     256.4        78.90     timing-PX              0.855         92.3
+    6   J2222-0137     268.6         0.97          VLBI              0.938          1.0
+    7   J2124-3358     322.6        57.23     timing-PX              1.353         42.3
+    8   J0030+0451     328.9         5.41          VLBI              1.407          3.8
+    9   J1744-1134     416.7        17.36     timing-PX              2.257          7.7
+   10   J1045-4509     437.3       218.67     timing-PX              2.487         87.9
+   11   J0613-0200     476.2       136.05     timing-PX              2.948         46.2
+
+  11 pulsars can be driven below 3 pc; 6 below 1 pc; 3 below lambda/2 = 0.324 pc.
+  This IS the '2-3 more sub-parsec distances next decade' expectation, reproduced from the
+  catalogue rather than assumed -- and it is why the ranking is dominated by d, not by timing.
+
+============================================================================================================
+DELIVERABLES 2+3 -- MARGINAL VALUE PER PULSAR, AND THE RANKING
+============================================================================================================
+  For each pulsar i: force its distance prior to sub-lambda and recompute all
+  four products. Marginal value = the change. Baseline and perturbed passes
+  share their noise draws, so every Delta is a prior response.
+
+  ORACLE arm     : sigma_d -> 0.10 pc for any pulsar (physics only)
+  ACHIEVABLE arm : sigma_d -> max(0.10 pc, 13 uas * d^2)  (what VLBI can do)
+
+    K= 1: baseline f_marg = 0.1995, f_cert = 0.0156, f_prior-pinned = 0.0125
+    K= 8: baseline f_marg = 0.1833, f_cert = 0.0215, f_prior-pinned = 0.0000
+    K=16: baseline f_marg = 0.2328, f_cert = 0.0316, f_prior-pinned = 0.0000
+
+  BASELINE PRODUCTS (today's priors, J0437-4715 at 0.11 pc):
+    K =  1  (today) f_marg = 0.1995   f_cert = 0.0156   f_prior-pinned = 0.0125
+    K =  8          f_marg = 0.1833   f_cert = 0.0215   f_prior-pinned = 0.0000
+    K = 16          f_marg = 0.2328   f_cert = 0.0316   f_prior-pinned = 0.0000
+    localisation: 1-sigma sky ellipse area of the loudest source = 5.761e-09 sr
+    chirp mass  : sigma(log10 Mc) = 0.0169 dex
+
+
+============================================================================================================
+THE RANKED TABLE -- ACHIEVABLE ARM (primary: Delta f_marg at seed K = 8, the soft channel that exists today)
+============================================================================================================
+  READING (a): 'dbar' is the reduction in the certification bar and CAN GO
+  NEGATIVE. That is not a bug. Shrinking a prior below one fringe removes the
+  rival fringes from the searched window, so the incoherent-comb NULL contrast
+  rises too and the refit floor rises with it -- the floor is doing its job.
+  The operative (a) quantity is therefore 'pin', the fraction of realisations
+  in which the pulsar goes from not-known to known (certified OR prior-pinned).
+
+    #       pulsar     cat now    d(pc)  sig_d now  sig_d new      w  K_fr now  (b) dfmarg  (b) dfmarg   (a) dbar  (a) pin  (c) dA/A  (d) dsMc
+                                              (pc)       (pc)                          K=1         K=8    K=8 nat      K=8              /sigma
+    1   J1216-6410   timing-PX    939.7     185.02     11.479   2.18    4159.4  +7.732e-05  +1.379e-02     +2.780     0.00 +1.18e-04 +2.59e-02
+    2   J0614-3329   timing-PX    570.2      85.38      4.227   1.63    1896.7  +5.935e-06  +6.959e-03     +2.876     0.04 +3.00e-04 +2.22e-03
+    3   J1630+3734  DM-default     89.0      24.00      0.103   1.75     544.5  +1.622e-03  +6.521e-03    -24.442     0.71 +9.73e-03 +2.37e-04
+    4   J1730-2304        VLBI    500.0      25.00      3.250   1.61     583.1  +1.859e-06  +6.032e-03     +0.946     0.29 +4.34e-04 +3.13e-03
+    5   J1017-7156   timing-PX    256.4      78.90      0.855   1.42    1752.1  +1.303e-04  +5.691e-03     +0.297     0.33 +1.53e-03 +1.13e-03
+    6   J2124-3358   timing-PX    322.6      57.23      1.353   1.45    1329.3  -9.348e-05  +5.347e-03     +1.903     0.17 +8.82e-04 +1.90e-03
+    7   J0636-3044   timing-PX    639.9     444.00      5.324   1.24    4255.6  +5.886e-05  +2.429e-03     +3.585     0.00 +2.34e-04 +3.63e-03
+    8   J1737-0811    DM-model    206.0      41.20      0.552   0.64     951.7  +1.618e-05  +1.663e-03     +3.784     0.04 +2.22e-03 +6.44e-05
+    9   J0125-2327   timing-PX   1348.4      91.16     23.636   2.42    2073.3  +2.687e-05  +1.626e-03     +1.350     0.00 +4.94e-05 +4.84e-02
+   10   J2322-2650   timing-PX    737.1     117.78      7.062   1.28    2754.9  -4.646e-05  +1.515e-03     +2.814     0.00 +1.82e-04 +5.52e-03
+
+  SPLIT-HALF STABILITY OF THE RANKING (the test that decides whether this
+  is a ranking at all): the 24 sky realisations are split in two, the value
+  is re-averaged in each half, and the two half-rankings are compared.
+    Spearman(half A, half B) over 115 candidates = +0.400
+    top-10 overlap of each half with the full ranking: 9/10, 9/10
+    per-pulsar |value| / standard error: median 1.33, top-10 median 4.60, n with S/N > 3: 11 of 115
+
+  DRIVER DECOMPOSITION -- rank correlation of the marginal value with each
+  candidate driver, over all 115 candidates (this is the decomposition; the
+  per-pulsar table below just shows where each top-10 entry sits on each axis)
+    Spearman(value,            timing weight w) = +0.209
+    Spearman(value,           prior-width gain) = +0.259
+    Spearman(value,                 1/distance) = +0.619
+    Spearman(value,    pulsar-term power share) = +0.214
+    Spearman(value,          geometry <dL_min>) = +0.038
+    Spearman(value,  current fringe count K_fr) = -0.608
+
+    #       pulsar  timing w  w rank  prior gain  gain rank  geom <dl>  pw share  value S/N
+    1   J1216-6410      2.18       3        16.1         35       0.28  4.00e-02       4.49
+    2   J0614-3329      1.63      13        20.2         22       0.28  2.31e-02       4.91
+    3   J1630+3734      1.75       9       233.1          1       0.27  2.46e-02       4.70
+    4   J1730-2304      1.61      14         7.7         77       0.26  2.06e-02       3.53
+    5   J1017-7156      1.42      18        92.3          3       0.27  1.74e-02       5.62
+    6   J2124-3358      1.45      17        42.3         10       0.27  1.93e-02       4.77
+    7   J0636-3044      1.24      27        83.4          5       0.28  1.34e-02       2.34
+    8   J1737-0811      0.64      62        74.7          6       0.26  3.31e-03       6.88
+    9   J0125-2327      2.42       2         3.9         99       0.27  5.34e-02       1.53
+   10   J2322-2650      1.28      25        16.7         32       0.26  1.55e-02       1.76
+
+  RANK AGREEMENT BETWEEN PRODUCTS (Spearman over the 115 candidates):
+                   f_marg K=1   f_marg K=8  f_marg K=16      bar K=8     sky area     chirp Mc
+       f_marg K=1        1.000        0.260        0.356       -0.017        0.347       -0.362
+       f_marg K=8        0.260        1.000        0.584        0.135        0.597       -0.228
+      f_marg K=16        0.356        0.584        1.000        0.251        0.682       -0.284
+          bar K=8       -0.017        0.135        0.251        1.000        0.506       -0.223
+         sky area        0.347        0.597        0.682        0.506        1.000       -0.588
+         chirp Mc       -0.362       -0.228       -0.284       -0.223       -0.588        1.000
+
+============================================================================================================
+THE RANKED TABLE -- ORACLE ARM (primary: Delta f_marg at seed K = 8, the soft channel that exists today)
+============================================================================================================
+  READING (a): 'dbar' is the reduction in the certification bar and CAN GO
+  NEGATIVE. That is not a bug. Shrinking a prior below one fringe removes the
+  rival fringes from the searched window, so the incoherent-comb NULL contrast
+  rises too and the refit floor rises with it -- the floor is doing its job.
+  The operative (a) quantity is therefore 'pin', the fraction of realisations
+  in which the pulsar goes from not-known to known (certified OR prior-pinned).
+
+    #       pulsar     cat now    d(pc)  sig_d now  sig_d new      w  K_fr now  (b) dfmarg  (b) dfmarg   (a) dbar  (a) pin  (c) dA/A  (d) dsMc
+                                              (pc)       (pc)                          K=1         K=8    K=8 nat      K=8              /sigma
+    1   J0406+3039  DM-default   1720.0     340.00      0.100   2.59    7430.9  +3.487e-02  +4.038e-02     +5.207     0.04 +6.57e-02 +1.22e-01
+    2   J0125-2327   timing-PX   1348.4      91.16      0.100   2.42    2073.3  +2.362e-02  +3.450e-02     -0.006     0.38 +6.91e-02 +6.21e-02
+    3   J1843-1113   timing-PX   1730.3     282.16      0.100   2.03    6486.9  +1.251e-02  +2.684e-02     +6.725     0.21 +7.20e-02 +6.65e-02
+    4   J1902-5105   timing-PX   2404.9     603.35      0.100   1.97   14026.9  +1.473e-02  +2.374e-02     +8.612     0.04 +6.66e-02 +1.06e-01
+    5   J1216-6410   timing-PX    939.7     185.02      0.100   2.18    4159.4  +1.115e-02  +2.359e-02     -6.907     0.83 +6.47e-02 +2.76e-02
+    6   J1705-1903  DM-default   1620.0     320.00      0.100   1.78    7482.2  +1.054e-02  +2.155e-02     +6.763     0.42 +7.37e-02 +6.29e-02
+    7   J1811-2405   timing-PX   2498.7     262.04      0.100   1.89    6073.4  +1.208e-02  +2.126e-02     +7.743     0.00 +7.25e-02 +1.07e-01
+    8   J2234+0944   timing-PX   1921.1     309.01      0.100   1.84    7604.0  +1.383e-02  +2.094e-02     +7.170     0.12 +7.50e-02 +6.58e-02
+    9   J1911+1347  DM-default   2080.0     420.00      0.100   1.69    9891.7  +7.920e-03  +1.736e-02     +7.985     0.04 +7.41e-02 +8.49e-02
+   10   J2322+2057   timing-PX   1160.4     223.61      0.100   1.67    5449.5  +1.006e-02  +1.674e-02     +2.679     0.46 +7.42e-02 +2.07e-02
+
+  SPLIT-HALF STABILITY OF THE RANKING (the test that decides whether this
+  is a ranking at all): the 24 sky realisations are split in two, the value
+  is re-averaged in each half, and the two half-rankings are compared.
+    Spearman(half A, half B) over 115 candidates = +0.990
+    top-10 overlap of each half with the full ranking: 9/10, 9/10
+    per-pulsar |value| / standard error: median 12.94, top-10 median 13.26, n with S/N > 3: 115 of 115
+
+  DRIVER DECOMPOSITION -- rank correlation of the marginal value with each
+  candidate driver, over all 115 candidates (this is the decomposition; the
+  per-pulsar table below just shows where each top-10 entry sits on each axis)
+    Spearman(value,            timing weight w) = +0.990
+    Spearman(value,           prior-width gain) = -0.010
+    Spearman(value,                 1/distance) = -0.105
+    Spearman(value,    pulsar-term power share) = +0.989
+    Spearman(value,          geometry <dL_min>) = -0.095
+    Spearman(value,  current fringe count K_fr) = -0.003
+
+    #       pulsar  timing w  w rank  prior gain  gain rank  geom <dl>  pw share  value S/N
+    1   J0406+3039      2.59       1      3400.0         39       0.28  5.94e-02      10.30
+    2   J0125-2327      2.42       2       911.6         95       0.27  5.34e-02       9.55
+    3   J1843-1113      2.03       4      2821.6         49       0.27  3.34e-02      22.01
+    4   J1902-5105      1.97       5      6033.5         18       0.26  3.34e-02      13.06
+    5   J1216-6410      2.18       3      1850.2         74       0.28  4.00e-02       8.33
+    6   J1705-1903      1.78       8      3200.0         42       0.26  2.54e-02      17.28
+    7   J1811-2405      1.89       6      2620.4         51       0.26  2.88e-02      14.03
+    8   J2234+0944      1.84       7      3090.1         44       0.25  3.05e-02      13.47
+    9   J1911+1347      1.69      10      4200.0         30       0.26  2.48e-02      14.74
+   10   J2322+2057      1.67      11      2236.1         62       0.25  2.57e-02      10.09
+
+  RANK AGREEMENT BETWEEN PRODUCTS (Spearman over the 115 candidates):
+                   f_marg K=1   f_marg K=8  f_marg K=16      bar K=8     sky area     chirp Mc
+       f_marg K=1        1.000        0.973        0.979       -0.200        0.616        0.779
+       f_marg K=8        0.973        1.000        0.991       -0.289        0.569        0.737
+      f_marg K=16        0.979        0.991        1.000       -0.237        0.620        0.774
+          bar K=8       -0.200       -0.289       -0.237        1.000        0.438        0.353
+         sky area        0.616        0.569        0.620        0.438        1.000        0.910
+         chirp Mc        0.779        0.737        0.774        0.353        0.910        1.000
+
+============================================================================================================
+DELIVERABLE 4 -- DIMINISHING RETURNS: THE VALUE OF ANCHOR #1, #2, ... #10
+============================================================================================================
+  GREEDY sequence: at each step take the pulsar with the largest marginal
+  value GIVEN the anchors already bought. Reported in the ACHIEVABLE arm.
+
+  STRUCTURAL WARNING, stated up front, because it changes what 'saturation' means:
+    f_marg is EXACTLY separable -- it is sum_a R_a^2 pw_a / sum pw and R_a depends
+      on pulsar a's prior alone. Its greedy curve IS the sorted cumulative sum, so
+      any flattening is a statement about the VALUE DISTRIBUTION being heavy-tailed,
+      NOT about anchors interacting. No anchor makes another anchor less useful.
+    chirp mass has a separable FISHER but sigma = 1/sqrt(sum_a I_a) is not additive,
+      so it gets a true greedy; the naive sorted cumsum overstates it ~2x.
+    localisation genuinely COUPLES pulsars through the Schur complement, so it is
+      the only product where a real interaction can appear. True greedy.
+
+  f_marg (K=8): baseline 0.1833
+    per-anchor : +1.379e-02 +6.959e-03 +6.521e-03 +6.032e-03 +5.691e-03 +5.347e-03 +2.429e-03 +1.663e-03 +1.626e-03 +1.515e-03
+    cumulative : +1.379e-02 +2.075e-02 +2.727e-02 +3.330e-02 +3.899e-02 +4.434e-02 +4.677e-02 +4.843e-02 +5.006e-02 +5.157e-02
+    frac of 10 :  0.267  0.402  0.529  0.646  0.756  0.860  0.907  0.939  0.971  1.000
+    50 / 80 / 90 % of the ten-anchor total reached at anchor 3 / 6 / 7
+
+  f_marg (K=16): baseline 0.2328
+    per-anchor : +9.736e-03 +7.972e-03 +7.106e-03 +6.000e-03 +5.858e-03 +4.972e-03 +4.851e-03 +4.309e-03 +3.975e-03 +3.950e-03
+    cumulative : +9.736e-03 +1.771e-02 +2.481e-02 +3.081e-02 +3.667e-02 +4.164e-02 +4.649e-02 +5.080e-02 +5.478e-02 +5.873e-02
+    frac of 10 :  0.166  0.302  0.423  0.525  0.624  0.709  0.792  0.865  0.933  1.000
+    50 / 80 / 90 % of the ten-anchor total reached at anchor 4 / 8 / 9
+
+  chirp sigma(log10 Mc)  (true greedy -- sigma = 1/sqrt(sum I_a) is NOT additive,
+  so the sorted cumulative sum of per-pulsar fractional gains would overstate it):
+    baseline sigma(log10 Mc) = 0.01690 dex
+      #       pulsar  sigma (dex)  cum. reduction    marginal
+      1   J0406+3039      0.01555          0.0803      0.0803
+      2   J0557+1551      0.01474          0.1281      0.0478
+      3   J1902-5105      0.01440          0.1481      0.0200
+      4   J1751-2857      0.01423          0.1583      0.0102
+      5   J1911+1347      0.01408          0.1668      0.0085
+      6   J0125-2327      0.01396          0.1743      0.0075
+      7   J1431-5740      0.01384          0.1813      0.0070
+      8   J1705-1903      0.01373          0.1875      0.0062
+      9   J2039-3616      0.01364          0.1932      0.0057
+     10   J1653-2054      0.01355          0.1983      0.0050
+    50 / 80 / 90 % of the ten-anchor reduction at anchor 2 / 5 / 7
+
+  LOCALISATION (coupled -- true greedy over the Schur-marginalised Fisher):
+    baseline sky-ellipse area 5.7609e-09 sr
+      #       pulsar    area (sr)  cum. reduction    marginal
+      1   J1630+3734   5.7041e-09          0.0099      0.0099
+      2   J0711-6830   5.6899e-09          0.0123      0.0025
+      3   J1737-0811   5.6818e-09          0.0137      0.0014
+      4   J1017-7156   5.6766e-09          0.0146      0.0009
+      5   J0030+0451   5.6735e-09          0.0152      0.0005
+      6   J2124-3358   5.6706e-09          0.0157      0.0005
+      7   J1744-1134   5.6682e-09          0.0161      0.0004
+      8   J1045-4509   5.6666e-09          0.0164      0.0003
+      9   J1730-2304   5.6650e-09          0.0166      0.0003
+     10   J0613-0200   5.6637e-09          0.0169      0.0002
+    80 % of the ten-anchor area reduction reached at anchor 3
+    marginal gain ratio anchor#2/#1 = 0.251, #5/#1 = 0.056, #10/#1 = 0.024
+
+  COMPARISON TO THE ANCHOR LITERATURE'S 3-6 SATURATION CLAIM: see the verdict.
+
+============================================================================================================
+DELIVERABLE 5 -- IS J0437-4715's ANCHOR STATUS ALREADY BANKED? (remove it)
+============================================================================================================
+  J0437-4715: d = 156.3 pc, w = 1.86 (rank 7 of 116 by timing weight),
+  reachable sigma_d at 13 uas = 0.3178 pc -- by far the most reachable pulsar in the array.
+
+                                 variant   sigma_d   f_marg K=1   f_marg K=8  f_cert K=8  own bar K=8    area (sr)   sig(Mc)
+                 anchor (brief, 0.11 pc)     0.110      0.19946      0.18334     0.02147     32.19256   5.7609e-09    0.0169
+    anchor (repo catalogue, Deller 2008)     1.320      0.19819      0.18305     0.01421      9.63033   6.2177e-09    0.0169
+          NO anchor: 20 % DM-model prior    31.270      0.19814      0.17618     0.00150      7.00470   6.2335e-09    0.0169
+
+  VALUE ALREADY BANKED BY THE EXISTING ANCHOR (brief value vs no anchor):
+    f_marg  K=1 : 0.19814 -> 0.19946  (+0.67 %)
+    f_marg  K=8 : 0.17618 -> 0.18334  (+4.06 %)
+    f_cert  K=8 : 0.00150 -> 0.02147
+    sky area    : 6.2335e-09 -> 5.7609e-09  (-7.58 %)
+    sigma(Mc)   : 0.0169 -> 0.0169 dex  (-0.04 %)
+
+  SANITY: if the anchor were a candidate, where would it rank? (its own marginal value from the
+  no-anchor state, scored against every other pulsar's achievable value)
+    J0437-4715 marginal Delta f_marg(K=8) from its no-anchor state = +7.159e-03
+    that would rank it #2 of 116 -- rank 2.
+
+============================================================================================================
+DELIVERABLE 6 -- CONTROLS: IS THE SUB-PARSEC CERTIFICATION REAL?
+============================================================================================================
+  A 0.11 pc prior puts a pulsar in a window narrower than one fringe. In that
+  regime BOTH the signal contrast and the incoherent-comb null contrast inflate,
+  because 'the best rival fringe' is barely represented in the window -- exactly
+  the sub-fringe family of artefact this project has already been bitten by. So
+  the certification is audited three ways: does the winning fringe contain the
+  TRUE distance (f_cert_true vs f_cert); does the SOURCE-LEVEL SCRAMBLED null
+  certify anything; and how far does the bar move.
+
+                                 variant   sigma_d   K    f_cert  f_cert_true  f_cert SCRAM  bar (J0437)  stat (J0437)
+                 anchor (brief, 0.11 pc)     0.110   8   0.02101      0.02101       0.00000       35.298        37.222
+                 anchor (brief, 0.11 pc)     0.110  16   0.03574      0.03318       0.01574       51.390       105.103
+    anchor (repo catalogue, Deller 2008)     1.320   8   0.01850      0.01850       0.00000       11.164        12.352
+    anchor (repo catalogue, Deller 2008)     1.320  16   0.03205      0.02949       0.01536       23.745        38.051
+          NO anchor: 20 % DM-model prior    31.270   8   0.00046      0.00046       0.00000        7.141         1.563
+          NO anchor: 20 % DM-model prior    31.270  16   0.00683      0.00058       0.01020       16.123         7.408
+
+  READ: f_cert_true == f_cert means every certified pulsar picked the fringe that
+  actually contains its true distance. A scrambled column at or below the 5 %
+  design false-alarm share of the certified power means the floor is holding.
+
+[V29] wrote /home/mattm/projects/HSYMT/reports/vernier29.npz
