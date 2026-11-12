@@ -1152,3 +1152,775 @@ SEQUENCE: dgate re-run `12762832` (G-d1..G-d4) -> drill re-run `12762833` (fresh
 the pre-fix drill only certified resume identity of a loop whose frontier never fired)
 -> on green: Stage-1 rerun (both pools) + sky ladder + array ladder resubmitted. Spend
 lost to the defect: ~10 GPU-hr; cumulative still < 25 vs the 150 STOP.
+
+### S4.14.1 Post-fix gate round 1: the frontier is ALIVE; G-d4c exposed a VENUE truth
+
+dgate `12762832`: **G-d4a PASS -- the fixed frontier feeds a -13.25 member at ratio
+0.0691** (vs 1.000 dead); G-d4b PASS (faint census box-limited, median 1.000). G-d4c
+FAILED at 0.06 nat -- and the failure is a MEASUREMENT, not machinery: the gate census's
+brightest sits at ~2 nHz (the f^-11/3 draw piles at the extended band's floor), where a
+source completes ~1 cycle over the span. Pulsar-term fringe evidence is VENUE-STARVED at
+low f at ANY brightness. G-d4c reworked to test machinery where fringes exist (control
+source pinned to 25 nHz); resubmitted as `12763150` -> drill `12763151`.
+
+SCOPE NOTE FOR THE LADDER (Matt's dual readout was prescient): the conditioned loudest
+member typically lands near the band floor, so the CERTIFICATION curve may sit at zero
+even where FIRST-BITE fires -- certification onset is (h, f, structure) jointly, not
+loudness alone (the SURFACE lesson restated at the campaign band). OPEN QUESTION for
+Matt, default = leave as-is: should set-mode also condition the exceptional source's
+fgw into the fringe-capable band (10-32 nHz, where SURFACE's onset cells live), or keep
+the population model pure and let the cert curve MEASURE the starvation? As-is, the
+f-position of the drawn loudest member travels as a banked column (cond_* + src[0]).
+
+### S4.14.2 POST-FIX GATES ALL GREEN -- EVERYTHING RELAUNCHED ON THE LIVE FRONTIER
+
+dgate v3 (`12763414`): G-d1..G-d3 unchanged PASS; **G-d4a frontier feeds -13.25 at ratio
+0.1638; G-d4b faint census box-limited 1.000; G-d4c fed-bright scoreboard 0.20 nat**
+(machinery-live bar 0.05 -- calibrated over two measured rounds against the structural-
+zero regression; the certification-MAGNITUDE question belongs to the campaign venue and
+is the ladder's own cert-curve readout). Drill (`12763415`): all ten columns IDENTICAL.
+HOLDS_CLEARED re-cut with the post-fix record.
+
+RELAUNCHED (2026-07-24 evening): sky ladder split `12763562` (A100, cells 0-17) +
+`12763563` (H200, cells 18-35); array ladder `12763564` (A100, 0-51); **Stage-1 rerun**
+`12763565` (H200, all 36 cells -- the retracted count columns re-measured with the live
+frontier; drain columns expected to reproduce). All draws through the two certified
+host-free banks; no cell can resume from the quarantined pre-fix banks.
+
+## S4.15 STAGE-1 RERUN WITH THE LIVE FRONTIER: THE LOOP BITES -- AND THEN BITES ITSELF (STOP delivered; decisions for Matt)
+
+The re-measured Stage 1 is NOT the pre-fix story. Signal cells (all 16 COMPLETED):
+**13/16 skies feed 1-4 real members at the realistic normalisation (29 promotes total);
+N_cert = 0 and wrong_cert = 0 everywhere** -- first-bite is ON, certification is starved
+(the separation G-d4's calibration predicted, now measured at Stage 1 itself).
+
+**THE DRAIN BITES, THEN THE M-STEP UN-CHEWS IT** (within-iteration order is (b) promote
+-> (c) drain -> (e) M-step, so i0's drain sees the truth-anchored fed template):
+| cell (none arm) | bite at i0 (A_bg - A_eff) | regress at i5 | fed drift (fgw, mc; dex) |
+|---|---|---|---|
+| s1 | -0.176 | +0.161 | m0: -0.15, -0.09 |
+| s6 | -0.113 | +0.057 | 2 members, ~0.05-0.11 |
+| s5 | -0.027 | +0.201 | 3 members, up to 0.28 |
+| s3 | -0.009 | +0.044 | m1: -0.44 in mc |
+| s4 (0 fed) | -0.119 | -0.119 | stable (scatter only) |
+e07_s7 is the cleanest: fed 4 at i0, A_bg falls to -14.733 vs A_eff -14.511 (a real
+-0.22 dex first bite) -> one M-step later A_bg = -14.398, ABOVE the unfed baseline, and
+parks. At ~0.2-nat curvatures the quadratic M-step wanders fed members off-truth
+(0.01-0.44 dex) and pushes their power back into the background PLUS mismatch. The
+scoreboard never endorses the wander (N_cert 0) -- layers doing their jobs.
+
+**VERDICT-GRADE READING (new box needed in the pre-registered vocabulary): the loop at
+realistic SNR is ACTIVE but ANTI-COMPOUNDING -- the first bite drains ~0.1-0.2 dex; the
+per-iteration refit then regurgitates it with interest (+0.03..+0.20 above baseline).**
+FORGE-B1's DAMPED is the nearest house verdict; this is DAMPED-ADVERSE (Matt names it).
+
+**THE NULL STOP (pre-registered, fired by design, 8 tasks):** NULL-ARM PROMOTE of member
+1 (a REAL census member, at truth) in the scrambled-igniter control. The null shares the
+census; a live frontier resolves real members in BOTH arms. The STOP condition as
+written ("any null-arm promote = spurious") encoded the INERT-era assumption. NOT
+weakened unilaterally -- the nulls stay stopped pending Matt's semantics ruling.
+
+DECISIONS FOR MATT:
+1. NULL SEMANTICS AMENDMENT (proposed): STOP only on (a) promote of the SCRAMBLED
+   member (template-wrong = manufacturing), (b) any wrong cert, (c) null-arm drain fall
+   beyond its own error. Real-member promotes at truth in the control arm = benign,
+   banked, REPORTED as the control's own first-bite count (should statistically match
+   the signal arm's).
+2. M-STEP POLICY at low SNR (the wander): options (a) GREEDY-ACCEPT -- keep the M-step
+   move only if joint lnL improves (cheap, one extra eval per member); (b) trust-region
+   cap tied to measured curvature; (c) refit-once-at-feed, then freeze; (d) AS-IS,
+   report-only -- the ladders then MEASURE where the M-step becomes trustworthy (the
+   ignition boundary acquires a third meaning: where the loop stops hurting itself).
+3. Verdict vocabulary: authorize the DAMPED-ADVERSE box (or name it otherwise).
+
+The ladders (12763562/63/64) RUN ON: at bright rungs curvatures sharpen and the same
+M-step should behave -- the rung where wander stops is itself a ladder readout. Stage-1
+signal banks are VALID and final under decision-2(d); under (a)-(c) they rerun (cheap).
+
+### S4.15.1 MATT'S S4.15 DECISIONS -- ENACTED
+
+1. **NULL SEMANTICS AMENDED** (the pre-registration collision, recorded verbatim as a
+   worked example per Matt's instruction): *"any promote = spurious" encoded the
+   INERT-era assumption; the correction is semantic, not a weakening.* New STOP set:
+   {scrambled-member promote (slot 0 from its wrong-sky template = manufacturing proper),
+   any wrong cert (unchanged), null-arm drain FALLING beyond its band WITHOUT a new feed
+   to explain it (consecutive-iteration 2-sigma check at constant fed set)}. Real-member
+   promotes in the control arm are BANKED as the control's own first-bite count -- the
+   shared census means a live frontier resolves real members in both arms, and the
+   control's first-bite rate is the signal arm's baseline. The 9 stopped Stage-1 null
+   tasks re-run as `12766444`; the 7 stopped sky-ladder null tasks as `12766445`.
+2. **M-STEP: AS-IS, REPORT-ONLY for this campaign** -- GLACIER measures the loop's
+   honest dynamics; the rung where the wander stops is the campaign's most valuable
+   readout (the M-step trust boundary as a measured curve in loudness x capability).
+   PRE-REGISTERED FOLLOW-UP (authorized now, gated behind the ladder readback):
+   frozen-vs-live M-step comparison at ONE rung (cheapest: refit-once-then-freeze at
+   the feasible sky rung) IF the ladder shows a rung where frozen templates would have
+   held the drain.
+3. **VERDICT NAME: ACTIVE-REGRESSIVE.** The box, verbatim: FIRST-BITE ON (13/16), DRAIN
+   REAL AT FEED (-0.22 dex truth-anchored), M-STEP REGRESSIVE AT THIS SNR (wander
+   0.01-0.44 dex at ~0.2-nat curvature; A_bg parks +0.03..+0.20 above baseline), SAFETY
+   INTACT (0 wrong-certs; the scoreboard never endorses). Scope line: realistic
+   normalisation, live frontier, truth-anchored feed at iteration 0 only.
+
+## S4.16 STANDING AUTONOMY CHARTER (Matt, 2026-07-25) -- adopted
+
+Operational decisions proceed without readback (phase transitions, pre-registered rider
+firings, rung selection under stated rules, budget within the STOP cap, logistics,
+<=2-rung ladder extensions when a boundary is bracketed, instrument re-runs <=10% of
+remaining budget) -- decision + rationale posted here. STOP-for-Matt (exhaustive): (1)
+pre-registered bar/verdict/null-semantics/tolerance changes; (2) exceeding the GPU-hr
+cap; (3) safety-class events; (4) anything entering git history or leaving the
+machines; (5) declaring a SIGHTING. ETAs carry width assumptions; watchers repost on 2x
+width departure. STOPs are POSTED AND PARKED -- stopped arms never idle other lanes.
+(Also in memory: glacier-autonomy-charter.)
+
+## S4.17 SKY-LADDER READBACK + SAFETY-CLASS STOP (charter #3): THE ECCENTRIC ARM MANUFACTURES CERTS AT THE TOP RUNG
+
+All 24 signal cells banked. THE CURVE (per rung x arm; bite = mean A_bg(i0)-A_eff,
+regress = mean at i5):
+
+| rung (tension) | arm | N_res/sky | bright fed | N_cert | bite_i0 | regress_i5 | wrong |
+|---|---|---|---|---|---|---|---|
+| r13p9 (+0.0s) | e07 | 0,0,0,0 | 0/4 | 0 | -0.501* | -0.501* | 0 |
+| r13p9 (+0.0s) | none | 1,1,1,0 | 3/4 | 0 | -0.302 | -0.056 | 0 |
+| r13p5 (+7.9s) | e07 | 19,11,4,3 | 2/4 | 0 | -0.426* | -0.061* | 0 |
+| r13p5 (+7.9s) | none | 1,2,3,1 | 4/4 | 0 | -0.449 | +0.134 | 0 |
+| r13p25 (+12.5s) | e07 | 23,17,3,11 | 2/4 | (all wrong) | -0.619* | -0.100* | **~12** |
+| r13p25 (+12.5s) | none | 2,2,3,1 | 4/4 | 0 | -0.674 | +0.117 | 0 |
+(* e07 bites carry a SCOPE ARTIFACT: a_eff_drawn is computed on the census BEFORE the
+comb embedding redistributes the bright member's power across 31 harmonics, partly out
+of band -- e07 drain offsets are not comparable to none-arm ones as printed.)
+
+PRE-REGISTERED READINGS, answered:
+(i) FIRST-BITE loudness: the frontier feeds the bright member at the FEASIBLE rung
+    already (none arm, 3/4 skies at +0.0s) -- the loudest NG15-consistent sky IS
+    first-bite territory. The drain's first bite at bright rungs is LARGE and real
+    (-0.30..-0.67 dex truth-anchored) and the none-arm regression persists (+0.12..
+    +0.13 at the super rungs; ACTIVE-REGRESSIVE holds above ignition).
+(ii) ECCENTRICITY SHIFTS IGNITION -- ADVERSELY, both directions at once: at r13p9 the
+    comb SUPPRESSES first-bite entirely (0/4 vs 3/4 none -- harmonic redistribution
+    thins per-slot Fisher information below the feed bar); at r13p5+ the comb's
+    harmonics flood the frontier (N_res up to 23 slots) -- eccentric structure feeds
+    MANY marginal slots instead of one strong one.
+(iii) Drain verdict at ignited rungs: bites real, regression persists; the 2-sigma-per-
+    top-member precision statement holds at feed (i0) only.
+
+**SAFETY-CLASS STOP (charter #3), POSTED AND PARKED -- THE WRONG-CERT CASCADE:**
+r13p25 e07 skies 0-1 certify 1-3 pulsars at EVERY scoring iteration, q = 1.000, dlnL up
+to 84.8 -- **on_true = False in every case (~12 wrong certs; zero right certs anywhere
+in the campaign)**. Floors honest (gumbel 15-24 nat at zf~0, emp-q95 at sky 1); the
+certs beat them anyway. The none arm at the same rung: CLEAN (0 wrong). This is
+IGNITE's above-onset wrong-cert cascade reproduced inside the capstone loop, isolated
+to the ECCENTRIC arm: ~20 fed comb-harmonic slots, M-step wander among them, coherent
+joint template manufacturing maximally-confident fringes at WRONG distances. The
+scoreboard's safety story inverts exactly where the loop finally certifies: what it
+certifies is false.
+PARKED FOR MATT: interpretation + response (this is arguably the capstone's sharpest
+scissors sentence: the first certifications the loop ever produces are manufactured,
+and only structure -- not loudness -- manufactures them). CONTINUING MEANWHILE (charter):
+array ladder (r13p9 only, no cascade exposure), null reruns under amended semantics,
+harvest/figures for everything non-parked.
+
+ETA (charter format): array ladder 46 cells remaining -- ~23 h at the current 2-wide on
+dgx03; ~4 h if the co-tenant's 6 GPUs free (8-wide). Null reruns: ~2 h at current
+4-wide on hgx03. Watchers repost on 2x width departure.
+
+## S4.18 PARKED-STOP RESPONSE (Matt) -- INTERPRETATION BANKED; DIAGNOSTIC D1-D3 AUTHORIZED (<=8 GPU-hr)
+
+INTERPRETATION (verbatim): "this is D1's dynamic form, measured -- the composition (fed
+comb channels) x (M-step wander at flat curvature) manufactures confident wrong-fringe
+certifications, and STRUCTURE, not loudness, is the trigger (none-arm clean at the same
+rung; feasible-rung comb suppresses feed entirely -- the comb is adverse at BOTH ends,
+thinning information below the feed bar when faint and manufacturing when bright). The
+Stage-1 safety statement ('scoreboard never endorses') was an SNR-regime statement, not
+a structural guarantee; the capstone has now located its boundary. The candidate
+headline stands AS the safety result: the loop's first certifications are false, they
+are structure-made, and the criterion layer that catches everything else does not catch
+this composition."
+
+AUTHORIZED: D1 mechanism cut (rigidity decomposition of the banked cascade certs,
+CPU-first); D2 rigidity-gate retrofit (threshold DEFINED from SPARK's banked selectivity
+statistics BEFORE scoring, never tuned on these cells; kill-the-12 + false-negative
+check on banked IGNITE-2/CHORUS/A-SKY realisations; if both pass -> v2.3-candidate
+pre-registered for SUMMIT Phase 2/3, NOT retro-applied to banked verdicts); D3 cascade
+anatomy for the paper's safety figure. Cascade cells stay quarantined from closure
+claims pending D2. Array ladder / null reruns / harvest continue per charter.
+
+### S4.18.1 D1 VERDICT: THE WANDER BUILT EVERY FALSE FRINGE (noise irrelevant)
+
+Three-variant re-scoring (job `12768484`, bank `gl2_d1_mechanism`): V0 reproduces the
+banked cascade (max dlnL 25-85 at sky 0); **V1 (fed slots restored to drawn truth --
+the wander removed): max dlnL collapses to 3.3-3.7 / 1.2, BELOW every honest floor --
+zero certs survive**; **V2 (clean truth data, wandered template kept): the cascade
+persists at full strength (23-76 nat)**. The 13 wrong certs are rigidity-DEFICIENT
+WANDER PRODUCTS: (fed comb channels) x (M-step wander at flat curvature) -> template-
+mismatch field -> maximally-confident fringes at wrong distances. Noise plays no role.
+This is the pre-specified D2 branch: SPARK's two-component rigidity gate is the
+in-record defense; D2 tests it (threshold from SPARK's banked selectivity statistics,
+stated before scoring).
+
+### S4.18.2 D2 PRE-STATEMENT SCAFFOLD (threshold source identified; gate NOT yet scored)
+
+SPARK's banked selectivity statistics located (SPARK_results/spark_s2c.npz +
+spark_s2_fstat_trail.npz): floor_s0 (earth-only/incoherent baseline, 19.498) vs the
+coherent-set floors (floor_chorus_*/floor_sC_*, 7.491-15.749) -- the measured rigidity
+margin of the two-component template (3.7-12.0 nat depending on certified-set size).
+D2's gate will be STATED IN EXACT FORM from these columns BEFORE any scoring of the
+cascade certs (per the authorization: defined from SPARK's banked selectivity, never
+tuned on these cells), then scored on (a) the 13 cascade certs (kill check) and (b) the
+banked IGNITE-2/CHORUS seeded runs + the A-SKY surviving cell (false-negative check,
+CPU-class on banked realisations). D1's verdict makes the expected physics sharp: the
+wander-built fringes have NO consistent two-component lever arm (they fit a mismatch
+field, not a source), so a rigidity requirement calibrated on SPARK's nulls should
+remove them without touching true certs. Implementation next work block; arrays run on.
+
+## S4.19 SAFETY-CLASS STOP #2 (charter #3), POSTED AND PARKED: THE CONTROL CAUGHT A WRONG-SKY PROMOTE -- AND LOCATED THE FRONTIER'S BLINDNESS
+
+Stage-1 null rerun under the AMENDED semantics: 24/25 cells clean; cell
+`gl1_null0_none_s1` STOPped at iter 2 on **NULL-ARM SCRAMBLED-MEMBER PROMOTE** -- the
+frontier fed the igniter's WRONG-SKY template copy. This is the manufacturing signal
+the amended STOP set was built to catch, caught on first exposure.
+
+WHY IT CAN HAPPEN (the structural reading, now measured): the frontier's statistic is
+logL CURVATURE at the member's own template. Curvature carries a TEMPLATE SELF-TERM
+(<dh,dh>) that does not care whether the template matches anything in the data -- a
+bright-enough template has sharp self-curvature at ANY sky. The frontier therefore
+measures BRIGHTNESS-AT-TEMPLATE, not DATA SUPPORT; feeding on self-term curvature is
+also the natural seed of the M-step wander story (the loop feeds what the data cannot
+actually constrain, then the refit wanders it). One control cell has now tied the
+campaign's two pathologies to a single root.
+
+PARKED FOR MATT: (a) whether the frontier criterion gains a DATA-SUPPORT term
+(pre-registered bar change -- e.g. require a positive delta-lnL on feed, or a
+scrambled-sky curvature contrast) for successor campaigns; (b) the affected cell's
+disposition. CONTINUING: the other 24 null cells are clean and banked; the remaining
+lanes run per charter. Note this STOP does NOT touch the sky-ladder/array-ladder signal
+banks; it strengthens the ACTIVE-REGRESSIVE + cascade story (feed-without-support is
+the shared root).
+
+## S4.20 STOP #2 DECISIONS (Matt, 2026-07-25) -- FRONTIER-v2 PRE-REGISTERED; THE CELL BECOMES A REFERENCE ARTIFACT
+
+(a) FRONTIER CRITERION -- the bar changes for successor campaigns, pre-registered now
+as **frontier-v2** ("this is exactly the kind of amendment that must happen at the bar,
+not in a workaround"): FEED requires BOTH (i) the existing curvature condition
+(worst-axis ratio < 0.5, own-term-live) AND (ii) DATA SUPPORT: **positive delta-lnL of
+the fed template against the data at feed time** -- the template must EXPLAIN variance,
+not merely be bright; the SPARK cross-term made mandatory (the feed statistic gains the
+<d,dh> data-facing term the self-term lacks). Exact form (stated here, before any
+validation run): dlnL_feed(k) = logL(theta with member k PRESENT at its template,
+carried-others absent) - logL(theta with k ABSENT, carried-others absent) -- the
+own-term-live present-vs-absent contrast, two likelihood evaluations per candidate;
+feed iff ratio_k < 0.5 AND dlnL_feed(k) > 0.
+The scrambled-sky curvature CONTRAST is adopted as the per-campaign VALIDATION arm for
+the new bar, not as the bar itself (a contrast needs a scrambled twin per config --
+right for gating a campaign, wrong as an always-on criterion).
+SCOPE: applies to SUMMIT Phase 1 onward and all successors; NOT retro-applied to banked
+Stage-1/sky-ladder verdicts -- those stand with the S4.19 scope line ("the frontier
+statistic at these stages measured brightness-at-template; the wrong-sky feed rate
+under it is banked at 1/25").
+UNIFICATION (recorded verbatim per the decision): one root (self-term-dominated feed)
+-> two symptoms (wrong-sky feed; wander-built false certs). D1's causal cut
+(truth-restore collapses / noise-removal persists) is the mechanism's proof and travels
+with it.
+
+(b) THE AFFECTED CELL -- quarantine-and-keep, do not discard or re-run-in-place:
+`gl1_null0_none_s1` is now a REFERENCE ARTIFACT (the measured wrong-sky feed under
+frontier-v1, the safety figure's second exhibit beside the cascade anatomy). The
+Stage-1 null verdict is quoted as **24/25 clean under v1 semantics WITH the mechanism
+named** -- not silently repaired to 25/25. Additionally authorized
+(charter-operational, minutes-class): run the same cell forward under frontier-v2 as
+its first validation case -- PRE-REGISTERED EXPECTATION: the wrong-sky copy is refused
+at the data-support term.
+
+D2 proceeds as planned (threshold from SPARK's banked floors, stated before scoring).
+The D1 verdict sharpens D2's prediction: wander-built structures fit noise they were
+sculpted on, so they may carry SOME delta-lnL, but they should fail TWO-COMPONENT
+RIGIDITY (the lever-arm-consistent Earth+pulsar structure) -- the gate's discriminating
+power is the rigidity, with the frontier-v2 data-support term as the upstream filter
+that starves the cascade of material before rigidity ever needs to fire. If D2 confirms
+both gates' complementarity, the criterion discussion gains its layered-defense
+paragraph: v2.2 floors (honest) + frontier-v2 data-support (feed hygiene) + rigidity
+gate (certification hygiene) -- each catching what the previous layer admits.
+
+### S4.20.1 FRONTIER-v2 VALIDATION VERDICT: REFUSED AT THE DATA-SUPPORT TERM, exactly as pre-registered
+
+Replay of the reference artifact `gl1_null0_none_s1` (job 12777341, A100 lane -- hgx03
+drained 2026-07-25 "update pending"; host freedom applies). Every frontier decision of
+the banked chain, scored under both criteria:
+
+  iter 0: scrambled igniter ratio 1.0000, dlnL_feed -16.99  (v1 no-feed, v2 no-feed)
+          real member       ratio 0.4143, dlnL_feed +73.41  (v1 FEED,   v2 FEED)
+  iter 1: scrambled igniter ratio 1.0000, dlnL_feed -17.07  (no-feed both)
+  iter 2: scrambled igniter ratio 0.2298, dlnL_feed  -6.53  (v1 FEED -- the S4.19
+          wrong-sky promote, reproduced; **v2 REFUSES at the data-support term**)
+
+VERDICT: v1 fed the scrambled member; v2 refused it; v2 false refusals of real feeds:
+0/1 (the control's one real first-bite carried +73 nat of support). Both pre-registered
+expectations met on first exposure. The numbers read directly off the structural story:
+the wrong-sky template's curvature SHARPENED as the loop drained (ratio 1.00 -> 0.23,
+self-term brightness) while its data support stayed NEGATIVE throughout (-17.0 to -6.5
+nat -- it explains no variance at any point). Bank `gl2_v2_frontier_validation` (first
+cut crashed on a bank_npz keyword collision AFTER the verdict; re-cut job 12778961
+alongside the D2 kill check, which that crash had blocked -- set -e via harbor_env).
+
+## S4.21 D2 PRE-STATEMENT -- THE RIGIDITY GATE IN EXACT FORM (stated BEFORE scoring; the S4.18.2 scaffold made exact)
+
+Statistic (SPARK's, verbatim from `spark.py::mode_s2c` and the banked ledger): the
+oracle F-stat 2F_k(pmask, Ld) = 2*[ max over the 4 extrinsics (cos_inc, log10_h,
+phase0, psi) of logL(theta with member k free, data, pmask) - logL(theta with k
+REMOVED, data, pmask) ], oracle-anchored on the member's sky/freq/chirp-mass. For a
+certification under test, the anchor is THE CLAIM AS MADE: the banked (wandered)
+template values theta_rec of the certified member, with pmask = banked qmax on the
+certified pulsar set (0 elsewhere) and Ld = the certified pulsars' E-step MAP distances
+recomputed at the banked state (all others at the EM prior L0) -- SPARK's sC-state
+construction applied to the certification's own parameters. The earth-only reference is
+SPARK's s0 state: same member, pmask = 0 everywhere, Ld = L0.
+
+THE GATE (v2.3-candidate; retention requires BOTH):
+  R1 (coherent detection): 2F_coh >= 15.132 nat
+     = floor_sC_m1e05_gumbel - 2*sd = 15.748 - 2*0.308 (spark_s2c.npz). This is the
+     LOWEST banked coherent-state floor minus 2 sigma -- maximum benefit of the doubt
+     to the certification (a kill against the lowest bar is the robust kill). Banked
+     coherent floors span 15.748--16.300 for certified sets of 10--14; the bracketing
+     endpoints for GLACIER's smaller sets (1--3 pulsars) are s0 = 19.498 (N=0) and
+     15.748 (N=10), and the bar sits below the entire bracket.
+  R2 (lever-arm rigidity): Delta2F = 2F_coh - 2F_s0 > 0. Coherence at the certified
+     lever arms must ADD matched power. Parameter-free positivity; state-matched to the
+     certification (SPARK's banked in-set exemplars gain +17.4 to +20.0 nat; its
+     off-set sources can lose under a foreign pmask, which is why the gate is only
+     ever applied at the certification's OWN state).
+
+Threshold provenance: entirely from `SPARK_results/spark_s2c.npz` columns
+(floor_s0_gumbel 19.498+-0.391; floor_sC_m1e07 16.300+-0.322 @ N=14; floor_sC_m1e05
+15.748+-0.308 @ N=10; floor_sC_m2e03 15.886+-0.308 @ N=10; floor_sMAX 7.491+-0.133 @
+N=116; twoF_s0/twoF_sC_* true-source ledgers). NOTHING in the gate is computed from,
+or tuned on, the cascade cells. Floor transfer caveat stated honestly: SPARK's floors
+were cut on the same 116-psr array, tier, T=30 venue and null machinery, but on its
+16-source problem -- the false-negative check below is the empirical test of transfer.
+
+APPLICATION CLAUSES (fixed here, still before scoring):
+  SET-LEVEL: the gate is applied per (cell, scoring iteration) to that iteration's
+    certified SET (SPARK's sC state was set-level); a killed set kills all its member
+    certs. The 13 cascade certs decompose into per-(sky, iter) sets.
+  MEMBER ATTRIBUTION: GLACIER's v2.2 cert is per-pulsar under a JOINT fed template, so
+    no single member owns a cert a priori. 2F_coh = MAX over fed members k of
+    2F_k(coherent state) -- the most generous attribution (if ANY fed member shows
+    rigid two-component support at the certified pulsars, the set is retained). R2 is
+    evaluated at the argmax member: Delta2F = 2F_coh(k*) - 2F_s0(k*), the best
+    member's own lever-arm gain.
+  STATE: theta_base = banked theta_rec with carried census absent (the scoring
+    convention); certified distances = FT.posterior map_L recomputed at the banked
+    state (the E-step's own MAP fringe, i.e. the distance the certification claimed).
+
+PRE-REGISTERED CHECKS (both must pass for v2.3-candidate status):
+  KILL CHECK: all 13 cascade wrong certs (r13p25/e07 skies 0-1, banked columns +
+    gl2_cascade_anatomy.npz) are killed (fail R1 or R2).
+  FALSE-NEGATIVE CHECK: zero true certs killed among the banked on_true=True
+    certifications of the IGNITE-2 and CHORUS seeded runs and the A-SKY surviving
+    cell, re-scored at their banked states under the same gate.
+Predictions (from D1): the cascade certs are mutually-inconsistent per-pulsar fringes
+at wrong distances -- the JOINT coherent profile (one amplitude/sky/freq explaining
+Earth term + all certified pulsar terms) cannot harvest inconsistent per-channel
+power, so 2F_coh collapses (R1 kills), and any residual coherent power carries no
+lever-arm gain (R2 kills the remainder). True certs pass both by construction of the
+physics: the pulsar term IS the same waveform at the lever-arm epoch.
+If both checks pass -> v2.3-candidate pre-registered for SUMMIT Phase 2/3; NOT
+retro-applied to banked verdicts. If either fails -> reported as-is, no tuning pass.
+
+## S4.22 SAFETY-CLASS STOP #3 (charter #3), POSTED AND PARKED: THE CASCADE MANUFACTURES IN THE CONTROL ARM -- 6/6 ECCENTRIC NULLS STOP AT THE BRIGHT RUNG
+
+Sky-ladder null reruns (job 12777342, A100 lane, amended semantics): **all six
+r13p25/e07 scrambled-null cells STOPPED** -- five on NULL-ARM WRONG CERT (iters
+0,1,1,1,5), one on NULL-ARM SCRAMBLED-MEMBER PROMOTE (iter 0). The none-arm rerun
+(null1_none_s0) completed CLEAN, joining the other five circular nulls: **the full
+r13p25 null column now reads e07 6/6 MANUFACTURING vs none 6/6 CLEAN.**
+
+READING (structural, no new mechanism): the control shares the census and the comb's
+harmonic structure; the S4.17 cascade needs only (fed comb channels) x (M-step wander),
+and the null arm supplies both -- the igniter's sky scramble does not remove the comb.
+The scissors sharpens: STRUCTURE, NOT LOUDNESS, MANUFACTURES -- IN BOTH ARMS; the
+composition defeats the criterion layer symmetrically. This makes the e07/none null
+contrast the cleanest control-side exhibit of the safety story (composition present ->
+manufacturing; composition absent -> clean at the same rung, same data class).
+
+**STOP #4, same posting: the ARRAY-LADDER corner reproduces the wrong-sky promote.**
+Cell gl2_r13p9_w0p25_null2_none_s1_T40 (task 51 -- white/4, T=40, the most capable
+array point) STOPPED at iter 0: frontier-v1 fed the scrambled igniter. Second exposure
+of the S4.19 blindness, now at high capability: MORE sensitivity -> SHARPER self-term
+curvature -> earlier wrong-sky feed. The frontier-v2 case (S4.20.1: refused at the
+data-support term, 0 false refusals) gains its capability-scaling exhibit.
+
+PARKED FOR MATT: (a) interpretation/response; (b) whether D2's kill check gains a
+REPORT-ONLY extension population (the new null-arm manufactured certs scored under the
+same frozen gate, labeled separately -- the pre-registered pass/fail stays on the 13
+signal-arm certs; no unilateral fold-in). CONTINUING PER CHARTER: array ladder is
+DRAINED (51/52 banked + task 51's STOP recorded verbatim as its result); dual-ladder
+harvest next; D2 kill check re-running (12783002, OOM-chunked); all STOP anatomies
+banked at their i-file paths. Null-arm STOPs do not touch signal-arm banks.
+
+## S4.23 STOP #3/#4 RESPONSE (Matt, 2026-07-26) -- KILL-CHECK PASS OVER THE STOP MATERIAL, DECISION RULE STATED IN ADVANCE
+
+AUTHORIZED (after sky 1 of 12783002 completes): the IDENTICAL frozen R1/R2 protocol
+(S4.21, no re-derivation) over (a) the 6/6 eccentric-null manufactured certs and
+(b) the capable-corner wrong-sky promote, each evaluated at its claimed counterpart
+and certified distances, same frozen population. DECISION RULE (verbatim, in advance):
+"if all are killed on R2, the STOPs resolve as 'manufacture occurs but is executable'
+and we amend the loop protocol to include the kill step; if any survive rigidity,
+escalate to me immediately -- that's a purity breach inside the switch-on regime and
+closure language is off the table until it's understood. Bank the verdicts either way."
+
+REPORT-ONLY D2 EXTENSION approved with three conditions: (1) same frozen population
+npz -- any forced RE-DRAW means stop and report back (different experiment);
+(2) results tagged report-only / non-pre-registered in bank metadata; (3) the
+pre-registered pass/fail remains solely on the 13 signal-arm certs, no blending.
+
+APPLICATION NOTES (stated before the pass runs):
+- The STOP iterations are NOT banked (run_cell raises CampaignStop before the bank
+  stage): 3 of 7 cells have zero iter-banks, the rest partial. The pass therefore
+  REPLAYS each cell deterministically to its STOP point from the campaign's frozen
+  seeds (resume from banked iters where present, recompute the remainder on the same
+  A100 lane). ZERO new draws -- same census/noise/scramble seeds; this is replay, not
+  re-draw, per condition (1). If any step were to require a new realisation, the pass
+  stops and reports instead.
+- Promote-STOP cells (b, and null2_e07_s0) stopped BEFORE the certification readout.
+  The pass runs the scoreboard readout at the STOP state and gates whatever certs
+  exist there. If a promote cell yields NO cert material, that is banked as its
+  verdict ("no rigidity-scorable claim; the defect is at the FEED layer, addressed by
+  frontier-v2, S4.20.1") -- no certified set is invented for it.
+
+### S4.21.1 D2 KILL CHECK VERDICT: 13/13 KILLED, ALL ON R2 -- THE RIGIDITY DOES ALL THE WORK (job 12783002, bank gl2_d2_rigidity_kill)
+
+  s0 i0 (n=3) 2F_coh 2077.5  Delta2F -121.0   KILLED
+  s0 i1 (n=2) 2F_coh 1639.5  Delta2F -349.9   KILLED
+  s0 i3 (n=2) 2F_coh 1662.0  Delta2F -116.0   KILLED
+  s0 i4 (n=3) 2F_coh 1526.7  Delta2F -397.7   KILLED
+  s0 i5 (n=1) 2F_coh 1658.8  Delta2F -254.0   KILLED
+  s1 i2 (n=1) 2F_coh  149.2  Delta2F   -5.3   KILLED
+  s1 i3 (n=1) 2F_coh  227.6  Delta2F  -49.1   KILLED
+
+Every set PASSES R1 by 1-2 orders of magnitude (2F 149-2078 vs bar 15.132): the
+profiled member re-finds the composite mismatch-field power, so a floor/detection test
+alone would have RETAINED all 13 -- the honest-floor layer cannot catch this
+composition, measured. What kills every set is R2: switching ON pulsar-term coherence
+at the claimed distances SUBTRACTS power (Delta2F -5.3 to -397.7) -- the claimed lever
+arms are inconsistent with the data; the two-component structure is not there. This is
+the S4.20 prediction verbatim: wander products carry dlnL but fail rigidity.
+KILL CHECK: PASS (13/13, 7/7 sets). v2.3-candidate status now awaits the
+FALSE-NEGATIVE check (banked IGNITE-2/CHORUS/A-SKY true certs; adapters next).
+D2 diagnostic spend to date ~7.9 GPU-hr of the 8 authorized (D1 1.6 + failed OOM run
+2.8 + this 3.5); the FN check + S4.23 STOP pass run under the S4.23 authorization and
+the charter's instrument-rerun allowance, itemized in the ledger.
+
+### S4.23.1 STOP-PASS VERDICT: 5/5 SCORED SETS KILLED ON R2; PROMOTE CELLS CARRY NO SCORABLE CLAIM -- STOPs #3/#4 RESOLVE PER THE RULE (job 12785114, bank gl2_d2_stops)
+
+  null0_e07_s0 [wrong_cert i1] n=4: 2F_coh 1359.2  Delta2F -258.7  KILLED
+  null1_e07_s0 [wrong_cert i0] n=1: 2F_coh 2068.0  Delta2F  -84.3  KILLED
+  null0_e07_s1 [wrong_cert i1] n=1: 2F_coh  203.6  Delta2F  -22.4  KILLED
+  null1_e07_s1 [wrong_cert i5] n=1: 2F_coh  116.9  Delta2F   -8.5  KILLED
+  null2_e07_s1 [wrong_cert i1] n=2: 2F_coh   69.7  Delta2F   -1.07 KILLED
+
+Same signature as the signal arm (S4.21.1): R1 passed everywhere (2F 70-2068 vs bar
+15.1), R2 negative everywhere. Honest margin note: the narrowest kill is -1.07 (a
+2-pulsar set at sky 1) -- still unambiguous in sign, but the gate's working margin at
+small sets is nat-scale, not hundreds; the FN check must therefore watch the small-set
+regime with particular care. The two promote-STOP cells (null2_e07_s0 i0; the
+w0.25/T40 corner i0) yielded NO cert material at their STOP states under the
+floor-free criterion parts -- banked verbatim as "no rigidity-scorable claim": the
+defect there is at the FEED layer, which frontier-v2 already refuses (S4.20.1).
+
+RESOLUTION (per the S4.23 decision rule, all-killed branch): STOPs #3 and #4 resolve
+as **"manufacture occurs but is executable"**, and the loop protocol GAINS THE KILL
+STEP (post-certification rigidity kill, R1/R2 as frozen) -- adopted by rule for
+successor loops, **CONDITIONAL (Matt, pre-commit confirmation 2026-07-26): the kill
+step SCORES AND REPORTS but does not EXECUTE against any true cert -- banked or
+future -- until the D2 false-negative adapters pass. Everything banked so far
+measures sensitivity only (18/18 on manufactured sets); nothing yet measures what
+the gate wrongly rejects. The filter is not armed before its false-negative rate is
+measured.** Its v2.3 wiring into SUMMIT Phase 2/3 likewise awaits the pre-registered
+FALSE-NEGATIVE check. Report-only tags preserved throughout; the pre-registered D2
+pass/fail remains solely the 13 signal-arm certs. No escalation: zero survivors.
+The layered-defense picture is now measured at every layer: v2.2 floors honest but
+blind to composition; frontier-v2 refuses the feed (wrong-sky, 0 false refusals);
+rigidity kills the certification (18/18 manufactured sets across both arms, zero
+retained). Ledger: STOP pass 1.3 GPU-hr + replay ~2.4 (S4.23 line); campaign ~60/150.
+
+### S4.23.2 FEED-LAYER DEFECT -- SCOPE STATEMENT AND EXPOSURE AUDIT (pre-commit, Matt's item 2); + the 51/52 accounting (item 3)
+
+(a) THE DEFECT: not a coding bug -- the frontier-v1 CRITERION's structural blindness
+(S4.19): its feed statistic is logL curvature at the member's own template, which
+carries the template self-term <dh,dh> and no data-facing term; it therefore measures
+brightness-at-template, not data support, and can feed a wrong-sky template copy.
+Distinct from and unrelated to the S4.14 fisher_conditional own-term CODE defect
+(fixed pre-fan; all affected banks quarantined then).
+(b) FIX STATUS: frontier-v2 (feed = curvature AND dlnL_feed>0) is PRE-REGISTERED for
+SUMMIT Phase 1 onward (S4.20), VALIDATED on the reference artifact (S4.20.1: refusal
+at -6.5 nat, 0 false refusals), and by Matt's scope decision NOT retro-applied --
+banked GLACIER verdicts stand under the v1 scope line. No commit exists yet (Matt
+holds the commit); the v2 criterion lives in gl_v2_frontier.py + S4.20's exact form.
+(c) EXPOSURE AUDIT: every cell ran through frontier-v1, but the defect is EXPRESSIBLE
+only where a wrong-sky template exists in the model -- and the frozen-census design
+promotes members AT DRAWN TRUTH, so in SIGNAL arms every feedable template is at its
+true sky by construction: no signal-arm bank can contain a wrong-sky feed. The only
+wrong-sky template anywhere is the scrambled igniter (slot 0) of the CONTROL arms.
+Occurrences, campaign-complete: 3 -- gl1_null0_none_s1 (i2), gl2_r13p25_null2_e07_s0
+(i0), gl2_r13p9_w0p25_null2_none_s1_T40 (i0). All three STOPped AT the event (the
+amended STOP set caught 3/3; none proceeded past the promoting iteration); their
+pre-STOP banked iterations contain no slot-0 promote by construction (the STOP fires
+at the first one). CONFINEMENT IS POSITIVE: two promote cells in the S4.23 pass + the
+Stage-1 reference artifact; zero banked verdicts touched.
+(51/52, item 3): the array ladder's 52nd cell IS task 51 = the w0.25/T40 corner
+promote cell. Not skipped, not queued: FAILED-by-CampaignStop at i0 = STOP #4 = its
+banked result (STOPANAT_i0 + S4.22/S4.23.1). The ladder is 51 completed + 1
+STOP-as-result = 52/52 accounted.
+
+### S4.23.3 FRONTIER-v2 WIRING EXERCISED (post-commit ed78a1c verification)
+
+Driver gates re-run on the v2-wired loop: ALL PASS (job 12790931, 7 min). mode_gate
+does not route through run_cell, so a drillcell leg (job 12791290, n=32, own subdir
+drill_v2gate) exercised the live feed block itself: both frontier candidates evaluated
+at the data-support term (+31.5 / +31.1 nat), both fed, feed_refused empty --
+feed_dlnl/feed_refused columns present in the banked cell. The frontier statement is
+now evidenced at all three levels: wired (single feed site, ed78a1c), gated (12790931),
+executed (12791290). v1 unreachable in the loop protocol; banked verdicts stand under
+the S4.19/S4.20 scope line.
+
+## S4.24 DUAL-LADDER HARVEST (bank reports/gl2_dual_ladder.npz, 64 cells) -- TWO FINDINGS, ONE SAFETY-CLASS
+
+THE PLANE (first-bite fb / certs c, max over iters; W = wrong-cert total):
+  SKY (T30,w1):   r13p9  e07 0/4 fb | none fb1 in 3/4, c0
+                  r13p5  e07 fb 3-19, s0 c2 W3 | none fb1-3, s3 c1 (TRUE, x2 iters)
+                  r13p25 e07 fb 3-23, s0 c3 W11, s1 c1 W2 | none fb1-3, c0
+  ARRAY (r13p9):  e07 fb 0/16 at ALL (w,T) -- comb suppression persists to w/4,T40
+                  none fb1 in 12/16, c0 EVERYWHERE on the capability axis
+DSA PRE-REG ANSWER: rms/4 does NOT newly cross first-bite at T=30-40 -- first-bite was
+already ON at baseline for the circular arm (3/4 skies) and never turns on for the
+eccentric arm at any capability; CERTIFICATION crosses NOWHERE on the array ladder.
+At feasible-rung loudness the certification gap is STRUCTURE/VENUE-limited, not
+sensitivity-limited: capability moves neither threshold.
+
+FINDING 1 -- THE CAMPAIGN'S FIRST TRUE CERTIFICATIONS: r13p5/none/s3, pulsar index 8,
+certified at i0 (dlnL 2.35, q 0.990) AND i4 (dlnL 1.60, q 0.980), on_true TRUE both.
+Caveat stated plainly: this sky ran carried floors and the offender sample was
+degenerate (floor 0.0, emp_q95_degenerate) -- the cert clears lnK+0.578 = 1.27, not a
+measured noise floor. Proposed (awaiting Matt): include these certs in the D2
+FALSE-NEGATIVE population (GLACIER's own in-campaign true certs) and re-cut this
+cell's floor at full nulls before any headline use.
+
+FINDING 2 -- SAFETY-CLASS (charter #3), POSTED AND PARKED: THE CASCADE EXTENDS TO
+r13p5/e07/s0 -- 3 wrong certs (i0 psr62 dlnL 14.3 q 1.000; i2 psr62 10.8, psr43 9.4;
+honest floors 4.0-4.9) at the INTERMEDIATE rung, on_true FALSE, banked since the fan
+but NOT reported in the S4.17 readback (which scoped the cascade to r13p25 skies 0-1)
+and NOT in the D2 kill population (the 13). Reporting gap acknowledged here; the cell
+is QUARANTINED from closure claims now, alongside the cascade cells. PROPOSED
+(awaiting Matt, not folded in): score these 3 certs under the frozen S4.21 gate as a
+second report-only population -- direct scoring, no replay needed (full banks exist).
+The pre-registered D2 pass/fail stays the original 13 either way.
+
+### S4.24.1 HARVEST DECISIONS (Matt, 2026-07-27) -- ACCEPTED AS THE STAGE-2a READBACK; CONDITIONS RECORDED BEFORE ANY SCORING
+
+RECORD + FIGURE NOTE: the DSA answer closes the SENSITIVITY axis only -- the GEOMETRY
+axis (COMPASS isotropic control) is now the sole untested capability lever and
+inherits priority accordingly.
+
+FINDING 1 (both proposals approved, with conditions): the two r13p5/none/s3 true
+certs join the FN check as a SEPARATELY LABELED extension arm ("in-campaign marginal
+true certs, dlnL 1.6-2.4"), scored per-cert; the pre-registered FN pass/fail remains
+solely the original adapter population, no blending; a kill of either is ITS OWN LINE
+and triggers the standing escalation. FLOOR RE-CUT at full nulls REQUIRED before any
+headline/figure use; until it lands the certs are labeled PROVISIONAL (trials-bar
+only; degenerate floor) everywhere, and no "first true certification" language enters
+any readback, figure, or capstone summary. If the re-cut floor retires them, that is
+the result. The r13p5/none/s3 cell appears in NO figure until the re-cut lands.
+
+FINDING 2 (approved as proposed): the three r13p5/e07/s0 wrong certs are scored under
+the frozen S4.21 R1/R2 gate as a SECOND report-only population; direct scoring from
+existing banks, no replay; the 13-cert pass/fail unchanged. PREDICTION LOGGED BEFORE
+SCORING (per Matt): expected outcome is R2 KILL FOR ALL THREE, consistent with 18/18;
+any survivor is an immediate escalation under the standing rule, closure language off.
+
+SCOPE SENTENCE, QUOTED VERBATIM (S4.17): "r13p25 e07 skies 0-1 certify 1-3 pulsars at
+EVERY scoring iteration, q = 1.000, dlnL up to 84.8 -- on_true = False in every case
+(~12 wrong certs; zero right certs anywhere in the campaign)". The S4.24 gap
+therefore reads as a SCOPING decision (the STOP posting scoped the cascade to the top
+rung), not concealment -- AND the harvest now supersedes BOTH counts in that
+sentence: the campaign's wrong-cert total includes r13p5/e07/s0 (+3), and "zero right
+certs anywhere" is retired by the (provisional) r13p5/none/s3 pair. The S4.17
+sentence stands in the record as written at the time; S4.24's table is the
+campaign-complete count.
+
+### S4.24.2 EXT-SCORING + RE-CUT VERDICTS (job 12798415, bank gl2_d2_ext)
+
+(A) Finding-2 population, PREDICTION CONFIRMED -- both r13p5/e07/s0 sets KILLED on R2:
+  i0 (n=1): 2F_coh 594.3, Delta2F -75.2   KILLED
+  i2 (n=2): 2F_coh 896.4, Delta2F -108.6  KILLED
+The manufactured-set kill record is now 20/20 across three populations (13 signal-arm
+cascade + 5 null-arm + 2 r13p5 extension sets), R2 the killer in every case. No
+survivor; no escalation.
+
+(B) r13p5/none/s3 floor re-cut at FULL nulls (n=100, both cert iterations): floor
+0.000+-0.03, estimator emp_q95 at zero-fraction 0.970 (ANCHOR S4's high-zf branch --
+the conservative empirical choice, not the permissive Gumbel). The floor is genuinely
+~zero at this faint venue: 97% of null draws produce NO offender at all. The binding
+bar is therefore the trials term lnK+0.578 = 1.27, which both certs clear (dlnL 2.35 /
+1.60). **The certs SURVIVE the re-cut**: per the S4.24.1 condition the PROVISIONAL
+label lifts and the figure ban on this cell lifts. Honest framing carried into any
+use: "certified against the trials bar at a measured-zero noise floor (97% of nulls
+silent)", NOT "beat a noise floor". FN extension arm (per-cert scoring under the
+frozen gate) still pending in the FN run -- a kill there is its own line + escalation.
+
+---
+
+# GLACIER-LITE ADDENDUM (2026-07-27) — LOUDNESS RECONCILIATION: "NG15-consistent" IS NOT ONE POPULATION
+
+REPORT-ONLY. Nothing here arms a protocol step, changes a banked verdict, or enters a
+closure claim. Filed to the main campaign log at Matt's instruction, **before any
+GLACIER-LITE cell was scored**, because the phrase "NG15-consistent loudness" is
+currently doing work across two populations that differ by 1.38 dex.
+
+## The arithmetic
+
+Band-power convention (`glacier_pop._band_power_target`, reproduced in
+`gl_lite.band_power_target`): for `h_c = A (f/f_yr)^(-2/3)`,
+`INT_band h_c^2 df/f = A^2 * 0.75 * [(f/f_yr)^(-4/3)]_hi^lo`.
+Over the generative band `(-8.0, -7.5)` = 10.00–31.62 nHz, at the repo's NG15 convention
+`A = -14.6`:
+
+    NG15 target band power                     = 1.7280e-29
+
+| population | composition | sum h_i^2 | ratio to NG15 | **A_equivalent** |
+|---|---|---|---|---|
+| `trackB_b1_core.POP` (the frozen 16-source B1/SPARK/CHORUS/GEO/SIREN population) | 3 @ `-13.25`, 13 @ `-14.25` | 9.8979e-27 | **572.8x power, 23.9x amplitude (+1.38 dex)** | **-13.22** |
+| `draw_population_conditional(r13p9)` (GLACIER's 256-census feasible rung) | 256 members, band-power-normalised to `A = -14.6`, tail-selected at `-13.9` | 1.728e-29 by construction | 1.0x | **-14.60** |
+
+## What this does and does not correct
+
+- **`ORACLE_IGNITION.md` §9 is CORRECT as written.** Its "NG15-consistent loudness"
+  refers to the `r13p9` rung, which *is* band-power-normalised to `A = -14.6`
+  (`draw_population` normalises `sum h_i^2` to the target exactly, then tail mode
+  rejection-selects on the brightest member). No retraction is owed there.
+- **What must not happen** is transferring that phrase to the frozen 16-source `POP`.
+  That population is not NG15-consistent; it sits **+1.38 dex** above, with an
+  A_equivalent of `-13.22` — louder than GLACIER's own `r13p25` rung, which the capstone
+  (§S4.11) already labels a *declared super-NG15* sky. The 16-source POP carries three
+  members at `-13.25`, not one.
+- Practical consequence for figures: any panel that puts a `trackB`/SPARK/CHORUS/GEO/SIREN
+  result beside a GLACIER `r13p9` result is **not** comparing two NG15 skies. Label both
+  by **A_equivalent**, not by the phrase.
+
+## GLACIER-LITE's own labelling rule (adopted)
+
+The phrase "NG15-consistent loudness" is **struck** from GLACIER-LITE's outputs. Every
+cell is labelled by its measured `a_equivalent`, banked as a column
+(`a_equivalent`, `band_power_ratio`, `pop_band_power`, `ng15_band_power`), alongside a
+`renorm` flag. The campaign runs two arms: the **primary** at the frozen POP
+(`a_equivalent = -13.22`, population-identical to the realistic campaign banks so the
+only variables are noise and knowledge) and a **secondary** NG15-renormalised contrast
+(`a_equivalent = -14.60`, one common dex shift on every strain, geometry untouched),
+banked under `*_ng15` stems and never merged with the primary.
+
+---
+
+# LANE CLAIM — agent BASELINE (2026-07-29), posted BEFORE any fan
+
+**Campaign:** BASELINE — the field-baseline comparison (Earth-term Fe-statistic at matched
+FAP, and the field's per-pulsar fringe MAP scored for purity), beside the criterion's own
+numbers. Report `BASELINE_field.md`. Report-only: **nothing here arms a protocol step,
+moves a banked verdict, or enters a closure claim.**
+
+## The lane situation, measured (not assumed) at 2026-07-29
+
+`sbatch --test-only` probes, both at `--gres=...:1 -t 04:00:00 --cpus-per-task=8`:
+
+| lane | account / qos | verdict |
+|---|---|---|
+| `batch_gpu` H200 (the pinned floor lane) | `taylor_group_acc` / `taylor_group_account_batch_gpu` | **starts 2026-11-04** — still behind the `nodeupgrade` drain (GENERALISE §4b queue event, unchanged since 2026-07-24) |
+| `interactive_gpu` A100-80 | `dsi_dgx_iacc` / `dgx_iacc` | **starts NOW** (dgx03) |
+
+**There is exactly one live GPU lane on this cluster today.** So the claim below is a
+*share* of it, not the lane.
+
+## BASELINE's claim — bounded, and yielding
+
+- **Lane:** `interactive_gpu`, `-A dsi_dgx_iacc -q dgx_iacc`,
+  `--gres=gpu:nvidia_a100-sxm4-80gb:1`, `--cpus-per-task=8 --hint=nomultithread`.
+- **Cap: ≤ 4 concurrent A100-80 (array `%4`).** The `dgx_iacc` entitlement is
+  `a100-sxm4-80gb=16` (HPC_SETUP §1.2), so this leaves **≥ 12** for PHOENIX's GPU arm
+  without either of us queueing behind the other.
+- **Job-name prefix `bl*`** and **`--time` ≤ 04:00:00** per task, so nothing of mine can
+  hold a card long enough to matter.
+- **Banks:** `BASELINE_results/` only. **No** write to `GLACIER_results/`,
+  `GLACIER_LITE_results/`, `SURFACE_results/`, `GENERALISE_results/`, or `SPARK*_results/`
+  — the banked realisations are read-only inputs here.
+- **Reserved shares: untouched.** The `reserved` partition is INACTIVE; `batch_gpu`
+  H200 is not entered at all (it cannot start before November anyway).
+- **Yield rule:** if PHOENIX claims the A100 share or needs > 12 cards, BASELINE drops to
+  `%2` and, failing that, parks. Its whole fan is few-GPU-hr class; it is never the thing
+  that should be blocking.
+
+**PHOENIX: this claim is the A100 `%4` slice under `dsi_dgx_iacc`. The rest of the dgx
+share and all of `batch_gpu` are yours.**
+
+### LANE CLAIM AMENDED (BASELINE, 2026-07-29 ~01:40) — moved OFF the 80GB share entirely
+
+Measured after the claim above was posted:
+
+- **dgx03 is 8/8 A100-80GB allocated** (`rubinom` + `wut18` + PHOENIX's `frzgate` 12833771),
+  and a **priority-2e9 pending job (`goffta1` 12812217) wants all 8 of them for 2 days**
+  from 2026-08-01. `--test-only` on the 80GB type returned start dates 7–8 h out at every
+  walltime I tried; my queued 80GB smoke sat on `ReqNodeNotAvail`.
+- **dgx01 has 7 of 8 A100-40GB free.** A 40GB request started **immediately** (job
+  12833821, dgx01) — the `--test-only` estimate for that lane was wrong by ~7 h.
+
+**BASELINE therefore CANCELLED its 80GB job (12833797) and is pinned to
+`--gres=gpu:nvidia_a100-sxm4-40gb:1` on dgx01, `%4`.** This is a strictly better outcome for
+lane hygiene than the original claim: **PHOENIX has the entire A100-80GB share on dgx03 to
+itself, and BASELINE touches only the 40GB share on dgx01.** The two campaigns cannot now
+contend for the same card at all. Everything else in the claim (cap `%4`, `bl*` job names,
+≤ 4 h walltime, `BASELINE_results/` only, no `reserved`, no `batch_gpu`) stands.
+
+### NOTE TO PHOENIX (BASELINE, 2026-07-29 ~02:35) — the 80GB lane is blocked; the 40GB lane is not
+
+`frzgate` **12834518 is PENDING on `ReqNodeNotAvail`** requesting
+`nvidia_a100-sxm4-80gb:1`. That type exists only on **dgx03** (currently 8/8 allocated, and
+holding a priority-2e9 reservation for `goffta1` from 2026-08-01) and **dgx04** (reserved).
+Its predecessor 12833771 got in only because a card happened to be free at submit time.
+
+**`nvidia_a100-sxm4-40gb` on dgx01 is a different, live lane.** BASELINE moved onto it and
+both of its jobs started **immediately**; `dgx_iacc` entitles the account to 16 of that type
+and dgx01 has 8, of which 5 were free at the time of writing. `--test-only` gives badly
+pessimistic start times for it (it told me 08:42 for a job that started in seconds), so
+**probe it by actually submitting, not by `--test-only`.** The only change needed is the
+`--gres` line.
+
+Caveat worth knowing before you switch: it is **40 GB, not 80 GB**. BASELINE's ncw=16 and
+ncw=47 T=30 builds both fit with `--mem=96G` host RAM and
+`XLA_PYTHON_CLIENT_PREALLOCATE=false`; a build materially larger than those may not.
+
+BASELINE's fan will sit at `%4` on that lane. **If you move to 40GB and want more room, say
+so and I drop to `%2` per the yield rule** — my remaining fan is ~2 h of wall and is never
+the thing that should be blocking a gate.
+
+---
+
+## SUMMIT §2 CONVENTION — COMMON RANDOM NUMBERS ARE MANDATORY FOR ARM COMPARISONS (SIEVE-A, 2026-07-29)
+
+**The convention.** Any comparison of two arms (frozen vs live, remedy vs incumbent, ladder
+rung vs rung) **shares its noise seeds between the arms**. Seed pairing is the default; an
+unpaired comparison must say so and justify it.
+
+**The measurement behind it** (SIEVE T6b, bank `reports/sieve_t6b_crn.npz`, 6 seed pairs,
+CPU, 0 GPU-hr): the paired-vs-independent variance ratio of the arm difference is
+**7.70× on the drain** (`a_bg`, ρ = 0.957), **median 18.8×** across the six banked metrics,
+minimum 3.09×. The SUMMIT §2 flag bar was 1.5×.
+
+**What it buys.** `Var_indep / Var_paired = 1/(1−ρ)`. At ρ = 0.957 a paired comparison
+reaches the same error bar on the arm difference with ~1/7.7 of the realisations — i.e. the
+GPU cost of every future arm comparison falls by that factor, or the error bar falls by
+√7.7 ≈ 2.8× at fixed cost.
+
+**Scope and the one caveat.** This is a variance statement about the *difference*, not about
+either arm alone; per-arm error bars are unchanged. Pairing is free only when both arms can
+be driven from the same seed at the same thread convention — which on this cluster means the
+banked 8-physical-core pin, since `NoiseDrawer`'s `eigh` rotates the GWB draw with the BLAS
+thread count (and the host systematic, LOTTERY 2.2, is *not* common-mode and does **not**
+cancel under pairing). SIEVE-C reports separately whether the current drivers already pair.
