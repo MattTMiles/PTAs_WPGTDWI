@@ -1,0 +1,5 @@
+wrote job53_fig1_heatmaps.png, job53_fig2_heatmap_Ns4.png; overlays beta 0.0549, 0.1798; prior-alone-90% boundary 0.152 pc; beta grid: [0.02, 0.03, 0.044, 0.065, 0.095, 0.137, 0.193, 0.264, 0.351, 0.449, 0.551, 0.649, 0.736, 0.807, 0.863, 0.905, 0.935, 0.956, 0.97, 0.98]
+  N_s = 2: grid max 1.000 min 0.000; raw-cell binomial s.e. <= 0.022
+  N_s = 4: grid max 1.000 min 0.000; raw-cell binomial s.e. <= 0.022
+  N_s = 8: grid max 1.000 min 0.002; raw-cell binomial s.e. <= 0.022
+  N_s = 12: grid max 1.000 min 0.002; raw-cell binomial s.e. <= 0.022

@@ -57,6 +57,29 @@ def f_ret(f, tc, tau):
     return f*(1.0+tau/np.maximum(tc, 1e-9))**(-3.0/8.0)
 
 
+NAT_SEED0 = 5000          # natural sky j uses population seed NAT_SEED0 + j (never used by the notebook: its seeds are 3..52)
+NAT_TC = {}               # {sky: chirp time of every source from its own drawn (Mc, z)}
+NAT_REJ = {}              # {sky: sources rejected by the CW upper limit during the draw}
+
+
+def natural_pop(j):
+    """Raw population draw, nothing rescaled: (seed, f, h, P0 = h^2 f T_OBS, sea = closed-form faint power per bin)."""
+    sd = NAT_SEED0+j
+    f, h, _mc, _d, S, nrej = NS["draw_population"](seed=sd)
+    NAT_REJ[j] = int(nrej)
+    # the drawn catalogue entry, recovered exactly (the amplitude lookup of _mcz_tc lands on a
+    # neighbouring entry for about 5% of sources through rounding: job53_diag_mc.py)
+    _mcz_tc(f[:1], h[:1]); oA = _CACHE["ordA"]; AS = _CACHE["AS"]
+    k = np.clip(np.searchsorted(AS, h/f**(2.0/3.0)), 0, len(AS)-1); ti = np.full(len(f), -1)
+    for dk in (0, -1, 1, -2, 2):
+        ii = oA[np.clip(k+dk, 0, len(AS)-1)]
+        m = (ti < 0) & (NS["SRC_MC"][ii] == _mc) & (NS["SRC_DL"][ii] == _d); ti[m] = ii[m]
+    assert (ti >= 0).all()
+    ts = TSUN*NS["SRC_MC"][ti]*((1.0+NS["SRC_Z"][ti]) if MASS == "z" else 1.0)/MSUN
+    NAT_TC[j] = (5.0/256.0)*ts**(-5.0/3.0)*(np.pi*f)**(-8.0/3.0)
+    return sd, f, h, h**2*f*NS["T_OBS"], S
+
+
 def census_priors():
     import csv
     rows = list(csv.DictReader(open(os.path.join(J.BASE, "job45_t2_parallax_census.csv"))))
@@ -90,7 +113,14 @@ def _decode_fine(c, kap, sd, kmax):
 
 
 def collect50(skies, T=45, marg=True, rate=None, seed0=8000, sens_n=1.0, priors="harness",
-              fine=True, arms=ARMS12, verbose=False, tau0=False, hook=None, arr_ovr=None):
+              fine=True, arms=ARMS12, verbose=False, tau0=False, hook=None, arr_ovr=None,
+              fmax_cand=3e-8, cand_cap=1300, fgrid_max=3.3e-8, sky="constructed", mass="exact", noskip=False, cand_bg=0):
+    # noskip (Job 54): keep skies whose booked list has fewer than two usable sources (default: skip, as Jobs 49-53)
+    # mass (natural skies only): "exact" = each source's own drawn (Mc, z); "lookup" = _mcz_tc as Jobs 50-52
+    # Job 53 addition (default = Jobs 49-52): sky = "constructed" (_pop18: three sources per
+    # sky rescaled by build_pop15) or "natural" (raw draw_population, one distinct seed per sky)
+    # Job 52 additions (defaults = Job 50/51): fmax_cand upper Earth-frequency edge of the
+    # candidate pool, cand_cap its size cap, fgrid_max top of the 1/(8T) field grid
     # Job 51 additions (defaults leave Job 50 behaviour bit-identical):
     #   hook     object with .psr(locals) -> dict merged into the record, .sky(locals) -> dict
     #            merged into the sky info
@@ -109,15 +139,20 @@ def collect50(skies, T=45, marg=True, rate=None, seed0=8000, sens_n=1.0, priors=
     out = []; info = []
     for j in skies:
         rt = rts[j] if marg else (1.0 if rate is None else rate)
-        sd, f2, h2, P0, sea = _pop18(j % 50, 0.35)
+        if sky == "natural": sd, f2, h2, P0, sea = natural_pop(j)
+        elif sky == "constructed": sd, f2, h2, P0, sea = _pop18(j % 50, 0.35)
+        else: raise ValueError(sky)
         rng = np.random.default_rng(seed0+sd+977*j); Np = 120
         beta = np.arcsin(rng.uniform(-1, 1, Np)); Dk = rng.uniform(0.5, 3.0, Np)
         px = 2.34/np.cos(beta)**2*Dk**2*10.0*np.sqrt(30.0/T); pb = 3.0*(T/30.0)**(-2.5)
         pri = np.maximum(np.where(rng.random(Np) < 0.7, np.minimum(px, pb), px), 0.05)
         Arn, _g = rn_draw(Np); rncl = Arn == 0.0
         r = inv_rate(f2, h2, P0, sea, T, rate=rt)
-        if r is None: continue
-        ks, sig, fk, rp, arr = r
+        if r is None:
+            if not noskip: continue
+            ks = np.zeros(0, int); sig = fk = rp = arr = np.zeros(0)     # Job 54: no usable booked list; the joint fit does not need one
+        else:
+            ks, sig, fk, rp, arr = r
         if priors == "census":
             rc = np.random.default_rng([50, 7, seed0, j]); pick = rc.integers(0, len(cD), Np)
             Dk = cD[pick].copy(); pri = np.maximum(cS[pick], 0.05)
@@ -129,14 +164,21 @@ def collect50(skies, T=45, marg=True, rate=None, seed0=8000, sens_n=1.0, priors=
         nt = T*365.25/14.0
         rp_all = (h2/(2*np.pi*f2))*np.sqrt(nt/2)/(100.0*1e-9)*sens_n
         arr_all = rp_all*np.sqrt(0.2*120)
-        cand = np.where((arr_all >= 3.0) & (f2 >= 2e-9) & (f2 <= 3e-8) & (rp_all >= 3.0))[0]
-        if len(cand) > 1300: cand = cand[np.argsort(rp_all[cand])[::-1][:1300]]
+        cand = np.where((arr_all >= 3.0) & (f2 >= 2e-9) & (f2 <= fmax_cand) & (rp_all >= 3.0))[0]
+        if len(cand) > cand_cap: cand = cand[np.argsort(rp_all[cand])[::-1][:cand_cap]]
+        if cand_bg:      # Job 54: also admit the cand_bg in-band sources loudest against timing noise + background, whatever their single-pulsar SNR
+            tg = np.where((arr_all >= 3.0) & (f2 >= 2e-9) & (f2 <= fmax_cand))[0]; gEt = np.zeros(len(tg))
+            for lo in range(0, len(f2), 4000):
+                gEt += (np.sinc((f2[lo:lo+4000, None]-f2[None, tg])*Ts)**2*P0[lo:lo+4000, None]).sum(0)
+            bs_ = sea[np.clip(np.digitize(f2[tg], be)-1, 0, len(bc)-1)]*(T_OBS/Ts)
+            oth_ = np.maximum(2*(gEt-P0[tg])*sc+2*bs_, 0)*rt; Nt_ = P0[tg]*sc*2.0/np.maximum(rp_all[tg], 1e-9)**2
+            cand = np.union1d(cand, tg[np.argsort(arr_all[tg]/np.sqrt(1.0+oth_/Nt_))[::-1][:cand_bg]])
         cand = np.union1d(cand, ks)                      # booked list always inside
         pos12 = np.searchsorted(cand, ks)                # position of booked sources
         nC = len(cand); fc = f2[cand]; Pc = P0[cand]
-        tc_all = _mcz_tc(f2, h2)
+        tc_all = NAT_TC[j] if (sky == "natural" and mass == "exact") else _mcz_tc(f2, h2)
         # static Earth-term field gE(f) = sum_j sinc^2((f_j-f)T) P_j (T/T_OBS) on a fine grid
-        fg8 = np.arange(0.3e-9, 3.3e-8, 1.0/(8*Ts)); fg8T = (fg8*Ts).astype(np.float32)
+        fg8 = np.arange(0.3e-9, fgrid_max, 1.0/(8*Ts)); fg8T = (fg8*Ts).astype(np.float32)
         gE8 = np.zeros(len(fg8)); f32 = (f2*Ts).astype(np.float32); P32 = P0.astype(np.float32)
         for lo in range(0, len(f2), 6000):
             gE8 += (np.sinc(f32[lo:lo+6000, None]-fg8T[None, :])**2*P32[lo:lo+6000, None]).sum(0, dtype=np.float64)
@@ -254,7 +296,8 @@ def collect50(skies, T=45, marg=True, rate=None, seed0=8000, sens_n=1.0, priors=
             ref = ia if len(ia) else (ia_ok if len(ia_ok) else np.arange(len(ks)))
             kref = kap["off"][pos12[ref]]
             rec = dict(sky=j, psr=i, pri=float(pri[i]), Ltrue=Lt, L_pc=float(Lpc), booked=bool(booked),
-                       Kc=float(6*pri[i]*kref.min()/(2*np.pi)), Kf=float(6*pri[i]*kref.max()/(2*np.pi)),
+                       Kc=float(6*pri[i]*kref.min()/(2*np.pi)) if len(kref) else np.nan,
+                       Kf=float(6*pri[i]*kref.max()/(2*np.pi)) if len(kref) else np.nan,
                        Kf_all=float(6*pri[i]*kap["off"].max()/(2*np.pi)), ncand=int(nC),
                        n12=int(len(ia)), nmov=int(mov.sum()))
             if len(ia):

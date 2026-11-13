@@ -1,0 +1,25 @@
+== Part 4: observing span, natural skies, census priors, reference
+
+-- T = 15 yr: 157 skies of 200 requested, 12403 pulsars (79 per sky); bins to 33 nHz: 16; candidates per sky 733 (min 669); booked list 3.3
+   detectable per sky: arr_bg>=3 0.62, arr_bg_opt>=3 2.15; beta_unmod N=12 pairs 10/50/90% [0.0018 0.0108 0.0435]; bins moved median 0.57; share of band power top 12: 0.059
+   classes: K>=60 11255, K>=600 6322; prior only 0.006 / 0.001 / 0.000; median Kc 623
+   reference N=  7: 0.016 [0.014, 0.018] / 0.004 [0.003, 0.005] / 0.001 [0.001, 0.002] | 1.28 per sky
+   reference N= 12: 0.022 [0.020, 0.025] / 0.006 [0.005, 0.008] / 0.002 [0.001, 0.003] | 1.75 per sky
+   reference N=all: 0.052 [0.048, 0.056] / 0.020 [0.018, 0.023] / 0.007 [0.005, 0.009] | 4.10 per sky
+   N=12 by K of the known set's coarsest tooth: K<10 0.285 (n=634); 10-100 0.021 (n=3150); >=100 0.003 (n=8619)
+
+-- T = 25 yr: 197 skies of 200 requested, 15563 pulsars (79 per sky); bins to 33 nHz: 27; candidates per sky 999 (min 923); booked list 6.7
+   detectable per sky: arr_bg>=3 1.89, arr_bg_opt>=3 4.69; beta_unmod N=12 pairs 10/50/90% [0.004  0.0258 0.0913]; bins moved median 1.22; share of band power top 12: 0.096
+   classes: K>=60 13648, K>=600 6033; prior only 0.006 / 0.001 / 0.000; median Kc 387
+   reference N=  7: 0.024 [0.022, 0.026] / 0.006 [0.005, 0.008] / 0.002 [0.001, 0.004] | 1.89 per sky
+   reference N= 12: 0.032 [0.029, 0.034] / 0.009 [0.008, 0.011] / 0.003 [0.002, 0.005] | 2.50 per sky
+   reference N=all: 0.097 [0.093, 0.102] / 0.051 [0.048, 0.055] / 0.020 [0.017, 0.024] | 7.68 per sky
+   N=12 by K of the known set's coarsest tooth: K<10 0.418 (n=716); 10-100 0.037 (n=3575); >=100 0.005 (n=11272)
+
+-- T = 45 yr: 200 skies of 200 requested, 15800 pulsars (79 per sky); bins to 33 nHz: 47; candidates per sky 1300 (min 1300); booked list 11.6
+   detectable per sky: arr_bg>=3 4.66, arr_bg_opt>=3 10.15; beta_unmod N=12 pairs 10/50/90% [0.0082 0.0549 0.1798]; bins moved median 2.73; share of band power top 12: 0.098
+   classes: K>=60 13255, K>=600 4638; prior only 0.006 / 0.001 / 0.000; median Kc 286
+   reference N=  7: 0.029 [0.026, 0.032] / 0.007 [0.005, 0.008] / 0.001 [0.000, 0.001] | 2.31 per sky
+   reference N= 12: 0.046 [0.043, 0.049] / 0.016 [0.014, 0.018] / 0.003 [0.001, 0.004] | 3.63 per sky
+   reference N=all: 0.260 [0.252, 0.269] / 0.194 [0.186, 0.203] / 0.080 [0.072, 0.087] | 20.55 per sky
+   N=12 by K of the known set's coarsest tooth: K<10 0.493 (n=689); 10-100 0.070 (n=3447); >=100 0.012 (n=11664)

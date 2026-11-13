@@ -1,0 +1,60 @@
+corrected run: 100 natural populations (skies 100-199), 7900 pulsars; Job 53 numbers below are for the same pulsars
+== census priors: random phases against Job 53 (all pulsars / K>=60 / K>=600)
+   ref N=  7: random phases 0.026 [0.022, 0.030] / 0.008 / 0.002   Job 53 0.028 / 0.007 / 0.001   pulsars that changed 270
+   ref N= 12: random phases 0.041 [0.037, 0.046] / 0.015 / 0.003   Job 53 0.045 / 0.017 / 0.003   pulsars that changed 454
+   ref N= 30: random phases 0.073 [0.067, 0.079] / 0.038 / 0.011   Job 53 0.079 / 0.041 / 0.016   pulsars that changed 800
+   ref N=all: random phases 0.241 [0.228, 0.254] / 0.188 / 0.088   Job 53 0.261 / 0.196 / 0.080   pulsars that changed 2121
+     A N=  7: random phases 0.045 [0.040, 0.051] / 0.020 / 0.005   Job 53 0.046 / 0.017 / 0.003   pulsars that changed 451
+     A N= 12: random phases 0.078 [0.071, 0.085] / 0.042 / 0.008   Job 53 0.083 / 0.043 / 0.014   pulsars that changed 827
+     A N= 30: random phases 0.153 [0.143, 0.164] / 0.104 / 0.037   Job 53 0.158 / 0.105 / 0.038   pulsars that changed 1514
+     A N=all: random phases 0.501 [0.484, 0.518] / 0.447 / 0.265   Job 53 0.505 / 0.447 / 0.262   pulsars that changed 2603
+
+== prior-width slice (fraction right; every pulsar the same prior width)
+   ref N=  7 random phases: 0.1: 0.988  0.3: 0.745  1: 0.435  3: 0.227  10: 0.102  30: 0.039  100: 0.018  300: 0.007 | crosses 0.9 / 0.5 / 0.1 at 0.15 / 0.78 / 10.3 pc
+                Job 53:        0.1: 0.998  0.3: 0.921  1: 0.631  3: 0.304  10: 0.126  30: 0.050  100: 0.020  300: 0.005
+   ref N= 12 random phases: 0.1: 0.990  0.3: 0.785  1: 0.503  3: 0.290  10: 0.147  30: 0.068  100: 0.033  300: 0.011 | crosses 0.9 / 0.5 / 0.1 at 0.16 / 1.02 / 19.3 pc
+                Job 53:        0.1: 0.999  0.3: 0.962  1: 0.720  3: 0.392  10: 0.181  30: 0.083  100: 0.035  300: 0.015
+   ref N= 30 random phases: 0.1: 0.993  0.3: 0.838  1: 0.608  3: 0.409  10: 0.232  30: 0.126  100: 0.064  300: 0.035 | crosses 0.9 / 0.5 / 0.1 at 0.19 / 1.81 / 49.3 pc
+                Job 53:        0.1: 1.000  0.3: 0.993  1: 0.845  3: 0.539  10: 0.287  30: 0.152  100: 0.072  300: 0.032
+   ref N=all random phases: 0.1: 0.996  0.3: 0.937  1: 0.856  3: 0.733  10: 0.567  30: 0.413  100: 0.280  300: 0.189 | crosses 0.9 / 0.5 / 0.1 at 0.52 / 16.11 / nan pc
+                Job 53:        0.1: 1.000  0.3: 1.000  1: 1.000  3: 0.948  10: 0.732  30: 0.520  100: 0.310  300: 0.197
+     A N=  7 random phases: 0.1: 0.991  0.3: 0.830  1: 0.563  3: 0.349  10: 0.176  30: 0.082  100: 0.037  300: 0.015 | crosses 0.9 / 0.5 / 0.1 at 0.19 / 1.38 / 24.4 pc
+                Job 53:        0.1: 1.000  0.3: 0.967  1: 0.725  3: 0.412  10: 0.196  30: 0.093  100: 0.043  300: 0.016
+     A N= 12 random phases: 0.1: 0.993  0.3: 0.871  1: 0.659  3: 0.448  10: 0.267  30: 0.147  100: 0.077  300: 0.034 | crosses 0.9 / 0.5 / 0.1 at 0.23 / 2.29 / 67.1 pc
+                Job 53:        0.1: 1.000  0.3: 0.987  1: 0.812  3: 0.527  10: 0.290  30: 0.166  100: 0.082  300: 0.040
+     A N= 30 random phases: 0.1: 0.996  0.3: 0.922  1: 0.781  3: 0.615  10: 0.424  30: 0.289  100: 0.164  300: 0.101 | crosses 0.9 / 0.5 / 0.1 at 0.36 / 6.19 / nan pc
+                Job 53:        0.1: 1.000  0.3: 0.997  1: 0.906  3: 0.680  10: 0.452  30: 0.304  100: 0.179  300: 0.107
+     A N=all random phases: 0.1: 0.998  0.3: 0.979  1: 0.957  3: 0.915  10: 0.840  30: 0.732  100: 0.600  300: 0.472 | crosses 0.9 / 0.5 / 0.1 at 3.82 / 236.61 / nan pc
+                Job 53:        0.1: 1.000  0.3: 1.000  1: 1.000  3: 0.988  10: 0.907  30: 0.788  100: 0.613  300: 0.476
+wrote talk_data/prior_slice.csv (corrected); Job 53 version kept as talk_data/prior_slice_job53.csv
+
+== Part 3 again: per-bin model with real shares against the corrected sky result (N = 12, reference, all pulsars)
+    census: sky, random phases 0.041 | per-bin model 0.040 (-0.001) | shared bins 0.040 (-0.002) | Job 53 sky 0.046
+       0.1: sky, random phases 0.990 | per-bin model 0.990 (+0.000) | shared bins 0.991 (+0.002) | Job 53 sky 0.999
+       0.3: sky, random phases 0.785 | per-bin model 0.784 (-0.001) | shared bins 0.815 (+0.030) | Job 53 sky 0.963
+         1: sky, random phases 0.503 | per-bin model 0.505 (+0.002) | shared bins 0.527 (+0.024) | Job 53 sky 0.723
+         3: sky, random phases 0.290 | per-bin model 0.292 (+0.002) | shared bins 0.294 (+0.004) | Job 53 sky 0.388
+        10: sky, random phases 0.147 | per-bin model 0.144 (-0.003) | shared bins 0.133 (-0.015) | Job 53 sky 0.173
+        30: sky, random phases 0.068 | per-bin model 0.069 (+0.000) | shared bins 0.073 (+0.005) | Job 53 sky 0.077
+       100: sky, random phases 0.033 | per-bin model 0.025 (-0.007) | shared bins 0.029 (-0.004) | Job 53 sky 0.032
+       300: sky, random phases 0.011 | per-bin model 0.012 (+0.000) | shared bins 0.009 (-0.002) | Job 53 sky 0.013
+
+== certification gate (train even skies, held out odd), corrected
+   sigma_d = 1 pc, ref, N=7: 1.58 pulsars per sky at purity 0.899 [0.841, 0.951] (ungated 33.5 right per sky)
+   sigma_d = 1 pc, ref, N=12: 3.86 pulsars per sky at purity 0.907 [0.870, 0.944] (ungated 39.1 right per sky)
+   sigma_d = 1 pc, ref, N=all: 70.76 pulsars per sky at purity 0.899 [0.887, 0.910] (ungated 67.7 right per sky)
+   sigma_d = 1 pc, A, N=7: 13.12 pulsars per sky at purity 0.872 [0.845, 0.897] (ungated 43.2 right per sky)
+   sigma_d = 1 pc, A, N=12: 25.50 pulsars per sky at purity 0.889 [0.867, 0.909] (ungated 51.4 right per sky)
+   sigma_d = 1 pc, A, N=all: 79.00 pulsars per sky at purity 0.957 [0.951, 0.963] (ungated 75.6 right per sky)
+   sigma_d = 3 pc, ref, N=7: no 0.90 catalogue (best 0.662)
+   sigma_d = 3 pc, ref, N=12: no 0.90 catalogue (best 0.866)
+   sigma_d = 3 pc, ref, N=all: 45.54 pulsars per sky at purity 0.902 [0.891, 0.913] (ungated 57.9 right per sky)
+   sigma_d = 3 pc, A, N=7: 1.08 pulsars per sky at purity 0.889 [0.792, 0.978] (ungated 26.7 right per sky)
+   sigma_d = 3 pc, A, N=12: 4.22 pulsars per sky at purity 0.938 [0.901, 0.968] (ungated 34.6 right per sky)
+   sigma_d = 3 pc, A, N=all: 78.94 pulsars per sky at purity 0.917 [0.906, 0.927] (ungated 72.4 right per sky)
+   census, ref, N=7: no 0.90 catalogue (best 0.492)
+   census, ref, N=12: no 0.90 catalogue (best 0.689)
+   census, ref, N=all: 5.40 pulsars per sky at purity 0.889 [0.839, 0.932] (ungated 18.6 right per sky)
+   census, A, N=7: no 0.90 catalogue (best 0.791)
+   census, A, N=12: 0.76 pulsars per sky at purity 0.895 [0.797, 1.000] (ungated 6.0 right per sky)
+   census, A, N=all: 26.32 pulsars per sky at purity 0.881 [0.858, 0.901] (ungated 38.5 right per sky)

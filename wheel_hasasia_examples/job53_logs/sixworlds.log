@@ -1,0 +1,11 @@
+check of the stored notebook text: '0.965' present: True | '0.515': True | '0.985': False | '0.540': False | 'K (coarsest comb)  : 8.2': True
+ACTIVE_WHEEL_REPORT.md lines mentioning 0.985: [6136, 6440] ; 0.540: [6441]
+K = 6 sigma_d kappa/2pi: coarsest tooth 8.19, finest 54.9
+
+world                          notebook | notebook method rebuilt here (truth 1.42) | joint fit, truth 1.42 | joint fit, truth drawn from the prior | notebook method, truth drawn
+1 clean                        1.000    | 1.000                                     | 1.000                 | 1.000                                 | 1.000
+2 + red noise                  0.965    | 0.949                                     | 0.991                 | 0.992                                 | 0.949
+3 + GWB (s = 0.5)              0.515    | 0.570                                     | 0.791                 | 0.780                                 | 0.514
+4 + realistic loudness         0.000    | 0.000                                     | 0.001                 | 0.133                                 | 0.123
+5 real world (4 + red noise)   0.000    | 0.000                                     | 0.001                 | 0.130                                 | 0.116
+prior only, truth drawn from the prior: 0.098; truth fixed at 1.42 pc: 0.000

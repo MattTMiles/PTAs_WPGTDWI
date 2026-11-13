@@ -1,0 +1,106 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 160 s
+  [statbg sky 102] 23 s
+[progress] 1/40 sky runs, 183 s
+  [statbg sky 101] 29 s
+  [statbg sky 100] 30 s
+  [statbg sky 103] 32 s
+  [statbg sky 104] 27 s
+  [statbg sky 105] 22 s
+  [statbg sky 107] 26 s
+  [statbg sky 106] 32 s
+  [statbg sky 108] 28 s
+  [statbg sky 109] 28 s
+  [statbg sky 110] 21 s
+  [statbg sky 111] 24 s
+  [statbg sky 113] 31 s
+  [statbg sky 112] 33 s
+  [statbg sky 115] 26 s
+  [statbg sky 114] 36 s
+  [statbg sky 116] 28 s
+  [statbg sky 118] 28 s
+  [statbg sky 117] 32 s
+  [statbg sky 119] 29 s
+  [statbg sky 120] 19 s
+[progress] 21/40 sky runs, 317 s
+  [statbg sky 121] 28 s
+  [statbg sky 122] 31 s
+  [statbg sky 123] 31 s
+  [statbg sky 124] 27 s
+  [statbg sky 125] 29 s
+  [statbg sky 126] 28 s
+  [statbg sky 128] 21 s
+  [statbg sky 127] 30 s
+  [statbg sky 129] 27 s
+  [statbg sky 130] 29 s
+  [statbg sky 132] 35 s
+  [statbg sky 131] 36 s
+  [statbg sky 133] 26 s
+  [statbg sky 134] 27 s
+  [statbg sky 135] 31 s
+  [statbg sky 136] 36 s
+  [statbg sky 137] 32 s
+  [statbg sky 138] 31 s
+  [statbg sky 139] 28 s
+[statbg] records 3160 skies 40
+TOTAL 459 s
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 118 s
+  [mainbg sky 101] 58 s
+[progress] 1/40 sky runs, 177 s
+  [mainbg sky 100] 64 s
+  [mainbg sky 102] 71 s
+  [mainbg sky 103] 88 s
+  [mainbg sky 104] 64 s
+  [mainbg sky 105] 63 s
+  [mainbg sky 106] 62 s
+  [mainbg sky 107] 66 s
+  [mainbg sky 108] 42 s
+  [mainbg sky 110] 52 s
+  [mainbg sky 109] 65 s
+  [mainbg sky 111] 57 s
+  [mainbg sky 112] 73 s
+  [mainbg sky 113] 74 s
+  [mainbg sky 114] 82 s
+  [mainbg sky 115] 72 s
+  [mainbg sky 116] 91 s
+  [mainbg sky 117] 73 s
+  [mainbg sky 118] 61 s
+  [mainbg sky 119] 77 s
+  [mainbg sky 122] 75 s
+[progress] 21/40 sky runs, 528 s
+  [mainbg sky 121] 82 s
+  [mainbg sky 120] 91 s
+  [mainbg sky 123] 87 s
+  [mainbg sky 125] 71 s
+  [mainbg sky 126] 66 s
+  [mainbg sky 124] 85 s
+  [mainbg sky 127] 78 s
+  [mainbg sky 128] 74 s
+  [mainbg sky 130] 68 s
+  [mainbg sky 129] 84 s
+  [mainbg sky 131] 62 s
+  [mainbg sky 132] 67 s
+  [mainbg sky 134] 77 s
+  [mainbg sky 133] 92 s
+  [mainbg sky 135] 73 s
+  [mainbg sky 136] 67 s
+  [mainbg sky 137] 74 s
+  [mainbg sky 138] 70 s
+  [mainbg sky 139] 75 s
+[mainbg] records 3160 skies 40
+TOTAL 856 s

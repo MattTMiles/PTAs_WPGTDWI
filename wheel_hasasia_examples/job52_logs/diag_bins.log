@@ -1,0 +1,6 @@
+DIAG harness skies 100-103, 316 pulsars, zero timing noise, extended pool
+DIAG  B N=12: bins to 100 nHz right 0.491 | bins above 33 nHz ignored 0.554 | (x1 timing, bins to 100 nHz: 0.551)
+DIAG  B N=all: bins to 100 nHz right 0.801 | bins above 33 nHz ignored 0.816 | (x1 timing, bins to 100 nHz: 0.823)
+DIAG  D N=12: bins to 100 nHz right 0.443 | bins above 33 nHz ignored 0.585 | (x1 timing, bins to 100 nHz: 0.579)
+DIAG  D N=all: bins to 100 nHz right 0.835 | bins above 33 nHz ignored 0.905 | (x1 timing, bins to 100 nHz: 0.902)
+DIAG  |mean normalised product of neighbouring bins| of the unmodelled data: bins > 40 nHz 0.192; bins 2-10 nHz 0.241 (independent bins: ~0.11 and ~0.30)

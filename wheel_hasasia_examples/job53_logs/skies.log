@@ -1,0 +1,42 @@
+== reproduction of Job 52 (constructed, census skies 100-119): all / K>=60 / K>=600
+   w|ref|12|t1: 0.053 / 0.021 / 0.000   (Job 52: 0.053 / 0.021 / 0.000)
+   w|ref|all|t1: 0.271 / 0.188 / 0.080   (Job 52: 0.271 / 0.188 / 0.080)
+   w|A|12|t1: 0.098 / 0.054 / 0.011   (Job 52: 0.098 / 0.054 / 0.011)
+
+== constructed skies: 20 skies, 1580 pulsars, 20 distinct populations
+   pulsars per class: all 1580, K>=60 1318, K>=600 452
+   sources per sky detectable against the background: arr_bg >= 3: mean 6.5 (min 3, median 6, max 10); arr_bg_opt >= 3: mean 10.8 (min 7, median 10, max 17); candidates 1175; sources 18654
+   share of the 2-30 nHz power (Earth + pulsar terms) held by the top N sources: N=1: 0.019, N=3: 0.090, N=7: 0.172, N=12: 0.191, N=30: 0.238, N=all: 0.447
+   largest beta_bin per pulsar (over all candidates) 10/50/90%: [0.114 0.268 0.397]; max 0.767
+   beta_unmod, N = 12 pairs (18960 pairs) 10/50/90%: [0.0085 0.0563 0.2287]; 99%: 0.454; max 0.624; fraction above 0.3: 0.0621
+   beta_bin, N = 12 pairs 10/50/90%: [0.0069 0.046  0.2106]
+   prior only: 0.007 / 0.003 / 0.000
+   decode (all / K>=60 / K>=600) [95% interval, populations resampled] | right per sky
+      ref N=  7: 0.042 [0.033, 0.051] / 0.014 [0.008, 0.022] / 0.000 [0.000, 0.000] | 3.3
+      ref N= 12: 0.053 [0.046, 0.060] / 0.021 [0.014, 0.030] / 0.000 [0.000, 0.000] | 4.2
+      ref N=all: 0.271 [0.242, 0.305] / 0.188 [0.163, 0.219] / 0.080 [0.050, 0.110] | 21.4
+        A N=  7: 0.066 [0.053, 0.080] / 0.031 [0.024, 0.038] / 0.007 [0.000, 0.014] | 5.2
+        A N= 12: 0.098 [0.084, 0.115] / 0.054 [0.041, 0.068] / 0.011 [0.002, 0.022] | 7.8
+        A N=all: 0.509 [0.472, 0.547] / 0.436 [0.395, 0.477] / 0.246 [0.194, 0.305] | 40.2
+
+== natural skies: 20 skies, 1580 pulsars, 20 distinct populations
+   pulsars per class: all 1580, K>=60 1333, K>=600 442
+   sources per sky detectable against the background: arr_bg >= 3: mean 4.5 (min 2, median 4, max 7); arr_bg_opt >= 3: mean 10.2 (min 4, median 10, max 16); candidates 1300; sources 18624
+   sources rejected by the CW upper limit in the draw, per sky: [1, 2, 1, 4, 2, 1, 1, 3, 1, 1, 3, 4, 1, 0, 1, 4, 3, 3, 1, 0] (mean 1.85)
+   share of the 2-30 nHz power (Earth + pulsar terms) held by the top N sources: N=1: 0.012, N=3: 0.034, N=7: 0.068, N=12: 0.093, N=30: 0.155, N=all: 0.401
+   largest beta_bin per pulsar (over all candidates) 10/50/90%: [0.105 0.209 0.372]; max 0.689
+   beta_unmod, N = 12 pairs (18960 pairs) 10/50/90%: [0.0097 0.0569 0.1783]; 99%: 0.364; max 0.535; fraction above 0.3: 0.0304
+   beta_bin, N = 12 pairs 10/50/90%: [0.0088 0.0501 0.1619]
+   prior only: 0.007 / 0.002 / 0.002
+   decode (all / K>=60 / K>=600) [95% interval, populations resampled] | right per sky
+      ref N=  7: 0.027 [0.019, 0.035] / 0.006 [0.002, 0.011] / 0.000 [0.000, 0.000] | 2.1
+      ref N= 12: 0.042 [0.035, 0.051] / 0.018 [0.014, 0.022] / 0.002 [0.000, 0.007] | 3.4
+      ref N=all: 0.258 [0.232, 0.283] / 0.188 [0.165, 0.210] / 0.077 [0.049, 0.105] | 20.4
+        A N=  7: 0.042 [0.032, 0.053] / 0.020 [0.013, 0.028] / 0.005 [0.000, 0.012] | 3.4
+        A N= 12: 0.078 [0.061, 0.094] / 0.041 [0.030, 0.053] / 0.011 [0.004, 0.020] | 6.2
+        A N=all: 0.509 [0.468, 0.548] / 0.450 [0.410, 0.488] / 0.274 [0.218, 0.333] | 40.2
+
+== natural skies 100-119, chirp mass from the amplitude lookup (as Jobs 50-52) instead of the drawn entry
+   N=7: lookup 0.028 / 0.010 / 0.000   exact 0.027 / 0.006 / 0.000
+   N=12: lookup 0.041 / 0.019 / 0.002   exact 0.042 / 0.018 / 0.002
+   N=all: lookup 0.268 / 0.196 / 0.095   exact 0.258 / 0.188 / 0.077

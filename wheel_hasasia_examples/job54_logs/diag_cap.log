@@ -1,0 +1,14 @@
+sky 100, 120 pulsars, Earth terms, noise = timing + all other GW power (Job 51 arr_bg definition): 11 sources at SNR >= 3 in 2-30 nHz; in the 1,300-candidate list: 3; left out by the cap: 8
+  f [nHz] | SNR against background | timing-only single-pulsar SNR rp | rank by rp among in-band sources | in candidate list
+   13.71 |  8.05 |     8.5 |   242 | True
+   26.90 |  6.06 |     2.2 |  2548 | False
+   26.81 |  4.41 |     1.8 |  3054 | False
+   22.34 |  3.85 |     1.5 |  3428 | False
+   15.88 |  3.46 |     2.6 |  1821 | False
+    3.74 |  3.40 |    84.0 |     2 | True
+   20.69 |  3.33 |     1.3 |  3829 | False
+   19.36 |  3.20 |     1.8 |  2985 | False
+   26.13 |  3.11 |     1.0 |  4885 | False
+    8.50 |  3.10 |    11.8 |   124 | True
+   23.75 |  3.08 |     1.0 |  4895 | False
+candidate list: 1300 sources, frequencies 10/50/90% [2.12 2.75 4.39] nHz, max 13.71 nHz; smallest rp kept 3.3

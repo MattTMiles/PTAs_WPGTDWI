@@ -1,0 +1,156 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 53 s
+  [stat_con sky 117] 11 s
+[progress] 1/60 sky runs, 64 s
+  [stat_con sky 106] 11 s
+  [stat_con sky 105] 11 s
+  [stat_con sky 100] 11 s
+  [stat_con sky 103] 11 s
+  [stat_con sky 107] 11 s
+  [stat_con sky 109] 12 s
+  [stat_con sky 111] 13 s
+  [stat_con sky 102] 16 s
+  [stat_con sky 112] 16 s
+[progress] 11/60 sky runs, 70 s
+  [stat_con sky 110] 16 s
+  [stat_con sky 119] 17 s
+  [stat_con sky 113] 17 s
+  [stat_con sky 116] 17 s
+  [stat_con sky 108] 19 s
+  [stat_con sky 115] 19 s
+  [stat_nat sky 101] 11 s
+  [stat_nat sky 104] 11 s
+  [stat_nat sky 102] 11 s
+  [stat_nat sky 103] 11 s
+[progress] 21/60 sky runs, 75 s
+  [stat_con sky 114] 22 s
+  [stat_con sky 104] 22 s
+  [stat_nat sky 105] 11 s
+  [stat_con sky 101] 22 s
+  [stat_nat sky 106] 11 s
+  [stat_con sky 118] 23 s
+  [stat_nat sky 107] 11 s
+  [stat_nat sky 109] 11 s
+  [stat_nat sky 108] 19 s
+  [stat_nat sky 110] 15 s
+[progress] 31/60 sky runs, 85 s
+  [stat_nat sky 117] 11 s
+  [stat_nat sky 112] 16 s
+  [stat_nat sky 118] 11 s
+  [statlk_nat20 sky 100] 11 s
+  [stat_nat sky 119] 11 s
+  [statlk_nat20 sky 105] 11 s
+  [statlk_nat20 sky 103] 12 s
+  [statlk_nat20 sky 107] 11 s
+  [stat_nat sky 111] 19 s
+  [stat_nat sky 114] 19 s
+[progress] 41/60 sky runs, 89 s
+  [stat_nat sky 113] 19 s
+  [stat_nat sky 115] 18 s
+  [statlk_nat20 sky 108] 11 s
+  [stat_nat sky 116] 19 s
+  [statlk_nat20 sky 101] 20 s
+  [statlk_nat20 sky 102] 20 s
+  [statlk_nat20 sky 104] 20 s
+  [statlk_nat20 sky 106] 19 s
+  [statlk_nat20 sky 111] 10 s
+  [statlk_nat20 sky 112] 10 s
+[progress] 51/60 sky runs, 96 s
+  [statlk_nat20 sky 114] 10 s
+  [statlk_nat20 sky 115] 10 s
+  [statlk_nat20 sky 116] 10 s
+  [statlk_nat20 sky 113] 11 s
+  [statlk_nat20 sky 117] 10 s
+  [statlk_nat20 sky 118] 9 s
+  [statlk_nat20 sky 110] 12 s
+  [statlk_nat20 sky 109] 13 s
+  [statlk_nat20 sky 119] 9 s
+[stat_con] records 1580 skies 20
+[stat_nat] records 1580 skies 20
+[statlk_nat20] records 1580 skies 20
+TOTAL 98 s
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 53 s
+  [main_con sky 110] 151 s
+[progress] 1/60 sky runs, 204 s
+  [main_con sky 114] 162 s
+  [main_con sky 113] 191 s
+  [main_con sky 108] 192 s
+  [main_con sky 119] 198 s
+  [main_con sky 100] 203 s
+  [main_con sky 105] 208 s
+  [main_con sky 107] 209 s
+  [main_con sky 104] 212 s
+  [main_con sky 111] 222 s
+[progress] 11/60 sky runs, 275 s
+  [main_con sky 115] 222 s
+  [main_con sky 101] 229 s
+  [main_con sky 102] 236 s
+  [main_con sky 118] 246 s
+  [main_con sky 109] 249 s
+  [main_con sky 106] 250 s
+  [main_con sky 116] 277 s
+  [main_con sky 117] 279 s
+  [main_con sky 112] 281 s
+  [main_nat sky 101] 183 s
+[progress] 21/60 sky runs, 387 s
+  [main_nat sky 108] 166 s
+  [mainlk_nat20 sky 100] 45 s
+  [main_con sky 103] 379 s
+  [mainlk_nat20 sky 101] 36 s
+  [mainlk_nat20 sky 103] 44 s
+  [mainlk_nat20 sky 102] 49 s
+  [main_nat sky 102] 284 s
+  [main_nat sky 110] 227 s
+  [main_nat sky 107] 248 s
+  [main_nat sky 109] 245 s
+[progress] 31/60 sky runs, 511 s
+  [mainlk_nat20 sky 104] 55 s
+  [main_nat sky 114] 220 s
+  [main_nat sky 104] 274 s
+  [mainlk_nat20 sky 105] 49 s
+  [mainlk_nat20 sky 106] 48 s
+  [main_nat sky 113] 243 s
+  [main_nat sky 103] 291 s
+  [main_nat sky 106] 282 s
+  [main_nat sky 112] 257 s
+  [main_nat sky 105] 294 s
+[progress] 41/60 sky runs, 545 s
+  [mainlk_nat20 sky 108] 44 s
+  [mainlk_nat20 sky 107] 47 s
+  [main_nat sky 111] 273 s
+  [main_nat sky 115] 250 s
+  [mainlk_nat20 sky 113] 35 s
+  [mainlk_nat20 sky 110] 43 s
+  [mainlk_nat20 sky 109] 50 s
+  [mainlk_nat20 sky 112] 41 s
+  [mainlk_nat20 sky 111] 41 s
+  [mainlk_nat20 sky 115] 35 s
+[progress] 51/60 sky runs, 563 s
+  [mainlk_nat20 sky 114] 40 s
+  [mainlk_nat20 sky 117] 33 s
+  [main_nat sky 116] 265 s
+  [mainlk_nat20 sky 116] 36 s
+  [mainlk_nat20 sky 118] 32 s
+  [mainlk_nat20 sky 119] 32 s
+  [main_nat sky 119] 237 s
+  [main_nat sky 117] 244 s
+  [main_nat sky 118] 249 s
+[main_con] records 1580 skies 20
+[main_nat] records 1580 skies 20
+[mainlk_nat20] records 1580 skies 20
+TOTAL 581 s

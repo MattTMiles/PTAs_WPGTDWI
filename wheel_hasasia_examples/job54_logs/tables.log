@@ -1,0 +1,48 @@
+wrote curve.csv: 32 rows x 19 columns
+wrote prior_slice_job53.csv: 8 rows x 27 columns
+wrote heatmap_Ns2.csv: 400 rows x 6 columns
+wrote heatmap_Ns4.csv: 400 rows x 6 columns
+wrote heatmap_Ns8.csv: 400 rows x 6 columns
+wrote heatmap_Ns12.csv: 400 rows x 6 columns
+wrote heatmap_contours.csv: 236 rows x 5 columns
+   retardation on: 189600 pairs; beta_unmod 10/50/90% [0.0082 0.0549 0.1798]; below 0.003: 0.034
+   retardation off: 189600 pairs; beta_unmod 10/50/90% [0.0645 0.1369 0.363 ]; below 0.003: 0.000
+wrote jitter_points.csv: 18 rows x 12 columns
+wrote beta_hist.csv: 61 rows x 4 columns
+wrote ladder.csv: 48 rows x 19 columns
+    12 sea_first 1 all 200 | all 0.999 [0.999, 1.000] | K>=60 booked 0.999 | K>=60 known set 0.999 | known binaries + timing noise only (quiet sky, no retardation)
+    12 sea_first 2 all 200 | all 0.744 [0.722, 0.767] | K>=60 booked 0.712 | K>=60 known set 0.708 | add the sea
+    12 sea_first 3 all 200 | all 0.071 [0.066, 0.077] | K>=60 booked 0.040 | K>=60 known set 0.038 | add every other binary (no retardation anywhere)
+    12 sea_first 4 all 200 | all 0.041 [0.037, 0.044] | K>=60 booked 0.014 | K>=60 known set 0.013 | add retardation (the reference)
+    12 sea_first 5 all 200 | all 0.042 [0.039, 0.045] | K>=60 booked 0.015 | K>=60 known set 0.014 | step 4 with timing x10 better
+    12 sea_first 6 all 200 | all 0.042 [0.039, 0.046] | K>=60 booked 0.015 | K>=60 known set 0.014 | step 4 with timing noise / 1e6
+    12 sea_first 7_25yr all 200 | all 0.023 [0.021, 0.026] | K>=60 booked 0.008 | K>=60 known set 0.006 | step 4 with a 25-year span
+    12 sea_first 7_25yr the 197 skies Job 53 used | all 0.023 [0.021, 0.026] | K>=60 booked 0.008 | K>=60 known set 0.006 | step 4 with a 25-year span
+    12 sea_first 7_25yr the 3 skies Job 53 skipped | all 0.013 [0.000, 0.025] | K>=60 booked nan | K>=60 known set 0.000 | step 4 with a 25-year span
+    12 sea_first 7_15yr all 200 | all 0.015 [0.013, 0.017] | K>=60 booked 0.005 | K>=60 known set 0.003 | step 4 with a 15-year span
+    12 sea_first 7_15yr the 157 skies Job 53 used | all 0.017 [0.015, 0.019] | K>=60 booked 0.005 | K>=60 known set 0.003 | step 4 with a 15-year span
+    12 sea_first 7_15yr the 43 skies Job 53 skipped | all 0.010 [0.007, 0.014] | K>=60 booked nan | K>=60 known set 0.002 | step 4 with a 15-year span
+    12 binaries_first 2 all 200 | all 0.081 [0.075, 0.088] | K>=60 booked 0.048 | K>=60 known set 0.045 | add every other binary (no sea, no retardation)
+    12 binaries_first 3 all 200 | all 0.071 [0.066, 0.077] | K>=60 booked 0.040 | K>=60 known set 0.038 | add the sea
+    7 sea_first 1 all 200 | all 0.954 [0.947, 0.960] | K>=60 booked 0.947 | K>=60 known set 0.948 | known binaries + timing noise only (quiet sky, no retardation)
+    7 sea_first 2 all 200 | all 0.486 [0.465, 0.509] | K>=60 booked 0.428 | K>=60 known set 0.435 | add the sea
+    7 sea_first 3 all 200 | all 0.044 [0.040, 0.048] | K>=60 booked 0.020 | K>=60 known set 0.021 | add every other binary (no retardation anywhere)
+    7 sea_first 4 all 200 | all 0.028 [0.025, 0.030] | K>=60 booked 0.008 | K>=60 known set 0.009 | add retardation (the reference)
+    7 sea_first 5 all 200 | all 0.027 [0.025, 0.030] | K>=60 booked 0.007 | K>=60 known set 0.009 | step 4 with timing x10 better
+    7 sea_first 6 all 200 | all 0.027 [0.025, 0.030] | K>=60 booked 0.007 | K>=60 known set 0.008 | step 4 with timing noise / 1e6
+    7 sea_first 7_25yr all 200 | all 0.018 [0.015, 0.020] | K>=60 booked 0.006 | K>=60 known set 0.005 | step 4 with a 25-year span
+    7 sea_first 7_25yr the 197 skies Job 53 used | all 0.018 [0.015, 0.020] | K>=60 booked 0.006 | K>=60 known set 0.005 | step 4 with a 25-year span
+    7 sea_first 7_25yr the 3 skies Job 53 skipped | all 0.013 [0.000, 0.025] | K>=60 booked nan | K>=60 known set 0.000 | step 4 with a 25-year span
+    7 sea_first 7_15yr all 200 | all 0.014 [0.012, 0.016] | K>=60 booked 0.003 | K>=60 known set 0.002 | step 4 with a 15-year span
+    7 sea_first 7_15yr the 157 skies Job 53 used | all 0.015 [0.013, 0.017] | K>=60 booked 0.003 | K>=60 known set 0.003 | step 4 with a 15-year span
+    7 sea_first 7_15yr the 43 skies Job 53 skipped | all 0.010 [0.007, 0.013] | K>=60 booked nan | K>=60 known set 0.002 | step 4 with a 15-year span
+    7 binaries_first 2 all 200 | all 0.047 [0.044, 0.051] | K>=60 booked 0.023 | K>=60 known set 0.023 | add every other binary (no sea, no retardation)
+    7 binaries_first 3 all 200 | all 0.044 [0.040, 0.048] | K>=60 booked 0.020 | K>=60 known set 0.021 | add the sea
+   T = 15 yr: on the skies Job 53 used, flags equal Job 53 (aligned phases) for 12090/12403 pulsars; fraction right 0.0222 (Job 53) -> 0.0169
+   T = 25 yr: on the skies Job 53 used, flags equal Job 53 (aligned phases) for 14974/15563 pulsars; fraction right 0.0317 (Job 53) -> 0.0234
+   T = 45 yr reference N = 7: flags equal Job 53 (aligned phases) for 15225/15800 pulsars; fraction right 0.0292 (Job 53) -> 0.0277
+   T = 45 yr reference N = 12: flags equal Job 53 (aligned phases) for 14904/15800 pulsars; fraction right 0.0459 (Job 53) -> 0.0405
+   T = 45 yr reference N = all: flags equal Job 53 (aligned phases) for 11652/15800 pulsars; fraction right 0.2602 (Job 53) -> 0.2377
+wrote answers_example.csv: 79 rows x 13 columns
+   sky 100: 3 of 79 right; marked 20
+wrote fisher_curves.csv: 672 rows x 11 columns

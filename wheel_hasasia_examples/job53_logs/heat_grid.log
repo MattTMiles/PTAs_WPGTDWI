@@ -1,0 +1,14 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+[grid] comb sets: 50/50 populations; sizes min 7, max 12; with >= 12: 38
+  N_s = 2: grid done, 13 s
+  N_s = 4: grid done, 34 s
+  N_s = 8: grid done, 74 s
+  N_s = 12: grid done, 143 s
+  N_s = 2: K per pc of sigma_d, median over realisations: coarsest tooth 1.92, finest tooth 5.84; frequencies used 10/50/90%: [ 2.9  6.1 18.2] nHz
+  N_s = 4: K per pc of sigma_d, median over realisations: coarsest tooth 1.38, finest tooth 10.02; frequencies used 10/50/90%: [ 3.   6.8 17.2] nHz
+  N_s = 8: K per pc of sigma_d, median over realisations: coarsest tooth 1.11, finest tooth 13.35; frequencies used 10/50/90%: [ 3.5 10.3 16.5] nHz
+  N_s = 12: K per pc of sigma_d, median over realisations: coarsest tooth 0.98, finest tooth 14.15; frequencies used 10/50/90%: [ 4.2 10.2 15.9] nHz
+TOTAL 143 s

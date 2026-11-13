@@ -1,0 +1,74 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 113 s
+  [inf sky 105] 37 s
+[progress] 1/60 sky runs, 151 s
+  [inf sky 104] 40 s
+  [inf sky 103] 41 s
+  [inf sky 101] 41 s
+  [inf sky 102] 41 s
+  [inf sky 100] 46 s
+  [inf sky 108] 26 s
+  [inf sky 109] 35 s
+  [inf sky 106] 43 s
+  [inf sky 110] 41 s
+  [inf sky 107] 43 s
+  [inf sky 111] 39 s
+  [inf sky 112] 37 s
+  [inf sky 113] 38 s
+  [inf sky 114] 37 s
+  [inf sky 115] 36 s
+  [inf sky 116] 36 s
+  [inf sky 117] 34 s
+  [inf sky 118] 44 s
+  [inf sky 119] 39 s
+  [inf sky 121] 36 s
+[progress] 21/60 sky runs, 268 s
+  [inf sky 122] 42 s
+  [inf sky 120] 45 s
+  [inf sky 123] 47 s
+  [inf sky 124] 41 s
+  [inf sky 126] 36 s
+  [inf sky 125] 42 s
+  [inf sky 128] 34 s
+  [inf sky 129] 31 s
+  [inf sky 127] 39 s
+  [inf sky 130] 23 s
+  [inf sky 132] 20 s
+  [inf sky 133] 21 s
+  [inf sky 131] 28 s
+  [inf sky 134] 20 s
+  [inf sky 135] 23 s
+  [inf sky 136] 13 s
+  [inf sky 137] 12 s
+  [inf sky 138] 11 s
+  [inf sky 139] 11 s
+  [inf sky 140] 11 s
+[progress] 41/60 sky runs, 343 s
+  [inf sky 141] 11 s
+  [inf sky 142] 10 s
+  [inf sky 143] 11 s
+  [inf sky 144] 10 s
+  [inf sky 145] 11 s
+  [inf sky 146] 11 s
+  [inf sky 147] 11 s
+  [inf sky 148] 11 s
+  [inf sky 149] 11 s
+  [inf sky 150] 11 s
+  [inf sky 151] 11 s
+  [inf sky 152] 11 s
+  [inf sky 153] 11 s
+  [inf sky 154] 10 s
+  [inf sky 155] 11 s
+  [inf sky 156] 11 s
+  [inf sky 157] 10 s
+  [inf sky 158] 10 s
+  [inf sky 159] 8 s
+[inf] records 4740 skies 60
+TOTAL 378 s

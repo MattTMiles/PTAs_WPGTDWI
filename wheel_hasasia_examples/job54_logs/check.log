@@ -1,0 +1,21 @@
+combs_example.json[pulsar_wrong]: 3648 points over the prior, 600 in the window; N = 12 winner at +16.74 pc from truth (stored +16.74); clean winner at -0.013 pc
+combs_example.json[pulsar_right]: 157 points over the prior, 157 in the window; N = 12 winner at -0.14 pc from truth (stored -0.14); clean winner at +0.010 pc
+phasor_example.json: 30 terms + remainder + sea + timing; |sum - bin datum| = 3.3e-16; |sum - known Earth - fit datum| = 8.7e-15
+spectrum_example.json: 47 bins, 12 known sources, 3000 loudest; max |parts - total|/total = 0.0e+00
+curve.csv                      32 rows x 19 columns  | reference, every candidate: 0.2377 (Job 53, before the phase correction: 0.260); N = 12: 0.0405 (Job 53: 0.046)
+prior_slice.csv                 8 rows x 27 columns  | N = 12 reference at 1 pc: 0.5034
+heatmap_Ns2.csv               400 rows x  6 columns  | min 0.000 max 1.000
+heatmap_Ns4.csv               400 rows x  6 columns  | min 0.000 max 1.000
+heatmap_Ns8.csv               400 rows x  6 columns  | min 0.002 max 1.000
+heatmap_Ns12.csv              400 rows x  6 columns  | min 0.002 max 1.000
+heatmap_contours.csv          236 rows x  5 columns  | levels: ['0.5', '0.9']
+jitter_points.csv              18 rows x 12 columns  | largest |measured - exact <cos>| in standard errors: 2.8
+beta_hist.csv                  61 rows x  4 columns  | pairs: 189600 189600
+ladder.csv                     48 rows x 19 columns  | N = 12 ladder: 0.999 -> 0.744 -> 0.071 -> 0.041 -> 0.042 -> 0.042 -> 0.023 -> 0.015
+answers_example.csv            79 rows x 13 columns  | right: 3 of 79; marked 20
+fisher_curves.csv             672 rows x 11 columns  | modes: ['fixed_per_source_strain', 'fixed_per_source_strain_job48b', 'fixed_total_power']
+sensitivity_vs_nph.csv      47520 rows x  7 columns  | columns: ['frequency_nHz', 'n_phased', 'ordering', 'filter', 'noise_version', 'source']
+sources_strain.csv           3000 rows x 26 columns  | columns: ['f_earth_nHz', 'strain_amplitude', 'ra_deg_assigned', 'dec_deg_assigned', 'snr_A_nph0', 'snr_A_nph1']
+localisation.csv             1831 rows x 14 columns  | columns: ['f_gw_nHz', 'snr', 'ordering', 'n_ph', 'sigma_L_pc', 'measure']
+skymaps.npz: {'n_ph': (11,), 'lnL_rel_max': (11, 256, 256), 'u_deg': (256,), 'v_deg': (256,), 'ra_deg': (256, 256), 'dec_deg': (256, 256), 'true_ra_deg': (), 'true_dec_deg': (), 'area90_deg2': (11,), 'n_islands': (11,), 'area90_truth_island_deg2': (11,), 'zoom_n_ph': (5,), 'zoom_lnL_rel_max': (5, 256, 256), 'zoom_u_deg': (256,), 'zoom_v_deg': (256,), 'zoom_ra_deg': (256, 256), 'zoom_dec_deg': (256, 256), 'source_index': (), 'f_gw_nHz': (), 'snr': (), 'fine_step_deg': (), 'zoom_fine_step_deg': (), 'phased_order': (116,), 'readme': ()}
+total size of talk_data/: 7.43 MB

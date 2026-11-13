@@ -1,0 +1,26 @@
+TEST main_h: ref|all|t1 flags equal to Job 51 wj: 79/79; right 0.823 (Job 51 0.823)
+TEST   N=1: right 0.354  share 0.014
+TEST   N=7: right 0.481  share 0.192
+TEST   N=12: right 0.532  share 0.203
+TEST   N=30: right 0.620  share 0.228
+TEST   N=300: right 0.709  share 0.368
+TEST   A all t1: right 0.848; N=12: 0.570
+TEST   C all t1: right 0.785; N=12: 0.532
+TEST   C: pairs moving >0.1 bin (all cand) median 0.000; nseg max 1062; segcap 0
+TEST main_h: 36 s for 1 sky, 79 pulsars; M max 70781
+TEST   B all t1: right 0.835; N=12: 0.532; pool 1213
+TEST   D all t1: right 0.861; N=12: 0.557; pool 1213
+TEST mainx_h: 40 s for 1 sky, 79 pulsars; M max 70781
+TEST main_c: ref|all|t1 flags equal to Job 51 wj: 79/79; right 0.241 (Job 51 0.241)
+TEST   N=1: right 0.000  share 0.014
+TEST   N=7: right 0.051  share 0.196
+TEST   N=12: right 0.038  share 0.207
+TEST   N=30: right 0.051  share 0.231
+TEST   N=300: right 0.228  share 0.372
+TEST   A all t1: right 0.494; N=12: 0.089
+TEST   C all t1: right 0.253; N=12: 0.038
+TEST   C: pairs moving >0.1 bin (all cand) median 0.298; nseg max 1663; segcap 0
+TEST main_c: 171 s for 1 sky, 79 pulsars; M max 367417
+TEST   B all t1: right 0.241; N=12: 0.051; pool 1213
+TEST   D all t1: right 0.506; N=12: 0.089; pool 1213
+TEST mainx_c: 233 s for 1 sky, 79 pulsars; M max 367417

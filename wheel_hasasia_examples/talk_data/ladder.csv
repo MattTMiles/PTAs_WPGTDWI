@@ -1,0 +1,49 @@
+N_known,order,step,what_is_added,skies,n_skies,n_pulsars,frac_all,frac_all_lo95,frac_all_hi95,count_of_80_pulsars,frac_K60_booked_list,frac_K60_booked_lo95,frac_K60_booked_hi95,n_pulsars_K60_booked,frac_K60_known_set,frac_K60_known_lo95,frac_K60_known_hi95,n_pulsars_K60_known
+12,sea_first,1,"known binaries + timing noise only (quiet sky, no retardation)",all 200,200,15800,0.999,0.999,1.000,79.94,0.999,0.998,1.000,13255,0.999,0.998,1.000,13024
+12,sea_first,2,add the sea,all 200,200,15800,0.744,0.722,0.767,59.54,0.712,0.688,0.738,13255,0.708,0.684,0.734,13024
+12,sea_first,3,add every other binary (no retardation anywhere),all 200,200,15800,0.071,0.066,0.077,5.68,0.040,0.036,0.045,13255,0.038,0.035,0.042,13024
+12,sea_first,4,add retardation (the reference),all 200,200,15800,0.041,0.037,0.044,3.24,0.014,0.012,0.017,13255,0.013,0.011,0.016,13024
+12,sea_first,5,step 4 with timing x10 better,all 200,200,15800,0.042,0.039,0.045,3.35,0.015,0.013,0.018,13255,0.014,0.012,0.017,13024
+12,sea_first,6,step 4 with timing noise / 1e6,all 200,200,15800,0.042,0.039,0.046,3.38,0.015,0.013,0.018,13255,0.014,0.012,0.017,13024
+12,sea_first,7_25yr,step 4 with a 25-year span,all 200,200,15800,0.023,0.021,0.026,1.86,0.008,0.006,0.009,13648,0.006,0.005,0.007,12862
+12,sea_first,7_25yr,step 4 with a 25-year span,the 197 skies Job 53 used,197,15563,0.023,0.021,0.026,1.87,0.008,0.006,0.009,13648,0.006,0.005,0.007,12681
+12,sea_first,7_25yr,step 4 with a 25-year span,the 3 skies Job 53 skipped,3,237,0.013,0.000,0.025,1.01,nan,nan,nan,0,0.000,0.000,0.000,181
+12,sea_first,7_15yr,step 4 with a 15-year span,all 200,200,15800,0.015,0.013,0.017,1.24,0.005,0.004,0.007,11255,0.003,0.002,0.004,12517
+12,sea_first,7_15yr,step 4 with a 15-year span,the 157 skies Job 53 used,157,12403,0.017,0.015,0.019,1.35,0.005,0.004,0.007,11255,0.003,0.002,0.004,9846
+12,sea_first,7_15yr,step 4 with a 15-year span,the 43 skies Job 53 skipped,43,3397,0.010,0.007,0.014,0.80,nan,nan,nan,0,0.002,0.000,0.004,2671
+12,binaries_first,1,"known binaries + timing noise only (quiet sky, no retardation)",all 200,200,15800,0.999,0.999,1.000,79.94,0.999,0.998,1.000,13255,0.999,0.998,1.000,13024
+12,binaries_first,2,"add every other binary (no sea, no retardation)",all 200,200,15800,0.081,0.075,0.088,6.50,0.048,0.043,0.054,13255,0.045,0.040,0.051,13024
+12,binaries_first,3,add the sea,all 200,200,15800,0.071,0.066,0.077,5.68,0.040,0.036,0.045,13255,0.038,0.035,0.042,13024
+12,binaries_first,4,add retardation (the reference),all 200,200,15800,0.041,0.037,0.044,3.24,0.014,0.012,0.017,13255,0.013,0.011,0.016,13024
+12,binaries_first,5,step 4 with timing x10 better,all 200,200,15800,0.042,0.039,0.045,3.35,0.015,0.013,0.018,13255,0.014,0.012,0.017,13024
+12,binaries_first,6,step 4 with timing noise / 1e6,all 200,200,15800,0.042,0.039,0.046,3.38,0.015,0.013,0.018,13255,0.014,0.012,0.017,13024
+12,binaries_first,7_25yr,step 4 with a 25-year span,all 200,200,15800,0.023,0.021,0.026,1.86,0.008,0.006,0.009,13648,0.006,0.005,0.007,12862
+12,binaries_first,7_25yr,step 4 with a 25-year span,the 197 skies Job 53 used,197,15563,0.023,0.021,0.026,1.87,0.008,0.006,0.009,13648,0.006,0.005,0.007,12681
+12,binaries_first,7_25yr,step 4 with a 25-year span,the 3 skies Job 53 skipped,3,237,0.013,0.000,0.025,1.01,nan,nan,nan,0,0.000,0.000,0.000,181
+12,binaries_first,7_15yr,step 4 with a 15-year span,all 200,200,15800,0.015,0.013,0.017,1.24,0.005,0.004,0.007,11255,0.003,0.002,0.004,12517
+12,binaries_first,7_15yr,step 4 with a 15-year span,the 157 skies Job 53 used,157,12403,0.017,0.015,0.019,1.35,0.005,0.004,0.007,11255,0.003,0.002,0.004,9846
+12,binaries_first,7_15yr,step 4 with a 15-year span,the 43 skies Job 53 skipped,43,3397,0.010,0.007,0.014,0.80,nan,nan,nan,0,0.002,0.000,0.004,2671
+7,sea_first,1,"known binaries + timing noise only (quiet sky, no retardation)",all 200,200,15800,0.954,0.947,0.960,76.31,0.947,0.939,0.954,13255,0.948,0.940,0.955,13680
+7,sea_first,2,add the sea,all 200,200,15800,0.486,0.465,0.509,38.91,0.428,0.405,0.453,13255,0.435,0.412,0.459,13680
+7,sea_first,3,add every other binary (no retardation anywhere),all 200,200,15800,0.044,0.040,0.048,3.50,0.020,0.017,0.023,13255,0.021,0.018,0.024,13680
+7,sea_first,4,add retardation (the reference),all 200,200,15800,0.028,0.025,0.030,2.22,0.008,0.007,0.009,13255,0.009,0.007,0.010,13680
+7,sea_first,5,step 4 with timing x10 better,all 200,200,15800,0.027,0.025,0.030,2.19,0.007,0.006,0.009,13255,0.009,0.007,0.010,13680
+7,sea_first,6,step 4 with timing noise / 1e6,all 200,200,15800,0.027,0.025,0.030,2.19,0.007,0.006,0.009,13255,0.008,0.007,0.010,13680
+7,sea_first,7_25yr,step 4 with a 25-year span,all 200,200,15800,0.018,0.015,0.020,1.40,0.006,0.004,0.007,13648,0.005,0.004,0.006,13554
+7,sea_first,7_25yr,step 4 with a 25-year span,the 197 skies Job 53 used,197,15563,0.018,0.015,0.020,1.41,0.006,0.004,0.007,13648,0.005,0.004,0.006,13361
+7,sea_first,7_25yr,step 4 with a 25-year span,the 3 skies Job 53 skipped,3,237,0.013,0.000,0.025,1.01,nan,nan,nan,0,0.000,0.000,0.000,193
+7,sea_first,7_15yr,step 4 with a 15-year span,all 200,200,15800,0.014,0.012,0.016,1.10,0.003,0.002,0.005,11255,0.002,0.002,0.003,13249
+7,sea_first,7_15yr,step 4 with a 15-year span,the 157 skies Job 53 used,157,12403,0.015,0.013,0.017,1.19,0.003,0.002,0.005,11255,0.003,0.002,0.004,10437
+7,sea_first,7_15yr,step 4 with a 15-year span,the 43 skies Job 53 skipped,43,3397,0.010,0.007,0.013,0.78,nan,nan,nan,0,0.002,0.000,0.003,2812
+7,binaries_first,1,"known binaries + timing noise only (quiet sky, no retardation)",all 200,200,15800,0.954,0.947,0.960,76.31,0.947,0.939,0.954,13255,0.948,0.940,0.955,13680
+7,binaries_first,2,"add every other binary (no sea, no retardation)",all 200,200,15800,0.047,0.044,0.051,3.78,0.023,0.020,0.026,13255,0.023,0.020,0.027,13680
+7,binaries_first,3,add the sea,all 200,200,15800,0.044,0.040,0.048,3.50,0.020,0.017,0.023,13255,0.021,0.018,0.024,13680
+7,binaries_first,4,add retardation (the reference),all 200,200,15800,0.028,0.025,0.030,2.22,0.008,0.007,0.009,13255,0.009,0.007,0.010,13680
+7,binaries_first,5,step 4 with timing x10 better,all 200,200,15800,0.027,0.025,0.030,2.19,0.007,0.006,0.009,13255,0.009,0.007,0.010,13680
+7,binaries_first,6,step 4 with timing noise / 1e6,all 200,200,15800,0.027,0.025,0.030,2.19,0.007,0.006,0.009,13255,0.008,0.007,0.010,13680
+7,binaries_first,7_25yr,step 4 with a 25-year span,all 200,200,15800,0.018,0.015,0.020,1.40,0.006,0.004,0.007,13648,0.005,0.004,0.006,13554
+7,binaries_first,7_25yr,step 4 with a 25-year span,the 197 skies Job 53 used,197,15563,0.018,0.015,0.020,1.41,0.006,0.004,0.007,13648,0.005,0.004,0.006,13361
+7,binaries_first,7_25yr,step 4 with a 25-year span,the 3 skies Job 53 skipped,3,237,0.013,0.000,0.025,1.01,nan,nan,nan,0,0.000,0.000,0.000,193
+7,binaries_first,7_15yr,step 4 with a 15-year span,all 200,200,15800,0.014,0.012,0.016,1.10,0.003,0.002,0.005,11255,0.002,0.002,0.003,13249
+7,binaries_first,7_15yr,step 4 with a 15-year span,the 157 skies Job 53 used,157,12403,0.015,0.013,0.017,1.19,0.003,0.002,0.005,11255,0.003,0.002,0.004,10437
+7,binaries_first,7_15yr,step 4 with a 15-year span,the 43 skies Job 53 skipped,43,3397,0.010,0.007,0.013,0.78,nan,nan,nan,0,0.002,0.000,0.003,2812

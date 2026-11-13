@@ -1,0 +1,6 @@
+selected: [(100, 103, 'sky 100: 5 pulsars with 100 <= K <= 300 that the N = 12 fit gets wrong; median margin'), (101, 97, 'sky 101 (first sky with one): 1 pulsars with prior width 1-3 pc that the N = 12 fit gets right; median margin')]
+
+pulsar_wrong: sky 100 pulsar 103: prior width 25.00 pc, K finest 270, grid 3001 points step 0.0500 pc, winners (offset from truth, pc): {'joint_N3_real': 35.69428310560461, 'joint_N3_clean': 21.89428310560461, 'joint_N12_real': 43.34428310560462, 'joint_N12_clean': -0.005716894395394689}
+pulsar_right: sky 101 pulsar 97: prior width 1.00 pc, K finest 9, grid 121 points step 0.0500 pc, winners (offset from truth, pc): {'joint_N3_real': -1.978089777980513, 'joint_N3_clean': -1.9280897779805128, 'joint_N12_real': -0.07808977798051275, 'joint_N12_clean': -0.02808977798051293}
+phasor: bin 19 at 13.38 nHz; residual 2.0e-15; |datum used by fit| 1.12 x own; beta_unmod 0.535
+sizes: {'combs_example.json': 951058, 'phasor_example.json': 4851, 'spectrum_example.json': 207744}

@@ -1,0 +1,3 @@
+T = 15 yr: 43 skies missing; inv_rate returns None for 43 of them; candidates passing the timing-noise cut on those skies: min 672, median 733.0
+T = 25 yr: 3 skies missing; inv_rate returns None for 3 of them; candidates passing the timing-noise cut on those skies: min 965, median 1009.0
+T = 45 yr: 0 skies missing; inv_rate returns None for 0 of them; candidates passing the timing-noise cut on those skies: min -, median -

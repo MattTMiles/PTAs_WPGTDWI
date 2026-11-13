@@ -1,0 +1,56 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 53 s
+  [p5_c skies 104-104] 103 s
+[progress] 1/40 chunks, 156 s
+  [p5_c skies 109-109] 104 s
+  [p5_c skies 119-119] 111 s
+  [p5_c skies 110-110] 117 s
+  [p5_c skies 112-112] 121 s
+  [p5_c skies 111-111] 122 s
+  [p5_c skies 113-113] 127 s
+  [p5_c skies 106-106] 131 s
+  [p5_c skies 101-101] 137 s
+  [p5_c skies 103-103] 142 s
+  [p5_c skies 115-115] 144 s
+[progress] 11/40 chunks, 197 s
+  [p5_c skies 117-117] 152 s
+  [p5_c skies 105-105] 152 s
+  [p5_c skies 118-118] 159 s
+  [p5_c skies 114-114] 160 s
+  [p5_c skies 108-108] 168 s
+  [p5_c skies 107-107] 172 s
+  [p5_c skies 100-100] 193 s
+  [p5_c skies 116-116] 194 s
+  [p5off_c skies 100-100] 93 s
+  [p5_c skies 102-102] 198 s
+[progress] 21/40 chunks, 251 s
+  [p5off_c skies 101-101] 102 s
+  [p5off_c skies 110-110] 75 s
+  [p5off_c skies 102-102] 117 s
+  [p5off_c skies 109-109] 87 s
+  [p5off_c skies 108-108] 102 s
+  [p5off_c skies 107-107] 111 s
+  [p5off_c skies 105-105] 120 s
+  [p5off_c skies 104-104] 125 s
+  [p5off_c skies 106-106] 119 s
+  [p5off_c skies 113-113] 109 s
+[progress] 31/40 chunks, 321 s
+  [p5off_c skies 119-119] 73 s
+  [p5off_c skies 114-114] 113 s
+  [p5off_c skies 103-103] 157 s
+  [p5off_c skies 115-115] 108 s
+  [p5off_c skies 116-116] 105 s
+  [p5off_c skies 111-111] 126 s
+  [p5off_c skies 112-112] 128 s
+  [p5off_c skies 117-117] 92 s
+  [p5off_c skies 118-118] 93 s
+[p5_c] records 1580 skies 20
+[p5off_c] records 1580 skies 20
+TOTAL 340 s

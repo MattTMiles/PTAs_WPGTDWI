@@ -1,0 +1,49 @@
+wrote talk_data/sensitivity_vs_nph.csv: 47520 rows
+
+== ratio of the strain at SNR 10 to Earth-terms-only (filter i); median over 2-100 nHz [value at 5, 10, 30 nHz]
+   Mc_1e9_Msun  A loc     nearest_first filter ii : 0: 1.000  1: 0.996  2: 0.991  3: 0.987  4: 0.983  6: 0.975  10: 0.959  20: 0.923  40: 0.861  80: 0.766  116: 0.700   | all phased at 5/10/30 nHz: 0.707 / 0.704 / 0.675
+   Mc_1e9_Msun  A loc     nearest_first filter iii: 0: 0.946  1: 0.943  2: 0.940  3: 0.937  4: 0.934  6: 0.928  10: 0.917  20: 0.889  40: 0.840  80: 0.759  116: 0.700   | all phased at 5/10/30 nHz: 0.707 / 0.704 / 0.675
+   Mc_1e9_Msun  A loc     random        filter ii : 0: 1.000  1: 0.995  2: 0.991  3: 0.987  4: 0.982  6: 0.973  10: 0.955  20: 0.919  40: 0.857  80: 0.762  116: 0.700   | all phased at 5/10/30 nHz: 0.707 / 0.704 / 0.675
+   Mc_1e9_Msun  A loc     random        filter iii: 0: 0.946  1: 0.943  2: 0.940  3: 0.937  4: 0.933  6: 0.927  10: 0.914  20: 0.886  40: 0.837  80: 0.756  116: 0.700   | all phased at 5/10/30 nHz: 0.707 / 0.704 / 0.675
+   Mc_1e9_Msun  A machine nearest_first filter ii : 0: 1.000  1: 0.996  2: 0.991  3: 0.987  4: 0.983  6: 0.975  10: 0.959  20: 0.923  40: 0.861  80: 0.766  116: 0.700   | all phased at 5/10/30 nHz: 0.707 / 0.704 / 0.675
+   Mc_1e9_Msun  A machine nearest_first filter iii: 0: 0.946  1: 0.943  2: 0.940  3: 0.937  4: 0.934  6: 0.928  10: 0.917  20: 0.889  40: 0.840  80: 0.759  116: 0.700   | all phased at 5/10/30 nHz: 0.707 / 0.704 / 0.675
+   Mc_1e9_Msun  A machine random        filter ii : 0: 1.000  1: 0.995  2: 0.991  3: 0.987  4: 0.982  6: 0.973  10: 0.955  20: 0.919  40: 0.857  80: 0.762  116: 0.700   | all phased at 5/10/30 nHz: 0.707 / 0.704 / 0.675
+   Mc_1e9_Msun  A machine random        filter iii: 0: 0.946  1: 0.943  2: 0.940  3: 0.937  4: 0.933  6: 0.927  10: 0.914  20: 0.886  40: 0.837  80: 0.756  116: 0.700   | all phased at 5/10/30 nHz: 0.707 / 0.704 / 0.675
+   Mc_1e9_Msun  B machine nearest_first filter ii : 0: 1.000  1: 0.996  2: 0.992  3: 0.987  4: 0.983  6: 0.975  10: 0.960  20: 0.924  40: 0.864  80: 0.772  116: 0.718   | all phased at 5/10/30 nHz: 0.710 / 0.732 / 0.789
+   Mc_1e9_Msun  B machine nearest_first filter iii: 0: 0.954  1: 0.950  2: 0.947  3: 0.944  4: 0.941  6: 0.934  10: 0.923  20: 0.895  40: 0.846  80: 0.768  116: 0.718   | all phased at 5/10/30 nHz: 0.710 / 0.732 / 0.789
+   Mc_1e9_Msun  B machine random        filter ii : 0: 1.000  1: 0.997  2: 0.993  3: 0.988  4: 0.987  6: 0.980  10: 0.967  20: 0.930  40: 0.871  80: 0.780  116: 0.718   | all phased at 5/10/30 nHz: 0.710 / 0.732 / 0.789
+   Mc_1e9_Msun  B machine random        filter iii: 0: 0.954  1: 0.951  2: 0.948  3: 0.945  4: 0.943  6: 0.938  10: 0.928  20: 0.900  40: 0.852  80: 0.775  116: 0.718   | all phased at 5/10/30 nHz: 0.710 / 0.732 / 0.789
+   non_evolving A loc     nearest_first filter ii : 0: 1.000  1: 0.996  2: 0.991  3: 0.987  4: 0.983  6: 0.975  10: 0.959  20: 0.924  40: 0.862  80: 0.769  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving A loc     nearest_first filter iii: 0: 0.949  1: 0.946  2: 0.943  3: 0.940  4: 0.937  6: 0.931  10: 0.920  20: 0.892  40: 0.843  80: 0.763  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving A loc     random        filter ii : 0: 1.000  1: 0.996  2: 0.991  3: 0.987  4: 0.983  6: 0.975  10: 0.959  20: 0.924  40: 0.862  80: 0.769  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving A loc     random        filter iii: 0: 0.949  1: 0.946  2: 0.943  3: 0.940  4: 0.937  6: 0.931  10: 0.920  20: 0.892  40: 0.843  80: 0.763  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving A machine nearest_first filter ii : 0: 1.000  1: 0.996  2: 0.991  3: 0.987  4: 0.983  6: 0.975  10: 0.959  20: 0.924  40: 0.862  80: 0.769  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving A machine nearest_first filter iii: 0: 0.949  1: 0.946  2: 0.943  3: 0.940  4: 0.937  6: 0.931  10: 0.920  20: 0.892  40: 0.843  80: 0.763  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving A machine random        filter ii : 0: 1.000  1: 0.996  2: 0.991  3: 0.987  4: 0.983  6: 0.975  10: 0.959  20: 0.924  40: 0.862  80: 0.769  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving A machine random        filter iii: 0: 0.949  1: 0.946  2: 0.943  3: 0.940  4: 0.937  6: 0.931  10: 0.920  20: 0.892  40: 0.843  80: 0.763  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving B machine nearest_first filter ii : 0: 1.000  1: 0.996  2: 0.991  3: 0.987  4: 0.983  6: 0.975  10: 0.959  20: 0.924  40: 0.862  80: 0.769  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving B machine nearest_first filter iii: 0: 0.949  1: 0.946  2: 0.943  3: 0.940  4: 0.937  6: 0.931  10: 0.920  20: 0.892  40: 0.843  80: 0.763  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving B machine random        filter ii : 0: 1.000  1: 0.996  2: 0.991  3: 0.987  4: 0.983  6: 0.975  10: 0.959  20: 0.924  40: 0.862  80: 0.769  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+   non_evolving B machine random        filter iii: 0: 0.949  1: 0.946  2: 0.943  3: 0.940  4: 0.937  6: 0.931  10: 0.920  20: 0.892  40: 0.843  80: 0.763  116: 0.707   | all phased at 5/10/30 nHz: 0.707 / 0.707 / 0.707
+
+== binaries of natural sky 100 above the curve (machine timing, 116 pulsars, filter ii, nearest-first), of 18468 drawn sources; counts for Earth frequency 2-30 nHz (Job 51's band), then 2-100 nHz
+   n_phased | version A: SNR >= 10, SNR >= 3 | version B: SNR >= 10, SNR >= 3
+      0 |  2704,  6447 |    0,   11   (2-100 nHz: 2704, 6451 | 0, 15)
+      1 |  2720,  6467 |    0,   11   (2-100 nHz: 2720, 6471 | 0, 15)
+      2 |  2737,  6479 |    0,   11   (2-100 nHz: 2737, 6483 | 0, 15)
+      3 |  2747,  6497 |    0,   11   (2-100 nHz: 2747, 6501 | 0, 15)
+      4 |  2766,  6515 |    0,   11   (2-100 nHz: 2766, 6519 | 0, 15)
+      6 |  2786,  6544 |    0,   12   (2-100 nHz: 2786, 6548 | 0, 16)
+     10 |  2827,  6586 |    0,   12   (2-100 nHz: 2828, 6590 | 0, 16)
+     20 |  2906,  6703 |    0,   13   (2-100 nHz: 2907, 6708 | 0, 17)
+     40 |  3027,  6902 |    0,   13   (2-100 nHz: 3028, 6908 | 0, 17)
+     80 |  3273,  7303 |    0,   15   (2-100 nHz: 3274, 7313 | 1, 20)
+    116 |  3496,  7657 |    0,   17   (2-100 nHz: 3497, 7671 | 1, 23)
+   sources below 2 nHz with version-B SNR >= 3 at n_ph = 0 (not counted; below the band): 0
+   check against Job 51's own number on this sky: arr_bg >= 3 for 4 sources (120 pulsars, own power removed from the noise); here, version B, n_ph = 0, SNR >= 3: 11
+   per-source ratio (this script, rescaled to 120 pulsars) / (Job 51 arr_bg), candidates with arr_bg >= 1: 10/50/90% [0.992 0.997 1.001]
+   same for version A against Job 51's timing-only arr: min 1.0000, max 1.0000
+   binaries lying above the drawn version-B curve (SNR 3, none phased), 2-30 nHz: 9; of the 11 with SNR >= 3, above the drawn curve: 8
+   detectable binaries (B, SNR >= 3): frequency 3.7-26.9 nHz, strain 6.1e-16-8.1e-15
+wrote talk_data/sources_strain.csv: 3000 loudest by timing-residual amplitude h/(2 pi f); sky positions are ASSIGNED at random (the population draw has none)
+wrote job54_fig3_reach.png

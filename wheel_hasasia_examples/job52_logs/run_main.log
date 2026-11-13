@@ -1,0 +1,113 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+==========================================================================
+JOB 43B -- T1: DIAGNOSING THE COLLAPSE FAILURE AT A = 5.0e-15
+==========================================================================
+[load] 53 s
+  [main_c skies 100-100] 384 s
+[progress] 1/90 chunks, 437 s
+  [main_c skies 110-110] 419 s
+  [main_c skies 114-114] 448 s
+  [main_c skies 105-105] 450 s
+  [main_c skies 108-108] 458 s
+  [main_c skies 107-107] 477 s
+  [main_c skies 109-109] 496 s
+  [main_c skies 101-101] 500 s
+  [main_c skies 117-117] 526 s
+  [main_c skies 113-113] 560 s
+  [mainx_c skies 101-101] 564 s
+[progress] 11/90 chunks, 617 s
+  [main_c skies 119-119] 574 s
+  [main_c skies 106-106] 588 s
+  [main_c skies 104-104] 609 s
+  [main_c skies 112-112] 612 s
+  [main_c skies 115-115] 661 s
+  [mainx_c skies 100-100] 701 s
+  [main_c skies 111-111] 707 s
+  [main_c skies 102-102] 712 s
+  [main_c skies 118-118] 797 s
+  [main_c skies 116-116] 930 s
+[progress] 21/90 chunks, 983 s
+  [main_c skies 103-103] 1073 s
+  [mainx_c skies 106-106] 619 s
+  [mainx_c skies 105-105] 681 s
+  [mainx_c skies 114-114] 643 s
+  [mainx_c skies 109-109] 731 s
+  [mainx_c skies 104-104] 810 s
+  [mainx_c skies 113-113] 739 s
+  [mainx_c skies 110-110] 808 s
+  [main_h skies 108-111] 411 s
+  [mainx_c skies 111-111] 789 s
+[progress] 31/90 chunks, 1402 s
+  [main_h skies 100-103] 637 s
+  [main_h skies 104-107] 610 s
+  [mainx_c skies 107-107] 971 s
+  [mainx_c skies 119-119] 780 s
+  [mainx_c skies 112-112] 978 s
+  [mainx_c skies 108-108] 1069 s
+  [mainx_c skies 117-117] 913 s
+  [mainx_c skies 116-116] 980 s
+  [mainx_c skies 115-115] 1003 s
+  [mainx_c skies 102-102] 1229 s
+[progress] 41/90 chunks, 1666 s
+  [main_h skies 132-135] 470 s
+  [main_h skies 128-131] 551 s
+  [main_h skies 144-147] 442 s
+  [main_h skies 136-139] 481 s
+  [main_h skies 112-115] 723 s
+  [main_h skies 140-143] 472 s
+  [main_h skies 156-159] 402 s
+  [mainx_c skies 103-103] 1407 s
+  [main_h skies 116-119] 802 s
+  [main_h skies 148-151] 542 s
+[progress] 51/90 chunks, 1944 s
+  [main_h skies 168-171] 397 s
+  [main_h skies 160-163] 506 s
+  [main_h skies 188-191] 362 s
+  [mainx_c skies 118-118] 1398 s
+  [main_h skies 164-167] 622 s
+  [main_h skies 180-183] 550 s
+  [main_h skies 176-179] 612 s
+  [main_h skies 120-123] 1058 s
+  [main_h skies 184-187] 647 s
+  [main_h skies 124-127] 1030 s
+[progress] 61/90 chunks, 2313 s
+  [main_h skies 192-195] 552 s
+  [mainx_h skies 108-111] 631 s
+  [main_h skies 196-199] 666 s
+  [mainx_h skies 140-143] 482 s
+  [mainx_h skies 100-103] 742 s
+  [mainx_h skies 104-107] 765 s
+  [mainx_h skies 132-135] 654 s
+  [main_h skies 172-175] 1083 s
+  [mainx_h skies 136-139] 724 s
+  [mainx_h skies 128-131] 794 s
+[progress] 71/90 chunks, 2738 s
+  [mainx_h skies 148-151] 602 s
+  [mainx_h skies 156-159] 542 s
+  [mainx_h skies 168-171] 468 s
+  [mainx_h skies 116-119] 931 s
+  [mainx_h skies 144-147] 674 s
+  [mainx_h skies 160-163] 593 s
+  [mainx_h skies 112-115] 985 s
+  [main_h skies 152-155] 1469 s
+  [mainx_h skies 188-191] 348 s
+  [mainx_h skies 176-179] 474 s
+[progress] 81/90 chunks, 2954 s
+  [mainx_h skies 124-127] 1036 s
+  [mainx_h skies 164-167] 677 s
+  [mainx_h skies 180-183] 493 s
+  [mainx_h skies 120-123] 1139 s
+  [mainx_h skies 184-187] 543 s
+  [mainx_h skies 196-199] 406 s
+  [mainx_h skies 192-195] 461 s
+  [mainx_h skies 172-175] 808 s
+  [mainx_h skies 152-155] 1032 s
+[main_c] records 1580 skies 20
+[mainx_c] records 1580 skies 20
+[main_h] records 7900 skies 100
+[mainx_h] records 7900 skies 100
+TOTAL 3229 s

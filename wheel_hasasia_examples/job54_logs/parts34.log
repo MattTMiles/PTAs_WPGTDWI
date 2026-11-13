@@ -1,0 +1,43 @@
+================ Part 3: the per-bin model fed the real shares (natural skies, N = 12 known sets) ================
+   6000 (pulsar, known set) pairs drawn from 15800; known sources sharing a bin with another known source: 3.83 of 12 per pulsar
+   prior | sky result, all pulsars | sky result, same 6000 | per-bin model, real shares | difference | per-bin model with shared bins | difference
+    census | 0.046 | 0.042 | 0.040 +- 0.003 | -0.002 | 0.040 | -0.002
+       0.1 | 0.999 | 1.000 | 0.990 +- 0.001 | -0.010 | 0.991 | -0.008
+       0.3 | 0.963 | 0.963 | 0.784 +- 0.005 | -0.179 | 0.815 | -0.148
+         1 | 0.723 | 0.728 | 0.505 +- 0.006 | -0.223 | 0.527 | -0.201
+         3 | 0.388 | 0.388 | 0.292 +- 0.006 | -0.096 | 0.294 | -0.094
+        10 | 0.173 | 0.173 | 0.144 +- 0.005 | -0.029 | 0.133 | -0.041
+        30 | 0.077 | 0.080 | 0.069 +- 0.003 | -0.011 | 0.073 | -0.007
+       100 | 0.032 | 0.031 | 0.025 +- 0.002 | -0.005 | 0.029 | -0.002
+       300 | 0.013 | 0.014 | 0.012 +- 0.001 | -0.002 | 0.009 | -0.005
+
+================ Part 4.1: frequency only / amplitude only (others retarded as in the reference) ================
+   N=7: all pulsars: off 0.044 [0.040, 0.048]; ot 0.046 [0.042, 0.050]; fo 0.037 [0.034, 0.040]; ao 0.027 [0.024, 0.030]; ref 0.028 [0.025, 0.030]
+          K>=60:       off 0.020; ot 0.023; fo 0.014; ao 0.009; ref 0.008
+          loss (others-retarded baseline 'ot' -> on) 0.0180: frequency only accounts for 0.48, amplitude only 1.03; against 'off' (0.0160): 0.41, 1.04
+   N=12: all pulsars: off 0.071 [0.066, 0.077]; ot 0.078 [0.072, 0.085]; fo 0.057 [0.054, 0.062]; ao 0.044 [0.041, 0.048]; ref 0.041 [0.037, 0.044]
+          K>=60:       off 0.040; ot 0.049; fo 0.026; ao 0.019; ref 0.014
+          loss (others-retarded baseline 'ot' -> on) 0.0380: frequency only accounts for 0.55, amplitude only 0.90; against 'off' (0.0304): 0.44, 0.87
+   N=all: all pulsars: off 0.389 [0.375, 0.404]; ot 0.398 [0.384, 0.413]; fo 0.321 [0.309, 0.333]; ao 0.267 [0.258, 0.277]; ref 0.238 [0.229, 0.247]
+          K>=60:       off 0.339; ot 0.348; fo 0.264; ao 0.209; ref 0.180
+          loss (others-retarded baseline 'ot' -> on) 0.1608: frequency only accounts for 0.48, amplitude only 0.82; against 'off' (0.1515): 0.45, 0.80
+   N = 12 pairs: retarded / unretarded pulsar-term power (amplitude factor^2) 10/50/90%: [0.149 0.573 0.94 ]; bins moved 10/50/90%: [0.27 2.73 9.21]
+
+================ Part 4.2: Earth terms against pulsar terms in what a known pulsar term competes with (N = 12) ================
+   [retardation on (reference)] all           (189600 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.424 0.473 0.502]; Earth terms (discrete + half the sea) [0.495 0.523 0.57 ]; timing [0.    0.002 0.012]; of which sea halves: median 0.072 each
+   [retardation on (reference)] below 5 nHz   ( 49465 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.451 0.487 0.504]; Earth terms (discrete + half the sea) [0.496 0.513 0.548]; timing [0. 0. 0.]; of which sea halves: median 0.120 each
+   [retardation on (reference)] 5-10 nHz      (111121 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.426 0.469 0.499]; Earth terms (discrete + half the sea) [0.499 0.528 0.571]; timing [0.001 0.002 0.006]; of which sea halves: median 0.068 each
+   [retardation on (reference)] 10-20 nHz     ( 29010 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.386 0.457 0.508]; Earth terms (discrete + half the sea) [0.472 0.525 0.59 ]; timing [0.009 0.015 0.038]; of which sea halves: median 0.041 each
+   [retardation on (reference)] above 20 nHz  (     4 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.307 0.404 0.572]; Earth terms (discrete + half the sea) [0.302 0.479 0.554]; timing [0.116 0.124 0.144]; of which sea halves: median 0.011 each
+   [retardation off] all           (189600 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.481 0.496 0.5  ]; Earth terms (discrete + half the sea) [0.481 0.496 0.5  ]; timing [0.    0.007 0.037]; of which sea halves: median 0.048 each
+   [retardation off] below 5 nHz   ( 17064 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.5 0.5 0.5]; Earth terms (discrete + half the sea) [0.5 0.5 0.5]; timing [0. 0. 0.]; of which sea halves: median 0.114 each
+   [retardation off] 5-10 nHz      ( 82397 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.496 0.499 0.5  ]; Earth terms (discrete + half the sea) [0.496 0.499 0.5  ]; timing [0.001 0.003 0.007]; of which sea halves: median 0.059 each
+   [retardation off] 10-20 nHz     ( 89665 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.471 0.491 0.495]; Earth terms (discrete + half the sea) [0.471 0.491 0.495]; timing [0.009 0.019 0.057]; of which sea halves: median 0.035 each
+   [retardation off] above 20 nHz  (   474 pairs): pulsar terms (discrete + half the sea) 10/50/90% [0.402 0.429 0.44 ]; Earth terms (discrete + half the sea) [0.402 0.429 0.44 ]; timing [0.121 0.143 0.196]; of which sea halves: median 0.011 each
+
+================ Part 4.3: is the destination bin louder because of the migration? ================
+   per bin, pulsar-term power of all discrete sources, on / off, median over pulsars: 0.7:1.01 1.4:1.02 2.1:0.99 2.8:1.02 3.5:0.95 4.2:0.90 4.9:0.95 5.6:0.90 6.3:0.83 7.0:0.86 7.7:0.83 8.5:0.76 9.2:0.80 9.9:0.73 10.6:0.69 11.3:0.70 12.0:0.69 12.7:0.65 13.4:0.64 14.1:0.60 14.8:0.57 15.5:0.60 16.2:0.56 16.9:0.54 17.6:0.54 18.3:0.54 19.0:0.49 19.7:0.52 20.4:0.49 21.1:0.44 21.8:0.45 22.5:0.44 23.2:0.42 23.9:0.42 24.6:0.45 25.4:0.39 26.1:0.36 26.8:0.38 27.5:0.34 28.2:0.35 28.9:0.33 29.6:0.32 30.3:0.31 31.0:0.29 31.7:0.26 32.4:0.25 33.1:0.25
+   below 5 nHz   (7 bins): pulsar-term power on/off: median over pulsars 0.971 (10-90% 0.905-1.001); per-bin medians 0.90-1.02; count of candidate pulsar terms on/off: 1.015 (mean count per pulsar on 1256, off 1236); all gravitational-wave power on/off 0.991
+   5-10 nHz      (7 bins): pulsar-term power on/off: median over pulsars 0.817 (10-90% 0.625-0.948); per-bin medians 0.73-0.90; count of candidate pulsar terms on/off: 0.750 (mean count per pulsar on 42, off 58); all gravitational-wave power on/off 0.917
+   10-20 nHz     (14 bins): pulsar-term power on/off: median over pulsars 0.609 (10-90% 0.390-0.811); per-bin medians 0.49-0.70; count of candidate pulsar terms on/off: 0.250 (mean count per pulsar on 2, off 6); all gravitational-wave power on/off 0.812
+   above 20 nHz  (19 bins): pulsar-term power on/off: median over pulsars 0.364 (10-90% 0.159-0.640); per-bin medians 0.25-0.49; count of candidate pulsar terms on/off: 0.000 (mean count per pulsar on 0, off 0); all gravitational-wave power on/off 0.689

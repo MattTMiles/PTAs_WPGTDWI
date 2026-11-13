@@ -1,0 +1,30 @@
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/fromnumeric.py:3824: RuntimeWarning: Mean of empty slice
+  return _methods._mean(a, axis=axis, dtype=dtype,
+/home/mattm/miniforge3/envs/discotech/lib/python3.12/site-packages/numpy/_core/_methods.py:142: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+[rows] comb sets: 50/50 populations; sizes min 7, max 12; with >= 12: 38
+  N_s =  2, beta = 0.95: 0.9 crossing at sigma_d = 0.93 pc; 0.5 crossing 5.80 pc; fraction at 0.1 pc 0.997, at 300 pc 0.012  (4 s)
+  N_s =  2, beta = 0.80: 0.9 crossing at sigma_d = 0.41 pc; 0.5 crossing 2.94 pc; fraction at 0.1 pc 0.997, at 300 pc 0.014  (8 s)
+  N_s =  2, beta = 0.50: 0.9 crossing at sigma_d = 0.18 pc; 0.5 crossing 1.01 pc; fraction at 0.1 pc 0.989, at 300 pc 0.003  (12 s)
+  N_s =  2, beta = 0.30: 0.9 crossing at sigma_d = 0.15 pc; 0.5 crossing 0.63 pc; fraction at 0.1 pc 0.988, at 300 pc 0.006  (15 s)
+  N_s =  2, beta = 0.20: 0.9 crossing at sigma_d = 0.14 pc; 0.5 crossing 0.53 pc; fraction at 0.1 pc 0.986, at 300 pc 0.001  (18 s)
+  N_s =  2, beta = 0.10: 0.9 crossing at sigma_d = 0.15 pc; 0.5 crossing 0.46 pc; fraction at 0.1 pc 0.988, at 300 pc 0.002  (22 s)
+  N_s =  4, beta = 0.95: 0.9 crossing at sigma_d = 23.94 pc; 0.5 crossing 275.04 pc; fraction at 0.1 pc 1.000, at 300 pc 0.478  (28 s)
+  N_s =  4, beta = 0.80: 0.9 crossing at sigma_d = 2.64 pc; 0.5 crossing 34.21 pc; fraction at 0.1 pc 1.000, at 300 pc 0.117  (35 s)
+  N_s =  4, beta = 0.50: 0.9 crossing at sigma_d = 0.34 pc; 0.5 crossing 3.49 pc; fraction at 0.1 pc 0.988, at 300 pc 0.021  (40 s)
+  N_s =  4, beta = 0.30: 0.9 crossing at sigma_d = 0.17 pc; 0.5 crossing 1.26 pc; fraction at 0.1 pc 0.980, at 300 pc 0.013  (46 s)
+  N_s =  4, beta = 0.20: 0.9 crossing at sigma_d = 0.16 pc; 0.5 crossing 0.84 pc; fraction at 0.1 pc 0.980, at 300 pc 0.003  (53 s)
+  N_s =  4, beta = 0.10: 0.9 crossing at sigma_d = 0.15 pc; 0.5 crossing 0.53 pc; fraction at 0.1 pc 0.975, at 300 pc 0.003  (60 s)
+  N_s =  8, beta = 0.95: 0.9 crossing at sigma_d = nan pc; 0.5 crossing nan pc; fraction at 0.1 pc 1.000, at 300 pc 0.998  (72 s)
+  N_s =  8, beta = 0.80: 0.9 crossing at sigma_d = 254.80 pc; 0.5 crossing nan pc; fraction at 0.1 pc 1.000, at 300 pc 0.865  (85 s)
+  N_s =  8, beta = 0.50: 0.9 crossing at sigma_d = 1.64 pc; 0.5 crossing 40.74 pc; fraction at 0.1 pc 0.999, at 300 pc 0.206  (99 s)
+  N_s =  8, beta = 0.30: 0.9 crossing at sigma_d = 0.32 pc; 0.5 crossing 3.92 pc; fraction at 0.1 pc 0.993, at 300 pc 0.047  (112 s)
+  N_s =  8, beta = 0.20: 0.9 crossing at sigma_d = 0.21 pc; 0.5 crossing 1.72 pc; fraction at 0.1 pc 0.989, at 300 pc 0.020  (124 s)
+  N_s =  8, beta = 0.10: 0.9 crossing at sigma_d = 0.15 pc; 0.5 crossing 0.71 pc; fraction at 0.1 pc 0.969, at 300 pc 0.006  (137 s)
+  N_s = 12, beta = 0.95: 0.9 crossing at sigma_d = nan pc; 0.5 crossing nan pc; fraction at 0.1 pc 1.000, at 300 pc 1.000  (154 s)
+  N_s = 12, beta = 0.80: 0.9 crossing at sigma_d = nan pc; 0.5 crossing nan pc; fraction at 0.1 pc 1.000, at 300 pc 0.997  (174 s)
+  N_s = 12, beta = 0.50: 0.9 crossing at sigma_d = 11.01 pc; 0.5 crossing nan pc; fraction at 0.1 pc 1.000, at 300 pc 0.556  (193 s)
+  N_s = 12, beta = 0.30: 0.9 crossing at sigma_d = 0.68 pc; 0.5 crossing 13.90 pc; fraction at 0.1 pc 0.999, at 300 pc 0.141  (208 s)
+  N_s = 12, beta = 0.20: 0.9 crossing at sigma_d = 0.28 pc; 0.5 crossing 3.57 pc; fraction at 0.1 pc 0.989, at 300 pc 0.051  (223 s)
+  N_s = 12, beta = 0.10: 0.9 crossing at sigma_d = 0.17 pc; 0.5 crossing 1.08 pc; fraction at 0.1 pc 0.986, at 300 pc 0.011  (243 s)
+TOTAL 243 s

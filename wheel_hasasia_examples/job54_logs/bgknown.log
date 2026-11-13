@@ -1,0 +1,16 @@
+natural skies 100-139: 3160 pulsars (enlarged pool), 3160 (Job 53 pool)
+   Job 53 pool (single-pulsar SNR >= 3, 1,300 loudest by it): candidates 1300; detectable per sky arr_bg >= 3: 4.62; arr_bg_opt >= 3: 10.10; Earth frequency of the 12 top-ranked 10/50/90%: [ 5.3  9.8 14.3] nHz; above 15 nHz: 0.9 of 12
+   enlarged pool (+ 300 loudest against the background): candidates 1495; detectable per sky arr_bg >= 3: 12.60; arr_bg_opt >= 3: 30.50; Earth frequency of the 12 top-ranked 10/50/90%: [10.1 17.7 26.4] nHz; above 15 nHz: 7.8 of 12
+   fraction right, all pulsars / K >= 60 (booked list)      Job 53 pool            | enlarged pool
+   ref N= 7: 0.026 [0.020, 0.033] / 0.006 [0.003, 0.009]   |   0.028 [0.022, 0.033] / 0.010 [0.007, 0.013]
+   ref N=12: 0.045 [0.038, 0.052] / 0.020 [0.016, 0.024]   |   0.041 [0.034, 0.048] / 0.016 [0.012, 0.020]
+   ref N=30: 0.078 [0.067, 0.090] / 0.044 [0.037, 0.053]   |   0.103 [0.088, 0.117] / 0.059 [0.047, 0.072]
+     A N= 7: 0.043 [0.035, 0.052] / 0.017 [0.012, 0.022]   |   0.047 [0.038, 0.055] / 0.021 [0.014, 0.028]
+     A N=12: 0.079 [0.066, 0.093] / 0.044 [0.035, 0.054]   |   0.082 [0.067, 0.098] / 0.041 [0.029, 0.057]
+     A N=30: 0.155 [0.134, 0.176] / 0.107 [0.090, 0.124]   |   0.237 [0.210, 0.262] / 0.183 [0.158, 0.209]
+   off N= 7: 0.045 [0.035, 0.055] / 0.020 [0.013, 0.029]   |   0.065 [0.052, 0.079] / 0.037 [0.028, 0.047]
+   off N=12: 0.073 [0.060, 0.087] / 0.041 [0.030, 0.052]   |   0.137 [0.115, 0.161] / 0.095 [0.077, 0.116]
+   off N=30:    -      |   0.366 [0.332, 0.400] / 0.318 [0.287, 0.352]
+   beta_unmod of N = 12 pairs 10/50/90%: Job 53 pool [0.009  0.0574 0.1818]; enlarged pool [0.0051 0.0591 0.2324]
+   K of the N = 12 known set, median: finest tooth 2247 -> 3269; coarsest tooth 240.0 -> 368.7
+   pairs whose source has Earth frequency above 15 nHz: 0.648; their beta_unmod 10/50/90% [0.0043 0.0515 0.2302]; bins moved median 12.3; pulsar-term frequency median 12.1 nHz
